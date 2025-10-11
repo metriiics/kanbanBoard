@@ -24,7 +24,7 @@ export default function AuthProvider({ children }) {
       const token = localStorage.getItem('token');
       if (token) {
         // Для FastAPI используется проверка токена через /users/me
-        const response = await fetch('http://localhost:8000/users/me', {
+        const response = await fetch('http://localhost:8000/api/users/me', {
           headers: {
             'Authorization': `Bearer ${token}`
           }

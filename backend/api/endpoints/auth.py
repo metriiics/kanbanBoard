@@ -20,7 +20,7 @@ def create_user_endpoint(user: UserCreate):
     return UserRead.model_validate(new_user)
 
 @router.post("/api/auth/login") # Вход пользователя и получение JWT токена
-def login(user: UserLogin, db: Session = Depends(get_db)):
+def login(user: UserLogin):
     db_user = OrmQuery.get_user_by_email(email=user.email)
     if not db_user or not verify_password(user.password, db_user.password): # Проверка email и пароля
         raise HTTPException(status_code=400, detail="Invalid credentials")
