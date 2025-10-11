@@ -4,44 +4,35 @@ import { useAuth } from '../contexts/AuthContext';
 
 export default function Registration() {
   const [formData, setFormData] = useState({
+    first_name: '',
+    last_name: '',
     username: '',
     email: '',
     password: '',
-    confirmPassword: ''
   });
-  
+
   const { register, user, loading, error, setError } = useAuth();
   const navigate = useNavigate();
 
   useEffect(() => {
-    if (user) {
-      navigate('/');
-    }
+    if (user) navigate('/');
   }, [user, navigate]);
 
-  useEffect(() => {
-    return () => setError('');
-  }, [setError]);
+  useEffect(() => () => setError(''), [setError]);
 
   function handleChange(e) {
-    setFormData({
-      ...formData,
+    setFormData(prev => ({
+      ...prev,
       [e.target.id]: e.target.value
-    });
+    }));
   }
 
-  function handleSubmit(e) {
+  async function handleSubmit(e) {
     e.preventDefault();
-    
-    const { username, email, password, confirmPassword } = formData;
+    const { first_name, last_name, username, email, password } = formData;
 
-    if (!username || !email || !password || !confirmPassword) {
+    if (!first_name || !last_name || !username || !email || !password) {
       setError('Все поля обязательны для заполнения');
-      return;
-    }
-
-    if (password !== confirmPassword) {
-      setError('Пароли не совпадают');
       return;
     }
 
@@ -50,78 +41,79 @@ export default function Registration() {
       return;
     }
 
-    register(username, email, password).then(result => {
-      if (result.success) {
-        navigate('/');
-      }
-    });
+    const result = await register(first_name, last_name, username, email, password);
+    if (result.success) navigate('/');
   }
 
   return (
     <div className="registration-container">
       <div className="registration-form">
         <h2>Регистрация</h2>
-        
-        {error && (
-          <div className="error-message">
-            {error}
-          </div>
-        )}
+
+        {error && <div className="error-message">{error}</div>}
 
         <form onSubmit={handleSubmit}>
           <div className="form-group">
+            <label htmlFor="first_name">Имя:</label>
+            <input
+              type="text"
+              id="first_name"
+              value={formData.first_name}
+              onChange={handleChange}
+              placeholder="Введите имя"
+              disabled={loading}
+            />
+          </div>
+
+          <div className="form-group">
+            <label htmlFor="last_name">Фамилия:</label>
+            <input
+              type="text"
+              id="last_name"
+              value={formData.last_name}
+              onChange={handleChange}
+              placeholder="Введите фамилию"
+              disabled={loading}
+            />
+          </div>
+
+          <div className="form-group">
             <label htmlFor="username">Имя пользователя:</label>
-            <input 
-              type="text" 
+            <input
+              type="text"
               id="username"
               value={formData.username}
               onChange={handleChange}
-              placeholder="Введите имя пользователя" 
+              placeholder="Введите имя пользователя"
               disabled={loading}
             />
           </div>
 
           <div className="form-group">
             <label htmlFor="email">Email:</label>
-            <input 
-              type="email" 
+            <input
+              type="email"
               id="email"
               value={formData.email}
               onChange={handleChange}
-              placeholder="Введите ваш email" 
+              placeholder="Введите ваш email"
               disabled={loading}
             />
           </div>
 
           <div className="form-group">
             <label htmlFor="password">Пароль:</label>
-            <input 
-              type="password" 
+            <input
+              type="password"
               id="password"
               value={formData.password}
               onChange={handleChange}
-              placeholder="Введите пароль" 
+              placeholder="Введите пароль"
               disabled={loading}
             />
           </div>
 
-          <div className="form-group">
-            <label htmlFor="confirmPassword">Подтвердите пароль:</label>
-            <input 
-              type="password" 
-              id="confirmPassword"
-              value={formData.confirmPassword}
-              onChange={handleChange}
-              placeholder="Подтвердите пароль" 
-              disabled={loading}
-            />
-          </div>
-
-          <button 
-            type="submit" 
-            className="register-btn"
-            disabled={loading}
-          >
+          <button type="submit" className="register-btn" disabled={loading}>
             {loading ? 'Регистрация...' : 'Зарегистрироваться'}
           </button>
         </form>

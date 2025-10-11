@@ -1,130 +1,123 @@
-from sqlalchemy import Integer, String, Boolean, ForeignKey
+from sqlalchemy import Integer, String, Boolean, ForeignKey, Column, DateTime, Text, Table
 from sqlalchemy.orm import relationship, Mapped, mapped_column
-from typing import Optional
+from typing import Optional, List
+from datetime import datetime
 
-
-from app.db.database import Base
+from db.database import Base
 
 class User(Base):
     __tablename__ = 'users'
     
-    id = Column(Integer, primary_key=True)
-    first_name = Column(String)
-    task_name = Column(String)
-    username = Column(String)
-    email = Column(String)
-    password = Column(String)
-    created_at = Column(DateTime, default=datetime.utcnow)
+    id: Mapped[int] = mapped_column(primary_key=True)
+    first_name: Mapped[Optional[str]] = mapped_column(String, nullable=True)
+    last_name: Mapped[Optional[str]] = mapped_column(String, nullable=True)
+    username: Mapped[Optional[str]] = mapped_column(String, nullable=True)
+    email: Mapped[Optional[str]] = mapped_column(String, nullable=True)
+    password: Mapped[Optional[str]] = mapped_column(String, nullable=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
     
-    # Связи
-    workspaces = relationship("Workspace", secondary=user_workspaces, back_populates="users")
-    comments = relationship("Comment", back_populates="user")
-    assigned_tasks = relationship("Task", foreign_keys="Task.assigned_to", back_populates="assignee")
+    workspaces: Mapped[List["Workspace"]] = relationship("Workspace", secondary="user_workspaces", back_populates="users")
+    comments: Mapped[List["Comment"]] = relationship(back_populates="user")
+    assigned_tasks: Mapped[List["Task"]] = relationship(foreign_keys="Task.assigned_to", back_populates="assignee")
 
 class Workspace(Base):
     __tablename__ = 'workspaces'
     
-    id = Column(Integer, primary_key=True)
-    name = Column(String)
-    description = Column(Text)
-    created_at = Column(DateTime, default=datetime.utcnow)
+    id: Mapped[int] = mapped_column(primary_key=True)
+    name: Mapped[Optional[str]] = mapped_column(String, nullable=True)
+    description: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
     
-    # Связи
-    users = relationship("User", secondary=user_workspaces, back_populates="workspaces")
-    projects = relationship("Project", back_populates="workspace")
-    labels = relationship("Label", back_populates="workspace")
+    users: Mapped[List["User"]] = relationship("User", secondary="user_workspaces", back_populates="workspaces")
+    projects: Mapped[List["Project"]] = relationship(back_populates="workspace")
+    labels: Mapped[List["Label"]] = relationship(back_populates="workspace")
 
 class Project(Base):
     __tablename__ = 'projects'
     
-    id = Column(Integer, primary_key=True)
-    title = Column(String)
-    workspaces_id = Column(Integer, ForeignKey('workspaces.id'))
-    created_at = Column(DateTime, default=datetime.utcnow)
+    id: Mapped[int] = mapped_column(primary_key=True)
+    title: Mapped[Optional[str]] = mapped_column(String, nullable=True)
+    workspaces_id: Mapped[int] = mapped_column(ForeignKey("workspaces.id"))
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
     
-    # Связи
-    workspace = relationship("Workspace", back_populates="projects")
-    boards = relationship("Board", back_populates="project")
+    workspace: Mapped["Workspace"] = relationship(back_populates="projects")
+    boards: Mapped[List["Board"]] = relationship(back_populates="project")
 
 class Board(Base):
     __tablename__ = 'boards'
     
-    id = Column(Integer, primary_key=True)
-    title = Column(String)
-    projects_id = Column(Integer, ForeignKey('projects.id'))
-    created_at = Column(DateTime, default=datetime.utcnow)
+    id: Mapped[int] = mapped_column(primary_key=True)
+    title: Mapped[Optional[str]] = mapped_column(String, nullable=True)
+    projects_id: Mapped[int] = mapped_column(ForeignKey("projects.id"))
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
     
-    # Связи
-    project = relationship("Project", back_populates="boards")
-    columns = relationship("Column", back_populates="board")
+    project: Mapped["Project"] = relationship(back_populates="boards")
+    columns: Mapped[List["Column"]] = relationship(back_populates="board")
 
 class Column(Base):
     __tablename__ = 'columns'
     
-    id = Column(Integer, primary_key=True)
-    title = Column(String)
-    position = Column(Integer)
-    board_id = Column(Integer, ForeignKey('boards.id'))
+    id: Mapped[int] = mapped_column(primary_key=True)
+    title: Mapped[Optional[str]] = mapped_column(String, nullable=True)
+    position: Mapped[Optional[int]] = mapped_column(Integer, nullable=True)
+    board_id: Mapped[int] = mapped_column(ForeignKey("boards.id"))
     
-    # Связи
-    board = relationship("Board", back_populates="columns")
-    tasks = relationship("Task", back_populates="column")
+    board: Mapped["Board"] = relationship(back_populates="columns")
+    tasks: Mapped[List["Task"]] = relationship(back_populates="column")
 
 class Task(Base):
     __tablename__ = 'tasks'
     
-    id = Column(Integer, primary_key=True)
-    title = Column(String)
-    description = Column(Text)
-    common_id = Column(Integer)  # Непонятное поле, возможно нужно уточнение
-    assigned_to = Column(Integer, ForeignKey('USCTS.id'))
-    priority = Column(String)
-    created_at = Column(DateTime, default=datetime.utcnow)
-    due_date = Column(DateTime)
-    column_id = Column(Integer, ForeignKey('columns.id'))
+    id: Mapped[int] = mapped_column(primary_key=True)
+    title: Mapped[Optional[str]] = mapped_column(String, nullable=True)
+    description: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
+    common_id: Mapped[Optional[int]] = mapped_column(Integer, nullable=True)
+    assigned_to: Mapped[Optional[int]] = mapped_column(ForeignKey("users.id"), nullable=True)
+    priority: Mapped[Optional[str]] = mapped_column(String, nullable=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+    due_date: Mapped[Optional[datetime]] = mapped_column(DateTime, nullable=True)
+    column_id: Mapped[int] = mapped_column(ForeignKey("columns.id"))
     
-    # Связи
-    assignee = relationship("User", foreign_keys=[assigned_to], back_populates="assigned_tasks")
-    column = relationship("Column", back_populates="tasks")
-    comments = relationship("Comment", back_populates="task")
-    labels = relationship("Label", secondary=task_labels, back_populates="tasks")
+    assignee: Mapped["User"] = relationship(foreign_keys=[assigned_to], back_populates="assigned_tasks")
+    column: Mapped["Column"] = relationship(back_populates="tasks")
+    comments: Mapped[List["Comment"]] = relationship(back_populates="task")
+    labels: Mapped[List["Label"]] = relationship("Label", secondary="task_labels", back_populates="tasks")
+
+
 
 class TaskLabel(Base):
     __tablename__ = 'task_labels'
     
-    id = Column(Integer, primary_key=True)
-    task_id = Column(Integer, ForeignKey('tasks.id'))
-    label_id = Column(Integer, ForeignKey('labels.id'))
+    id: Mapped[int] = mapped_column(primary_key=True)
+    task_id: Mapped[int] = mapped_column(ForeignKey("tasks.id"))
+    label_id: Mapped[int] = mapped_column(ForeignKey("labels.id"))
 
 class UserWorkspace(Base):
     __tablename__ = 'user_workspaces'
-    
-    id = Column(Integer, primary_key=True)
-    user_id = Column(Integer, ForeignKey('USCTS.id'))
-    workspaces_id = Column(Integer, ForeignKey('workspaces.id'))
-    test_id = Column(Integer)
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+    user_id: Mapped[int] = mapped_column(ForeignKey("users.id"))
+    workspace_id: Mapped[int] = mapped_column(ForeignKey("workspaces.id"))
 
 class Comment(Base):
     __tablename__ = 'comments'
     
-    id = Column(Integer, primary_key=True)
-    task_id = Column(Integer, ForeignKey('tasks.id'))
-    user_id = Column(Integer, ForeignKey('USCTS.id'))
-    content = Column(Text)
-    created_at = Column(DateTime, default=datetime.utcnow)
+    id: Mapped[int] = mapped_column(primary_key=True)
+    task_id: Mapped[int] = mapped_column(ForeignKey("tasks.id"))
+    user_id: Mapped[int] = mapped_column(ForeignKey("users.id"))
+    content: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
     
-    # Связи
-    task = relationship("Task", back_populates="comments")
-    user = relationship("User", back_populates="comments")
+    task: Mapped["Task"] = relationship(back_populates="comments")
+    user: Mapped["User"] = relationship(back_populates="comments")
 
 class Label(Base):
     __tablename__ = 'labels'
     
-    id = Column(Integer, primary_key=True)
-    name = Column(String)
-    color = Column(String)
-    workspace_id = Column(Integer, ForeignKey('workspaces.id'))
+    id: Mapped[int] = mapped_column(primary_key=True)
+    name: Mapped[Optional[str]] = mapped_column(String, nullable=True)
+    color: Mapped[Optional[str]] = mapped_column(String, nullable=True)
+    workspace_id: Mapped[int] = mapped_column(ForeignKey("workspaces.id"))
     
-    # Связи
-    workspace = relationship("Workspace", back_populates="labels")
-    tasks = relationship("Task", secondary=task_labels, back_populates="labels")
+    workspace: Mapped["Workspace"] = relationship(back_populates="labels")
+    tasks: Mapped[List["Task"]] = relationship("Task", secondary="task_labels", back_populates="labels")

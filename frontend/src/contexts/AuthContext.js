@@ -24,7 +24,7 @@ export default function AuthProvider({ children }) {
       const token = localStorage.getItem('token');
       if (token) {
         // Для FastAPI используется проверка токена через /users/me
-        const response = await fetch('/api/users/me', {
+        const response = await fetch('http://localhost:8000/users/me', {
           headers: {
             'Authorization': `Bearer ${token}`
           }
@@ -51,7 +51,7 @@ export default function AuthProvider({ children }) {
       setLoading(true);
 
       // fastapi эндпоинт для логина
-      const response = await fetch('/api/auth/login', {
+      const response = await fetch('http://localhost:8000/api/auth/login', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -78,34 +78,27 @@ export default function AuthProvider({ children }) {
     }
   };
 
-  const register = async (username, email, password) => {
+  const register = async (first_name, last_name, username, email, password) => {
     try {
       setError('');
       setLoading(true);
-
-      // fastapi эндпоинт для регистрации
-      const response = await fetch('/api/auth/register', {
+      const response = await fetch('http://localhost:8000/api/auth/register', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ username, email, password }),
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ first_name, last_name, username, email, password }),
       });
-
       const data = await response.json();
-
       if (response.ok) {
-        // После регистрации сразу логиним пользователя
         localStorage.setItem('token', data.access_token);
         setUser(data.user);
         return { success: true };
       } else {
         setError(data.detail || 'Ошибка регистрации');
-        return { success: false, error: data.detail };
+        return { success: false };
       }
-    } catch (error) {
+    } catch {
       setError('Ошибка сети');
-      return { success: false, error: 'Ошибка сети' };
+      return { success: false };
     } finally {
       setLoading(false);
     }

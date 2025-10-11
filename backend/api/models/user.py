@@ -8,6 +8,10 @@ class UserBase(BaseModel): # Базовая схема пользователя
     username: str
 
 class UserCreate(UserBase): # Схема для создания пользователя
+    email: EmailStr
+    first_name: str
+    last_name: str
+    username: str
     password: str
 
 class UserRead(UserBase): # Схема для чтения информации о пользователе
