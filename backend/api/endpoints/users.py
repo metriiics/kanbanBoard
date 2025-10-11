@@ -1,32 +1,25 @@
-from typing import Annotated
-from fastapi import APIRouter, Depends, HTTPException
-from fastapi.security import OAuth2PasswordRequestForm
-
-from app.api.models.user import UserCreate, UserResponse
-from app.core.security import get_password_hash, create_access_token, get_user_by_token, verify_password
-from app.db.database import session_factory
-from app.db.dbstruct import UserOrm
-from app.db.OrmQuery import OrmQuery
+from fastapi import APIRouter, HTTPException, Depends
+from sqlalchemy.orm import Session
+from app.db.database import get_db
+from app.schemas.user import UserRead
+from app.crud.user import get_user_by_id
+from app.models.user import User 
+from app.core.security import get_current_user
 
 router = APIRouter()
+    
+@router.get("/users/me") # Получение информации о текущем пользователе (защищенная ручка для проверки токена) - работает
+def read_users_me(current_user: User = Depends(get_current_user)):
+    return {
+        "id": current_user.id,
+        "email": current_user.email
+    }  
 
-@router.post("/register/")
-def create_user(user: UserCreate): 
-    OrmQuery.insert_data(
-        username=user.username, 
-        email=user.email,
-        hashed_password=get_password_hash(user.password)
-    )
-    return {"message": "The user has been successfully registered!"}
+@router.get("/users/{user_id}", response_model=UserRead) # Получение информации о пользователе по ID
+def get_user_endpoint(user_id: int, db: Session = Depends(get_db)):
+    db_user = get_user_by_id(db, user_id=user_id)
+    if db_user is None:
+        raise HTTPException(status_code=404, detail="User not found")
+    return UserRead.model_validate(db_user)
 
-@router.post("/login/")
-def login(form_data: Annotated[OAuth2PasswordRequestForm, Depends()]):
-    user = OrmQuery.select_users(form_data.username)
-    if not user or not verify_password(form_data.password, user[0].hashed_password): 
-        raise HTTPException(
-            status_code=401, 
-            detail="Invalid credentials", 
-            headers={"WWW-Authenticate": "Bearer"}
-        )
-    jwt_token = create_access_token({"sub": form_data.username})
-    return {"access_token": jwt_token, "token_type": "bearer"}
+   

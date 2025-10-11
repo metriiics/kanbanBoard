@@ -1,11 +1,19 @@
 from pydantic import BaseModel, EmailStr
 
-class UserCreate(BaseModel):
+class UserBase(BaseModel): # Базовая схема пользователя
+    id: int
+    email: EmailStr
+    first_name: str
+    last_name: str
     username: str
-    email: EmailStr = str
+
+class UserCreate(UserBase): # Схема для создания пользователя
     password: str
 
-class UserResponse(BaseModel):
-    id: int
-    username: str
-    email: str
+class UserRead(UserBase): # Схема для чтения информации о пользователе
+    class Config:
+        from_attributes = True
+
+class UserLogin(BaseModel): # Схема для входа пользователя
+    email: EmailStr
+    password: str
