@@ -5,11 +5,14 @@ import ProtectedRoute from './components/ProtectedRoute';
 import Home from "./components/Home";
 import Login from "./components/Login";
 import Registration from "./components/Registration";
+import KanbanBoard from "./components/KanbanBoard";
 import Workspace from "./components/Workspace";
 import './App.css';
 import "./css/Home.css";
 import './css/Login.css';
 import './css/Registration.css';
+import './css/KanbanBoard.css';
+import './css/Sidebar.css';
 
 export default function App() {
   return (
@@ -19,6 +22,7 @@ export default function App() {
             <Route path="/" element={<Home />} />
             <Route path="/login" element={<Login />} />
             <Route path="/registration" element={<Registration />} />
+            <Route path="/board" element={<KanbanBoard />} />
 
             <Route path="/workspace" element={<ProtectedRoute> <Workspace /> </ProtectedRoute>} />
          </Routes>
