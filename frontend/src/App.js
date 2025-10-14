@@ -18,7 +18,6 @@ import './css/TaskModal.css';
 export default function App() {
   return (
     <AuthProvider>
-      <Router>
          <Routes>
             <Route path="/" element={<Home />} />
             <Route path="/login" element={<Login />} />
@@ -27,7 +26,6 @@ export default function App() {
 
             <Route path="/workspace" element={<ProtectedRoute> <Workspace /> </ProtectedRoute>} />
          </Routes>
-      </Router>
     </AuthProvider>
   );
 }

@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useDrop } from 'react-dnd';
 import KanbanTask from "./KanbanTask";
 
-export default function KanbanColumn({ column, onUpdateColumns, onTaskClick, moveTaskInColumn, moveTaskBetweenColumns }) {
+export default function KanbanColumn({ column, onUpdateColumns, onTaskClick, moveTaskInColumn, moveTaskBetweenColumns, onAddTask }) {
   const [isAddingTask, setIsAddingTask] = useState(false);
   const [newTaskTitle, setNewTaskTitle] = useState('');
   const taskCount = column.tasks.length;
@@ -23,6 +23,9 @@ export default function KanbanColumn({ column, onUpdateColumns, onTaskClick, mov
 
     // Функция для добавления новой задачи
   const handleAddTask = () => {
+
+    console.log('handleAddTask вызвана в колонке:', column.id);
+
     if (newTaskTitle.trim()) {
       const newTask = {
         id: Date.now(), // Временный ID, в реальном приложении нужно генерировать на сервере
@@ -35,15 +38,16 @@ export default function KanbanColumn({ column, onUpdateColumns, onTaskClick, mov
         createdAt: new Date().toISOString()
       };
 
-      // Здесь нужно добавить логику для обновления состояния в KanbanBoard
-      // Пока просто сбросим состояние
-      setNewTaskTitle('');
-      setIsAddingTask(false);
+      console.log('Создана задача:', newTask);
       
       // Вызываем функцию из пропсов для добавления задачи
-      if (window.addTaskToColumn) {
-        window.addTaskToColumn(column.id, newTask);
+      if (onAddTask) {
+        console.log('Вызываю onAddTask');
+        onAddTask(column.id, newTask);
       }
+
+      setNewTaskTitle('');
+      setIsAddingTask(false);
     }
   };
 
@@ -56,6 +60,7 @@ export default function KanbanColumn({ column, onUpdateColumns, onTaskClick, mov
   // Обработчик нажатия Enter
   const handleKeyPress = (e) => {
     if (e.key === 'Enter') {
+      e.preventDefault();
       handleAddTask();
     } else if (e.key === 'Escape') {
       handleCancelAdd();
@@ -120,7 +125,14 @@ export default function KanbanColumn({ column, onUpdateColumns, onTaskClick, mov
       </div>
 
       <div className="column-footer">
-        <button className="add-task-btn">+ Добавить задачу</button>
+        {!isAddingTask ? (
+          <button 
+            className="add-task-btn"
+            onClick={() => setIsAddingTask(true)}
+          >
+            + Добавить задачу
+          </button>
+        ) : null}
       </div>
     </div>
   );

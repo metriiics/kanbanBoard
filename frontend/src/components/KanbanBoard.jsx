@@ -15,33 +15,60 @@ export default function KanbanBoard() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isModalRightAligned, setIsModalRightAligned] = useState(false);
 
+  const [columns, setColumns] = useState([
+    {
+      id: 1,
+      title: 'TO DO',
+      tasks: [
+        { id: 1, title: 'Создать дизайн', description: 'Разработать макет приложения', priority: 'high' },
+        { id: 2, title: 'Настроить API', description: 'Подключить бэкенд', priority: 'medium' }
+      ]
+    },
+    {
+      id: 2,
+      title: 'IN PROGRESS',
+      tasks: [
+        { id: 3, title: 'Разработка фронтенда', description: 'Создать React компоненты', priority: 'high' }
+      ]
+    },
+    {
+      id: 3,
+      title: 'REVIEW',
+      tasks: []
+    },
+    {
+      id: 4,
+      title: 'DONE',
+      tasks: [
+        { id: 4, title: 'Инициализация проекта', description: 'Создать базовую структуру', priority: 'low' }
+      ]
+    }
+  ]);
+
   // Пример данных проекта и доски
   const projectData = {
     name: 'Разработка Kanban доски',
     boardName: 'Активная разработка'
   };
 
-// Функция для добавления задачи в колонку
-const addTaskToColumn = (columnId, newTask) => {
-  setColumns(prevColumns => {
-    const newColumns = [...prevColumns];
-    const column = newColumns.find(col => col.id === columnId);
-    
-    if (column) {
-      column.tasks.push(newTask);
-    }
-    
-    return newColumns;
-  });
-};
-
-// Сделаем функцию доступной глобально для KanbanColumn (временное решение)
-React.useEffect(() => {
-  window.addTaskToColumn = addTaskToColumn;
-  return () => {
-    window.addTaskToColumn = null;
+  // Функция для добавления задачи в колонку
+  const addTaskToColumn = (columnId, newTask) => {
+    console.log('addTaskToColumn вызвана для колонки:', columnId, 'задача:', newTask);
+    setColumns(prevColumns => {
+      const newColumns = [...prevColumns];
+      const column = newColumns.find(col => col.id === columnId);
+      
+      if (column) {
+        console.log('Добавляю задачу в колонку:', column.title);
+        const taskExists = column.tasks.some(task => task.id === newTask.id);
+        if (!taskExists) {
+        column.tasks.push(newTask);
+        }
+      }
+      
+      return newColumns;
+    });
   };
-}, []);
 
   // Функция для перемещения задачи между колонками
   const moveTaskBetweenColumns = (taskId, fromColumnId, toColumnId) => {
@@ -98,36 +125,6 @@ React.useEffect(() => {
     setIsModalRightAligned(!isModalRightAligned);
   };
 
-  const [columns, setColumns] = useState([
-    {
-      id: 1,
-      title: 'TO DO',
-      tasks: [
-        { id: 1, title: 'Создать дизайн', description: 'Разработать макет приложения', priority: 'high' },
-        { id: 2, title: 'Настроить API', description: 'Подключить бэкенд', priority: 'medium' }
-      ]
-    },
-    {
-      id: 2,
-      title: 'IN PROGRESS',
-      tasks: [
-        { id: 3, title: 'Разработка фронтенда', description: 'Создать React компоненты', priority: 'high' }
-      ]
-    },
-    {
-      id: 3,
-      title: 'REVIEW',
-      tasks: []
-    },
-    {
-      id: 4,
-      title: 'DONE',
-      tasks: [
-        { id: 4, title: 'Инициализация проекта', description: 'Создать базовую структуру', priority: 'low' }
-      ]
-    }
-  ]);
-
   const navItems = [
     { key: 'board', label: 'Доска' },
     { key: 'my-tasks', label: 'Мои задачи' },
@@ -147,6 +144,7 @@ React.useEffect(() => {
                 moveTaskBetweenColumns={moveTaskBetweenColumns}
                 moveTaskInColumn={moveTaskInColumn}
                 onTaskClick={handleTaskClick}
+                onAddTask={addTaskToColumn}
               />
             ))}
             <div className="add-column">
