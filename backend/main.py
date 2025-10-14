@@ -1,7 +1,9 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from api.endpoints import users, auth
 from db.database import Base, engine
+from core.logger import logger
+import time
 
 app = FastAPI() # Создание экземпляра FastAPI
 app.include_router(users.router) # Подключение роутеров
@@ -25,3 +27,28 @@ def startup_db():
 @app.get("/")
 def read_root():
     return {"message": "Welcome to the Real-Time Task Manager API"}
+
+@app.middleware("http")
+async def log_requests(request: Request, call_next):
+    start_time = time.time()
+
+    # IP клиента
+    client_ip = request.client.host if request.client else "unknown"
+
+    # User-Agent устройства (если есть)
+    user_agent = request.headers.get("user-agent", "unknown")
+
+    # Начало запроса
+    logger.info(f"-> {request.method} {request.url.path} | IP: {client_ip} | UA: {user_agent}")
+
+    response = await call_next(request)
+
+    process_time = round(time.time() - start_time, 3)
+    status = response.status_code
+
+    # Результат
+    logger.info(
+        f"<- {request.method} {request.url.path} | {status} | {process_time}s | IP: {client_ip}"
+    )
+
+    return response
