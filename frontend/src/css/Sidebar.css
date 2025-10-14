@@ -1,7 +1,7 @@
 /* Боковое меню */
 .sidebar {
   width: 240px;
-  background-color: #0747a6;
+  background-color: gray;
   color: white;
   height: 100vh;
   position: fixed;

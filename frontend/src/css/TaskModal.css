@@ -1,0 +1,542 @@
+/* Оверлей модалки */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  z-index: 1000;
+}
+
+.modal-overlay.right-aligned {
+  background-color: rgba(0, 0, 0, 0.3);
+}
+
+/* Основное модальное окно */
+.task-modal {
+  background: white;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+  z-index: 1001;
+  display: flex;
+  flex-direction: column;
+  transition: all 0.3s ease;
+}
+
+/* Центрированная модалка */
+.task-modal.centered {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  border-radius: 8px;
+  width: 600px;
+  max-width: 90vw;
+  max-height: 90vh;
+}
+
+/* Правый сайдбар */
+.task-modal.right-sidebar {
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  width: 500px;
+  max-width: 90vw;
+  border-radius: 0;
+  border-left: 1px solid #dfe1e6;
+  animation: slideInRight 0.3s ease;
+}
+
+@keyframes slideInRight {
+  from {
+    transform: translateX(100%);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+
+/* Заголовок модалки */
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  padding: 20px 24px 16px;
+  border-bottom: 1px solid #dfe1e6;
+  background-color: #fafbfc;
+}
+
+.modal-title {
+  flex: 1;
+}
+
+.modal-title h2 {
+  margin: 0 0 8px 0;
+  color: #172b4d;
+  font-size: 20px;
+  font-weight: 600;
+}
+
+.task-meta-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.created-date {
+  font-size: 12px;
+  color: #5e6c84;
+}
+
+.modal-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.align-btn, .close-btn {
+  background: none;
+  border: none;
+  font-size: 18px;
+  cursor: pointer;
+  padding: 4px 8px;
+  border-radius: 3px;
+  transition: background-color 0.2s;
+}
+
+.align-btn {
+  color: #5e6c84;
+}
+
+.align-btn:hover {
+  background-color: #f4f5f7;
+  color: #172b4d;
+}
+
+.close-btn {
+  color: #5e6c84;
+  font-size: 24px;
+  line-height: 1;
+}
+
+.close-btn:hover {
+  background-color: #f4f5f7;
+  color: #172b4d;
+}
+
+/* Контент модалки */
+.modal-content {
+  flex: 1;
+  overflow-y: auto;
+  padding: 20px 24px;
+  display: flex;
+  flex-direction: column;
+}
+
+.task-section {
+  margin-bottom: 24px;
+}
+
+.task-section h3 {
+  font-size: 16px;
+  font-weight: 600;
+  color: #172b4d;
+  margin: 0 0 12px 0;
+}
+
+/* Описание */
+/* Описание */
+.task-section {
+  margin-bottom: 24px;
+}
+
+.task-section h3 {
+  font-size: 16px;
+  font-weight: 600;
+  color: #172b4d;
+  margin: 0 0 12px 0;
+}
+
+.description-input {
+  width: 100%;
+  padding: 12px;
+  border: 1px solid #dfe1e6;
+  border-radius: 3px;
+  font-family: inherit;
+  font-size: 14px;
+  resize: none; /* Убираем возможность ручного изменения размера */
+  line-height: 1.5;
+  min-height: 80px;
+  max-height: 400px; /* Ограничиваем максимальную высоту */
+  overflow-y: auto;
+  transition: border-color 0.2s ease;
+  display: block;
+}
+
+.description-input:focus {
+  outline: none;
+  border-color: #0052cc;
+  box-shadow: 0 0 0 2px rgba(0, 82, 204, 0.1);
+}
+
+.description-input::placeholder {
+  color: #5e6c84;
+}
+
+/* Стили для скроллбара в описании */
+.description-input::-webkit-scrollbar {
+  width: 6px;
+}
+
+.description-input::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 3px;
+}
+
+.description-input::-webkit-scrollbar-thumb {
+  background: #c1c1c1;
+  border-radius: 3px;
+}
+
+.description-input::-webkit-scrollbar-thumb:hover {
+  background: #a8a8a8;
+}
+/* Детали задачи */
+.task-details {
+  display: grid;
+  gap: 16px;
+  margin-bottom: 20px;
+}
+
+.detail-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.detail-label {
+  font-weight: 500;
+  color: #5e6c84;
+  min-width: 120px;
+}
+
+.detail-value {
+  color: #172b4d;
+}
+
+/* Выбор приоритета */
+.priority-select {
+  padding: 6px 8px;
+  border: 1px solid #dfe1e6;
+  border-radius: 3px;
+  font-size: 14px;
+  background: white;
+}
+
+.priority-select:focus {
+  outline: none;
+  border-color: #0052cc;
+}
+
+/* Ввод даты */
+.date-input {
+  padding: 6px 8px;
+  border: 1px solid #dfe1e6;
+  border-radius: 3px;
+  font-size: 14px;
+  font-family: inherit;
+}
+
+.date-input:focus {
+  outline: none;
+  border-color: #0052cc;
+}
+
+/* Теги */
+/* Контейнер выпадающего меню тегов */
+.tags-dropdown-container {
+  position: relative;
+  flex: 1;
+}
+
+/* Основная строка с тегами */
+.tags-main-row {
+  display: flex;
+  align-items: center;
+  min-height: 32px;
+  padding: 4px 0;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+  border-radius: 3px;
+}
+
+.tags-main-row:hover {
+  background-color: #f8f9fa;
+}
+
+.tags-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  flex: 1;
+  align-items: center;
+}
+
+.tags-placeholder {
+  color: #5e6c84;
+  font-style: italic;
+  font-size: 14px;
+}
+
+.tag-item {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  background-color: #e3fcef;
+  color: #00875a;
+  padding: 4px 8px;
+  border-radius: 3px;
+  font-size: 12px;
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.tag-remove {
+  background: none;
+  border: none;
+  color: #00875a;
+  cursor: pointer;
+  font-size: 14px;
+  padding: 0;
+  width: 16px;
+  height: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  line-height: 1;
+  transition: background-color 0.2s ease;
+}
+
+.tag-remove:hover {
+  background-color: rgba(0, 0, 0, 0.1);
+}
+
+/* Выпадающее меню */
+.tags-dropdown {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  background: white;
+  border: 1px solid #dfe1e6;
+  border-radius: 3px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  z-index: 10;
+  margin-top: 4px;
+  padding: 16px;
+  animation: dropdownAppear 0.2s ease;
+}
+
+@keyframes dropdownAppear {
+  from {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Существующие теги */
+.existing-tags h4,
+.add-new-tag h4 {
+  font-size: 14px;
+  font-weight: 600;
+  color: #172b4d;
+  margin: 0 0 12px 0;
+}
+
+.existing-tags-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+.existing-tag-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  padding: 4px 0;
+  transition: background-color 0.2s;
+  border-radius: 3px;
+}
+
+.existing-tag-item:hover {
+  background-color: #f8f9fa;
+}
+
+.existing-tag-item input[type="checkbox"] {
+  margin: 0;
+}
+
+.tag-label {
+  font-size: 14px;
+  color: #172b4d;
+}
+
+/* Добавление нового тега */
+.new-tag-input {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.tag-input {
+  flex: 1;
+  padding: 6px 8px;
+  border: 1px solid #dfe1e6;
+  border-radius: 3px;
+  font-size: 14px;
+}
+
+.tag-input:focus {
+  outline: none;
+  border-color: #0052cc;
+}
+
+/* Кнопка маленькая */
+.btn-small {
+  padding: 6px 12px;
+  font-size: 12px;
+  min-width: auto;
+  white-space: nowrap;
+}
+
+/* Детали задачи - общие стили */
+.detail-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.detail-label {
+  font-weight: 500;
+  color: #5e6c84;
+  min-width: 120px;
+  padding-top: 8px;
+}
+
+/* Комментарии внизу */
+.comments-section-bottom {
+  margin-top: auto;
+  margin-bottom: 0;
+  padding-top: 20px;
+  border-top: 1px solid #dfe1e6;
+}
+
+.comments-container {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+/* Отображение существующего комментария */
+.comment-display {
+  padding: 12px;
+  background-color: #f8f9fa;
+  border-radius: 8px;
+  min-height: 40px;
+}
+
+.comment-text {
+  color: #172b4d;
+  line-height: 1.5;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+}
+
+.comment-placeholder {
+  color: #5e6c84;
+  font-style: italic;
+}
+
+/* Секция ввода нового комментария */
+.comment-input-section {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.comment-input {
+  width: 100%;
+  padding: 8px 12px;
+  border: 1px solid #dfe1e6;
+  border-radius: 8px;
+  font-family: inherit;
+  font-size: 14px;
+  resize: none;
+  line-height: 1.5;
+  min-height: 40px;
+  max-height: 120px;
+  overflow-y: auto;
+  transition: border-color 0.2s ease;
+}
+
+.comment-input:focus {
+  outline: none;
+  border-color: #0052cc;
+  box-shadow: 0 0 0 2px rgba(0, 82, 204, 0.1);
+}
+
+.comment-input::placeholder {
+  color: #5e6c84;
+}
+
+/* Кнопка */
+.btn {
+  padding: 8px 16px;
+  border: none;
+  border-radius: 3px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  align-self: flex-start;
+}
+
+.btn-primary {
+  background-color: #0052cc;
+  color: white;
+}
+
+.btn-primary:hover:not(:disabled) {
+  background-color: #0065ff;
+}
+
+.btn-primary:disabled {
+  background-color: #c1c7d0;
+  cursor: not-allowed;
+}
+
+/* Стили для скроллбара */
+.comment-input::-webkit-scrollbar {
+  width: 4px;
+}
+
+.comment-input::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 2px;
+}
+
+.comment-input::-webkit-scrollbar-thumb {
+  background: #c1c1c1;
+  border-radius: 2px;
+}
+
+.comment-input::-webkit-scrollbar-thumb:hover {
+  background: #a8a8a8;
+}

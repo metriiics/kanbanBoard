@@ -13,6 +13,7 @@ import './css/Login.css';
 import './css/Registration.css';
 import './css/KanbanBoard.css';
 import './css/Sidebar.css';
+import './css/TaskModal.css';
 
 export default function App() {
   return (
