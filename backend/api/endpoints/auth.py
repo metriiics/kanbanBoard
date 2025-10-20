@@ -14,7 +14,7 @@ router = APIRouter()
 def create_user_endpoint(user: UserCreate):
     db_user = OrmQuery.get_user_by_email(email=user.email) # Проверка, что пользователь с таким email не существует
     if db_user:
-        raise HTTPException(status_code=400, detail="Username already taken")
+        raise HTTPException(status_code=400, detail="Имя пользователя или email уже заняты")
 
     new_user = OrmQuery.create_user(user=user)
     return UserRead.model_validate(new_user)
@@ -23,7 +23,7 @@ def create_user_endpoint(user: UserCreate):
 def login(user: UserLogin):
     db_user = OrmQuery.get_user_by_email(email=user.email)
     if not db_user or not verify_password(user.password, db_user.password): # Проверка email и пароля
-        raise HTTPException(status_code=400, detail="Invalid credentials")
+        raise HTTPException(status_code=400, detail="Неверные учетные данные")
     
     access_token = create_access_token(data={"sub": db_user.email})
     return {"access_token": access_token, "token_type": "bearer"}
