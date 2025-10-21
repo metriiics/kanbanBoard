@@ -19,7 +19,7 @@ def read_users_me(current_user: User = Depends(get_current_user)):
 def get_user_endpoint(user_id: int):
     db_user = OrmQuery.get_user_by_id(user_id=user_id)
     if db_user is None:
-        raise HTTPException(status_code=404, detail="User not found")
+        raise HTTPException(status_code=404, detail="Пользователь не найден")
     return UserRead.model_validate(db_user)
 
    
