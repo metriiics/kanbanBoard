@@ -1,0 +1,89 @@
+.workspace-home {
+  padding: 2rem;
+  background: #f8f9fb;
+  min-height: 100vh;
+  color: #1e1e1e;
+}
+
+.workspace-header h1 {
+  font-size: 2rem;
+  font-weight: 600;
+  margin-bottom: 0.3rem;
+}
+
+.workspace-header p {
+  color: #666;
+  margin-bottom: 2rem;
+}
+
+.recent-projects h2,
+.my-tasks h2 {
+  font-size: 1.5rem;
+  margin-bottom: 1rem;
+  font-weight: 500;
+}
+
+.projects-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 1rem;
+}
+
+.project-card {
+  background: white;
+  border-radius: 1rem;
+  padding: 1.2rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  transition: all 0.2s ease-in-out;
+  text-decoration: none;
+  color: inherit;
+}
+
+.project-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.1);
+}
+
+.tasks-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 1rem;
+  background: white;
+  border-radius: 1rem;
+  overflow: hidden;
+}
+
+.tasks-table th,
+.tasks-table td {
+  padding: 0.9rem 1.2rem;
+  border-bottom: 1px solid #eee;
+  text-align: left;
+}
+
+.tasks-table th {
+  background: #f3f4f6;
+  font-weight: 500;
+}
+
+.status-badge {
+  display: inline-block;
+  padding: 0.3rem 0.7rem;
+  border-radius: 0.5rem;
+  font-size: 0.85rem;
+  font-weight: 500;
+}
+
+.status-badge.готово {
+  background: #e7f9ee;
+  color: #3a9a5f;
+}
+
+.status-badge.в {
+  background: #fff6e0;
+  color: #d29400;
+}
+
+.status-badge.на {
+  background: #eaf2ff;
+  color: #3a73d9;
+}

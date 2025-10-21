@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Link, useLocation, useParams } from 'react-router-dom';
+import { useProjects } from '../hooks/useProjects';
 
 export default function Sidebar({ isCollapsed, onToggle }) {
   const [expandedProjects, setExpandedProjects] = useState({});
@@ -7,36 +8,10 @@ export default function Sidebar({ isCollapsed, onToggle }) {
   const location = useLocation();
   const { id } = useParams();
 
-  // Пример данных проектов и досок
-  const workspace = {
-    name: 'Мое рабочее пространство',
-    projects: [
-      {
-        id: 1,
-        name: 'Разработка Kanban доски',
-        boards: [
-          { id: 1, name: 'Бэклог', path: '/board/1' },
-          { id: 2, name: 'Активная разработка', path: '/board/2' },
-          { id: 3, name: 'Тестирование', path: '/board/3' }
-        ]
-      },
-      {
-        id: 2,
-        name: 'Маркетинг',
-        boards: [
-          { id: 4, name: 'Кампания Q1', path: '/board/4' },
-          { id: 5, name: 'Контент план', path: '/board/5' }
-        ]
-      },
-      {
-        id: 3,
-        name: 'Дизайн',
-        boards: [
-          { id: 6, name: 'UI/UX', path: '/board/6' }
-        ]
-      }
-    ]
-  };
+  const workspaceId = 1;
+  const workspaceName = 'mertiics';
+  const { projects, loading, error } = useProjects(workspaceId);
+
 
   const handleProjectClick = (project) => {
     setSelectedProject(project);
@@ -56,6 +31,9 @@ export default function Sidebar({ isCollapsed, onToggle }) {
     return location.pathname === boardPath;
   };
 
+  if (loading) return <div className="sidebar">Загрузка...</div>;
+  if (error) return <div className="sidebar">Ошибка загрузки проектов {error.message || JSON.stringify(error, null, 2)}</div>;
+
   if (isCollapsed) {
     return (
       <div className="sidebar collapsed">
@@ -66,7 +44,7 @@ export default function Sidebar({ isCollapsed, onToggle }) {
         </div>
         <div className="sidebar-content">
           <div className="workspace-icon">
-            <span title={workspace.name}>🏢</span>
+            <span title={workspaceName}>🏢</span>
           </div>
         </div>
       </div>
@@ -77,7 +55,7 @@ export default function Sidebar({ isCollapsed, onToggle }) {
     <div className="sidebar">
       <div className="sidebar-header">
         <div className="workspace-info">
-          <h3>{workspace.name}</h3>
+          <h3>{workspaceName}</h3>
         </div>
         <button className="toggle-btn" onClick={onToggle}>
           ◀
@@ -98,15 +76,15 @@ export default function Sidebar({ isCollapsed, onToggle }) {
               </button>
             </div>
             
-            {workspace.projects.map(project => (
+            {projects.map(project => (
               <div key={project.id} className="project-item">
                 <div 
                   className={`project-header ${selectedProject?.id === project.id ? 'selected' : ''}`}
                   onClick={() => handleProjectClick(project)}
                 >
                   <span className="project-icon">📁</span>
-                  <span className="project-name">{project.name}</span>
-                  <span className="project-boards-count">({project.boards.length})</span>
+                  <span className="project-name">{project.title}</span>
+                  <span className="project-boards-count">({project.boards?.length || 0})</span>
                 </div>
               </div>
             ))}
@@ -129,7 +107,7 @@ export default function Sidebar({ isCollapsed, onToggle }) {
               </div>
               
               <div className="boards-list">
-                {selectedProject.boards.map(board => (
+                {selectedProject.boards?.map(board => (
                   <Link
                     key={board.id}
                     to={board.path}
