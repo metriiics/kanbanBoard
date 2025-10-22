@@ -1,40 +1,22 @@
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, HTTPException, Depends
+from typing import List
+
 from core.security import get_current_user
-from api.models.projects import ProjectCreate, ProjectOut
 from db.OrmQuery import OrmQuery
+from api.models.projects import ProjectWithBoardsOut
 
 router = APIRouter()
 
-from fastapi import APIRouter, Depends, HTTPException
-from api.models.projects import ProjectCreate, ProjectOut
-from db.OrmQuery import OrmQuery
-from core.security import get_current_user
+@router.get("/users/{user_id}/projects", response_model=List[ProjectWithBoardsOut])
+def get_user_projects(user_id: int, current_user = Depends(get_current_user)):
+    # текущая реализация security возвращает объект пользователя из БД
+    current_user_id = getattr(current_user, "id", None)
+    if current_user_id is None:
+        raise HTTPException(status_code=401, detail="Невалидные учетные данные")
 
-router = APIRouter()
+    # разрешаем доступ только владельцу (тут можно расширить логику для ролей/админов)
+    if current_user_id != user_id:
+        raise HTTPException(status_code=403, detail="Доступ запрещен")
 
-@router.post("/workspaces/{workspace_id}/create_project", response_model=ProjectOut)
-def create_project(
-    workspace_id: int,
-    project: ProjectCreate,
-    current_user=Depends(get_current_user)
-):
-    # Проверим, что workspace принадлежит текущему пользователю
-    workspace = OrmQuery.get_workspace_for_user(current_user.id, workspace_id)
-    if not workspace:
-        raise HTTPException(status_code=403, detail="Нет доступа к этому рабочему пространству")
-
-    # Создание проекта
-    new_project = OrmQuery.create_project(
-    title=project.title,
-    workspaces_id=workspace_id
-    )
-
-    return new_project
-
-
-@router.get("/workspaces/{workspace_id}/projects", response_model=list[ProjectOut])
-def get_projects(workspace_id: int, current_user=Depends(get_current_user)):
-    projects = OrmQuery.get_projects_for_workspace(current_user.id, workspace_id)
-    if not projects:
-        raise HTTPException(status_code=404, detail="Проекты не найдены или нет доступа")
+    projects = OrmQuery.get_projects_by_user_id(user_id) or []
     return projects
