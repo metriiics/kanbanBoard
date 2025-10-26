@@ -745,3 +745,118 @@
 2025-10-22 02:17:07 | INFO | -> GET /api/users/me | IP: 127.0.0.1 | UA: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:144.0) Gecko/20100101 Firefox/144.0
 2025-10-22 02:17:07 | INFO | <- GET /api/users/me | 200 | 0.006s | IP: 127.0.0.1
 2025-10-22 02:17:07 | INFO | <- GET /workspaces/1/projects | 200 | 0.017s | IP: 127.0.0.1
+2025-10-22 19:49:14 | INFO | -> GET / | IP: 127.0.0.1 | UA: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/26.0.1 Safari/605.1.15
+2025-10-22 19:49:14 | INFO | -> GET //docs | IP: 127.0.0.1 | UA: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/26.0.1 Safari/605.1.15
+2025-10-22 19:49:14 | INFO | <- GET //docs | 404 | 0.001s | IP: 127.0.0.1
+2025-10-22 19:49:14 | INFO | <- GET / | 200 | 0.004s | IP: 127.0.0.1
+2025-10-22 19:49:18 | INFO | -> GET /docs | IP: 127.0.0.1 | UA: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/26.0.1 Safari/605.1.15
+2025-10-22 19:49:18 | INFO | <- GET /docs | 200 | 0.001s | IP: 127.0.0.1
+2025-10-22 19:49:18 | INFO | -> GET /openapi.json | IP: 127.0.0.1 | UA: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/26.0.1 Safari/605.1.15
+2025-10-22 19:49:18 | INFO | <- GET /openapi.json | 200 | 0.014s | IP: 127.0.0.1
+2025-10-22 20:02:50 | INFO | -> GET /docs | IP: 127.0.0.1 | UA: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/26.0.1 Safari/605.1.15
+2025-10-22 20:02:50 | INFO | <- GET /docs | 200 | 0.001s | IP: 127.0.0.1
+2025-10-22 20:02:50 | INFO | -> GET /openapi.json | IP: 127.0.0.1 | UA: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/26.0.1 Safari/605.1.15
+2025-10-22 20:02:50 | INFO | <- GET /openapi.json | 200 | 0.009s | IP: 127.0.0.1
+2025-10-22 20:05:18 | INFO | -> GET /docs | IP: 127.0.0.1 | UA: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/26.0.1 Safari/605.1.15
+2025-10-22 20:05:18 | INFO | <- GET /docs | 200 | 0.002s | IP: 127.0.0.1
+2025-10-22 20:05:18 | INFO | -> GET /openapi.json | IP: 127.0.0.1 | UA: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/26.0.1 Safari/605.1.15
+2025-10-22 20:05:18 | INFO | <- GET /openapi.json | 200 | 0.036s | IP: 127.0.0.1
+2025-10-22 20:05:18 | INFO | -> GET /apple-touch-icon-precomposed.png | IP: 127.0.0.1 | UA: com.apple.WebKit.Networking/21622.1.22.11.15 Network/5569.1.3 macOS/26.0.1
+2025-10-22 20:05:18 | INFO | <- GET /apple-touch-icon-precomposed.png | 404 | 0.0s | IP: 127.0.0.1
+2025-10-22 20:05:18 | INFO | -> GET /apple-touch-icon.png | IP: 127.0.0.1 | UA: com.apple.WebKit.Networking/21622.1.22.11.15 Network/5569.1.3 macOS/26.0.1
+2025-10-22 20:05:18 | INFO | <- GET /apple-touch-icon.png | 404 | 0.0s | IP: 127.0.0.1
+2025-10-22 20:05:18 | INFO | -> GET /favicon.ico | IP: 127.0.0.1 | UA: com.apple.WebKit.Networking/21622.1.22.11.15 Network/5569.1.3 macOS/26.0.1
+2025-10-22 20:05:18 | INFO | <- GET /favicon.ico | 404 | 0.002s | IP: 127.0.0.1
+2025-10-22 20:06:46 | INFO | -> GET /docs | IP: 127.0.0.1 | UA: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/26.0.1 Safari/605.1.15
+2025-10-22 20:06:46 | INFO | <- GET /docs | 200 | 0.002s | IP: 127.0.0.1
+2025-10-22 20:06:47 | INFO | -> GET /openapi.json | IP: 127.0.0.1 | UA: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/26.0.1 Safari/605.1.15
+2025-10-22 20:06:47 | INFO | <- GET /openapi.json | 200 | 0.006s | IP: 127.0.0.1
+2025-10-22 20:10:56 | INFO | -> GET /docs | IP: 127.0.0.1 | UA: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/26.0.1 Safari/605.1.15
+2025-10-22 20:10:56 | INFO | <- GET /docs | 200 | 0.002s | IP: 127.0.0.1
+2025-10-22 20:10:56 | INFO | -> GET /openapi.json | IP: 127.0.0.1 | UA: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/26.0.1 Safari/605.1.15
+2025-10-22 20:10:56 | INFO | <- GET /openapi.json | 200 | 0.021s | IP: 127.0.0.1
+2025-10-22 20:11:14 | INFO | -> POST /api/auth/register | IP: 127.0.0.1 | UA: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/26.0.1 Safari/605.1.15
+2025-10-22 20:11:14 | INFO | <- POST /api/auth/register | 200 | 0.112s | IP: 127.0.0.1
+2025-10-22 20:13:39 | INFO | -> GET /users/1/projects | IP: 127.0.0.1 | UA: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/26.0.1 Safari/605.1.15
+2025-10-22 20:13:39 | INFO | <- GET /users/1/projects | 403 | 0.005s | IP: 127.0.0.1
+2025-10-22 20:13:49 | INFO | -> POST /api/auth/login | IP: 127.0.0.1 | UA: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/26.0.1 Safari/605.1.15
+2025-10-22 20:13:49 | INFO | <- POST /api/auth/login | 200 | 0.093s | IP: 127.0.0.1
+2025-10-22 20:13:59 | INFO | -> GET /users/1/projects | IP: 127.0.0.1 | UA: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/26.0.1 Safari/605.1.15
+2025-10-22 20:13:59 | INFO | <- GET /users/1/projects | 403 | 0.002s | IP: 127.0.0.1
+2025-10-22 20:14:01 | INFO | -> GET /users/1/projects | IP: 127.0.0.1 | UA: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/26.0.1 Safari/605.1.15
+2025-10-22 20:14:01 | INFO | <- GET /users/1/projects | 403 | 0.001s | IP: 127.0.0.1
+2025-10-22 20:14:20 | INFO | -> GET /users/1/projects | IP: 127.0.0.1 | UA: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/26.0.1 Safari/605.1.15
+2025-10-22 20:14:20 | INFO | <- GET /users/1/projects | 403 | 0.002s | IP: 127.0.0.1
+2025-10-22 20:14:22 | INFO | -> GET /users/1/projects | IP: 127.0.0.1 | UA: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/26.0.1 Safari/605.1.15
+2025-10-22 20:14:22 | INFO | <- GET /users/1/projects | 403 | 0.001s | IP: 127.0.0.1
+2025-10-22 20:14:23 | INFO | -> GET /users/1/projects | IP: 127.0.0.1 | UA: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/26.0.1 Safari/605.1.15
+2025-10-22 20:14:23 | INFO | <- GET /users/1/projects | 403 | 0.001s | IP: 127.0.0.1
+2025-10-22 20:15:20 | INFO | -> GET /users/1/projects | IP: 127.0.0.1 | UA: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/26.0.1 Safari/605.1.15
+2025-10-22 20:15:20 | INFO | <- GET /users/1/projects | 403 | 0.002s | IP: 127.0.0.1
+2025-10-22 20:15:21 | INFO | -> GET /users/1/projects | IP: 127.0.0.1 | UA: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/26.0.1 Safari/605.1.15
+2025-10-22 20:15:21 | INFO | <- GET /users/1/projects | 403 | 0.001s | IP: 127.0.0.1
+2025-10-22 20:15:37 | INFO | -> GET /docs | IP: 127.0.0.1 | UA: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/26.0.1 Safari/605.1.15
+2025-10-22 20:15:37 | INFO | <- GET /docs | 200 | 0.001s | IP: 127.0.0.1
+2025-10-22 20:15:37 | INFO | -> GET /openapi.json | IP: 127.0.0.1 | UA: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/26.0.1 Safari/605.1.15
+2025-10-22 20:15:37 | INFO | <- GET /openapi.json | 200 | 0.016s | IP: 127.0.0.1
+2025-10-22 20:15:48 | INFO | -> GET /users/1/projects | IP: 127.0.0.1 | UA: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/26.0.1 Safari/605.1.15
+2025-10-22 20:15:48 | INFO | <- GET /users/1/projects | 200 | 0.046s | IP: 127.0.0.1
+2025-10-22 20:18:18 | INFO | -> POST /api/projects | IP: 127.0.0.1 | UA: curl/8.7.1
+2025-10-22 20:18:18 | INFO | <- POST /api/projects | 404 | 0.004s | IP: 127.0.0.1
+2025-10-22 20:18:40 | INFO | -> POST /api/projects | IP: 127.0.0.1 | UA: curl/8.7.1
+2025-10-22 20:18:40 | INFO | <- POST /api/projects | 404 | 0.001s | IP: 127.0.0.1
+2025-10-22 20:21:07 | INFO | -> GET /users/1/projects | IP: 127.0.0.1 | UA: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/26.0.1 Safari/605.1.15
+2025-10-22 20:21:07 | INFO | <- GET /users/1/projects | 200 | 0.05s | IP: 127.0.0.1
+2025-10-22 20:22:10 | INFO | -> GET /users/1/projects | IP: 127.0.0.1 | UA: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/26.0.1 Safari/605.1.15
+2025-10-22 20:22:10 | INFO | <- GET /users/1/projects | 200 | 0.027s | IP: 127.0.0.1
+2025-10-22 20:22:35 | INFO | -> GET /users/2/projects | IP: 127.0.0.1 | UA: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/26.0.1 Safari/605.1.15
+2025-10-22 20:22:35 | INFO | <- GET /users/2/projects | 403 | 0.005s | IP: 127.0.0.1
+2025-10-22 20:22:37 | INFO | -> GET /docs | IP: 127.0.0.1 | UA: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/26.0.1 Safari/605.1.15
+2025-10-22 20:22:37 | INFO | <- GET /docs | 200 | 0.001s | IP: 127.0.0.1
+2025-10-22 20:22:37 | INFO | -> GET /openapi.json | IP: 127.0.0.1 | UA: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/26.0.1 Safari/605.1.15
+2025-10-22 20:22:37 | INFO | <- GET /openapi.json | 200 | 0.013s | IP: 127.0.0.1
+2025-10-22 22:47:27 | INFO | -> GET /docs | IP: 127.0.0.1 | UA: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/26.0.1 Safari/605.1.15
+2025-10-22 22:47:27 | INFO | <- GET /docs | 200 | 0.002s | IP: 127.0.0.1
+2025-10-22 22:47:28 | INFO | -> GET /openapi.json | IP: 127.0.0.1 | UA: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/26.0.1 Safari/605.1.15
+2025-10-22 22:47:28 | INFO | <- GET /openapi.json | 200 | 0.01s | IP: 127.0.0.1
+2025-10-22 22:58:08 | INFO | -> GET / | IP: 127.0.0.1 | UA: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/26.0.1 Safari/605.1.15
+2025-10-22 22:58:08 | INFO | <- GET / | 200 | 0.002s | IP: 127.0.0.1
+2025-10-22 22:58:11 | INFO | -> GET /docs | IP: 127.0.0.1 | UA: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/26.0.1 Safari/605.1.15
+2025-10-22 22:58:11 | INFO | <- GET /docs | 200 | 0.001s | IP: 127.0.0.1
+2025-10-22 22:58:11 | INFO | -> GET /openapi.json | IP: 127.0.0.1 | UA: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/26.0.1 Safari/605.1.15
+2025-10-22 22:58:11 | INFO | <- GET /openapi.json | 200 | 0.017s | IP: 127.0.0.1
+2025-10-22 22:58:18 | INFO | -> GET /boards/1/tasks_by_columns | IP: 127.0.0.1 | UA: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/26.0.1 Safari/605.1.15
+2025-10-22 22:58:18 | INFO | <- GET /boards/1/tasks_by_columns | 403 | 0.001s | IP: 127.0.0.1
+2025-10-22 22:58:31 | INFO | -> POST /api/auth/login | IP: 127.0.0.1 | UA: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/26.0.1 Safari/605.1.15
+2025-10-22 22:58:31 | INFO | <- POST /api/auth/login | 200 | 0.122s | IP: 127.0.0.1
+2025-10-22 22:58:44 | INFO | -> GET /boards/1/tasks_by_columns | IP: 127.0.0.1 | UA: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/26.0.1 Safari/605.1.15
+2025-10-22 23:00:59 | INFO | -> GET /boards/1/tasks_by_columns | IP: 127.0.0.1 | UA: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/26.0.1 Safari/605.1.15
+2025-10-22 23:01:14 | INFO | -> GET /boards/1/tasks_by_columns | IP: 127.0.0.1 | UA: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/26.0.1 Safari/605.1.15
+2025-10-22 23:01:43 | INFO | -> GET /boards/1/tasks_by_columns | IP: 127.0.0.1 | UA: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/26.0.1 Safari/605.1.15
+2025-10-22 23:01:51 | INFO | -> GET /docs | IP: 127.0.0.1 | UA: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/26.0.1 Safari/605.1.15
+2025-10-22 23:01:51 | INFO | <- GET /docs | 200 | 0.001s | IP: 127.0.0.1
+2025-10-22 23:01:52 | INFO | -> GET /openapi.json | IP: 127.0.0.1 | UA: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/26.0.1 Safari/605.1.15
+2025-10-22 23:01:52 | INFO | <- GET /openapi.json | 200 | 0.013s | IP: 127.0.0.1
+2025-10-22 23:01:59 | INFO | -> GET /boards/1/tasks_by_columns | IP: 127.0.0.1 | UA: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/26.0.1 Safari/605.1.15
+2025-10-22 23:02:49 | INFO | -> GET /boards/1/tasks_by_columns | IP: 127.0.0.1 | UA: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/26.0.1 Safari/605.1.15
+2025-10-22 23:03:05 | INFO | -> GET /boards/1/tasks_by_columns | IP: 127.0.0.1 | UA: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/26.0.1 Safari/605.1.15
+2025-10-22 23:03:05 | INFO | <- GET /boards/1/tasks_by_columns | 200 | 0.037s | IP: 127.0.0.1
+2025-10-22 23:03:29 | INFO | -> GET /boards/2/tasks_by_columns | IP: 127.0.0.1 | UA: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/26.0.1 Safari/605.1.15
+2025-10-22 23:03:29 | INFO | <- GET /boards/2/tasks_by_columns | 200 | 0.017s | IP: 127.0.0.1
+2025-10-22 23:03:32 | INFO | -> GET /boards/3/tasks_by_columns | IP: 127.0.0.1 | UA: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/26.0.1 Safari/605.1.15
+2025-10-22 23:03:32 | INFO | <- GET /boards/3/tasks_by_columns | 404 | 0.007s | IP: 127.0.0.1
+2025-10-22 23:11:20 | INFO | -> GET /docs | IP: 127.0.0.1 | UA: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/26.0.1 Safari/605.1.15
+2025-10-22 23:11:20 | INFO | <- GET /docs | 200 | 0.001s | IP: 127.0.0.1
+2025-10-22 23:11:21 | INFO | -> GET /openapi.json | IP: 127.0.0.1 | UA: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/26.0.1 Safari/605.1.15
+2025-10-22 23:11:21 | INFO | <- GET /openapi.json | 200 | 0.031s | IP: 127.0.0.1
+2025-10-22 23:11:28 | INFO | -> GET /boards/1/tasks_by_columns | IP: 127.0.0.1 | UA: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/26.0.1 Safari/605.1.15
+2025-10-22 23:11:28 | INFO | <- GET /boards/1/tasks_by_columns | 403 | 0.001s | IP: 127.0.0.1
+2025-10-22 23:11:34 | INFO | -> GET /boards/1/tasks_by_columns | IP: 127.0.0.1 | UA: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/26.0.1 Safari/605.1.15
+2025-10-22 23:13:45 | INFO | -> GET /boards/1/tasks_by_columns | IP: 127.0.0.1 | UA: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/26.0.1 Safari/605.1.15
+2025-10-22 23:13:46 | INFO | <- GET /boards/1/tasks_by_columns | 200 | 0.053s | IP: 127.0.0.1
+2025-10-22 23:14:12 | INFO | -> GET /boards/2/tasks_by_columns | IP: 127.0.0.1 | UA: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/26.0.1 Safari/605.1.15
+2025-10-22 23:14:12 | INFO | <- GET /boards/2/tasks_by_columns | 200 | 0.024s | IP: 127.0.0.1
+2025-10-22 23:14:17 | INFO | -> GET /boards/3/tasks_by_columns | IP: 127.0.0.1 | UA: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/26.0.1 Safari/605.1.15
+2025-10-22 23:14:17 | INFO | <- GET /boards/3/tasks_by_columns | 404 | 0.009s | IP: 127.0.0.1
+2025-10-22 23:14:20 | INFO | -> GET /boards/1/tasks_by_columns | IP: 127.0.0.1 | UA: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/26.0.1 Safari/605.1.15
+2025-10-22 23:14:20 | INFO | <- GET /boards/1/tasks_by_columns | 200 | 0.007s | IP: 127.0.0.1
