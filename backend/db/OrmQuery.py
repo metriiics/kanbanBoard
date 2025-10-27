@@ -4,7 +4,7 @@ from fastapi import Depends
 from core.security import hash_password
 
 from db.database import engine, Base, session_factory
-from db.dbstruct import User, Workspace, Project, Board, Column
+from db.dbstruct import User, Workspace, Project, Board, Column, Task
 from api.models.user import UserCreate
 
 from sqlalchemy.orm import joinedload
@@ -61,6 +61,22 @@ class OrmQuery:
                 .filter(Board.id == board_id)
                 .first()
             )
+        
+    @staticmethod
+    def get_projects_by_user_id(user_id: int):
+        """
+        Возвращает список Project для workspaces, в которых состоит пользователь user_id,
+        заранее подгружая доски (joinedload).
+        """
+        with session_factory() as session:
+            return (
+                session.query(Project)
+                .join(Project.workspace)             # join на workspace через relationship
+                .join(Workspace.users)               # join на users через secondary association
+                .filter(User.id == user_id)          # фильтр по пользователю
+                .options(joinedload(Project.boards)) # заранее подгружаем доски
+                .all()
+            )
 
     @staticmethod
     def get_columns_with_tasks_by_board_id(board_id: int):
@@ -74,3 +90,8 @@ class OrmQuery:
                 )
                 .all()
             )
+        
+    @staticmethod
+    def get_task_by_id(task_id: int):
+        with session_factory() as session:
+            return session.query(Task).filter(Task.id == task_id).first()
