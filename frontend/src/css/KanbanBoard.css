@@ -450,3 +450,17 @@
     transform: translateY(0);
   }
 }
+
+.column-drag-handle {
+  cursor: grab;
+  font-size: 18px;
+  padding: 0 6px;
+  margin-right: 6px;
+  user-select: none;
+  color: #888;
+  transition: color 0.2s ease;
+}
+
+.column-drag-handle:hover {
+  color: #000;
+}

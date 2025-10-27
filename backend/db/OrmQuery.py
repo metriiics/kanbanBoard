@@ -4,7 +4,7 @@ from fastapi import Depends
 from core.security import hash_password
 
 from db.database import engine, Base, session_factory
-from db.dbstruct import User, Workspace, Project, Board, Column, Task
+from db.dbstruct import User, Workspace, Project, Board, Column, Task, UserWorkspace
 from api.models.user import UserCreate
 
 from sqlalchemy.orm import joinedload
@@ -63,20 +63,28 @@ class OrmQuery:
             )
         
     @staticmethod
-    def get_projects_by_user_id(user_id: int):
-        """
-        Возвращает список Project для workspaces, в которых состоит пользователь user_id,
-        заранее подгружая доски (joinedload).
-        """
+    def get_workspace_by_user_id(user_id: int) -> Workspace | None:
         with session_factory() as session:
             return (
+                session.query(Workspace)
+                .join(UserWorkspace, Workspace.id == UserWorkspace.workspace_id)
+                .filter(UserWorkspace.user_id == user_id)
+                .first()
+            )
+
+    @staticmethod
+    def get_projects_by_workspace_id(workspace_id: int) -> list[Project]:
+        """Возвращает проекты по workspace_id вместе с досками"""
+
+        with session_factory() as session:
+            projects = (
                 session.query(Project)
-                .join(Project.workspace)             # join на workspace через relationship
-                .join(Workspace.users)               # join на users через secondary association
-                .filter(User.id == user_id)          # фильтр по пользователю
-                .options(joinedload(Project.boards)) # заранее подгружаем доски
+                .options(joinedload(Project.boards))  # 👈 заранее подгружаем boards
+                .filter(Project.workspaces_id == workspace_id)
                 .all()
             )
+            # можно сделать deepcopy, чтобы точно "оторвать" от сессии
+            return projects
 
     @staticmethod
     def get_columns_with_tasks_by_board_id(board_id: int):
@@ -88,6 +96,7 @@ class OrmQuery:
                     joinedload(Column.tasks),                         # подгружаем задачи колонки
                     joinedload(Column.board).joinedload(Board.project) # подгружаем board -> project
                 )
+                .order_by(Column.position.asc())
                 .all()
             )
         
@@ -95,3 +104,15 @@ class OrmQuery:
     def get_task_by_id(task_id: int):
         with session_factory() as session:
             return session.query(Task).filter(Task.id == task_id).first()
+        
+    @staticmethod
+    def update_column_positions(positions: list[dict]):
+        """
+            Обновляет позиции колонок.
+        """
+        with session_factory() as session:
+            for col_data in positions:
+                session.query(Column).filter(Column.id == col_data["id"]).update(
+                    {"position": col_data["position"]}
+                )
+            session.commit()

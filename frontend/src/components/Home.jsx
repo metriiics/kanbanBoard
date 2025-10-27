@@ -85,7 +85,7 @@ export default function Home() {
           <div className="workspace-card fade-in-delay">
             <h2>Готов начать?</h2>
             <p>Перейди в своё рабочее пространство и продолжи работу над проектами.</p>
-            <Link to={`/${user.username}/board`} className="btn-workspace">
+            <Link to={`/${user.username}`} className="btn-workspace">
               Перейти в пространство →
             </Link>
           </div>

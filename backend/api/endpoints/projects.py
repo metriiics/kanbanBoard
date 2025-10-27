@@ -7,16 +7,23 @@ from api.models.projects import ProjectWithBoardsOut
 
 router = APIRouter()
 
-@router.get("/users/{user_id}/projects", response_model=List[ProjectWithBoardsOut])
-def get_user_projects(user_id: int, current_user = Depends(get_current_user)):
-    # текущая реализация security возвращает объект пользователя из БД
+@router.get("/api/workspace/projects", response_model=List[ProjectWithBoardsOut])
+def get_workspace_projects(
+        current_user = Depends(get_current_user)
+    ):
+    """
+    Возвращает проекты текущего пользователя по его workspace_id.
+    workspace_id берётся из связанной таблицы user_workspaces.
+    """
     current_user_id = getattr(current_user, "id", None)
-    if current_user_id is None:
+    if not current_user_id:
         raise HTTPException(status_code=401, detail="Невалидные учетные данные")
 
-    # разрешаем доступ только владельцу (тут можно расширить логику для ролей/админов)
-    if current_user_id != user_id:
-        raise HTTPException(status_code=403, detail="Доступ запрещен")
+    # Получаем workspace_id по user_id
+    workspace = OrmQuery.get_workspace_by_user_id(current_user_id)
+    if not workspace:
+        raise HTTPException(status_code=404, detail="Рабочее пространство не найдено")
 
-    projects = OrmQuery.get_projects_by_user_id(user_id) or []
-    return projects
+    # Получаем проекты по workspace_id
+    projects = OrmQuery.get_projects_by_workspace_id(workspace.id)
+    return projects or []

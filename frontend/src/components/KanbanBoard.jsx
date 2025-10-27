@@ -6,50 +6,21 @@ import KanbanColumn from "./KanbanColumn";
 import TaskModal from "./TaskModal";
 import KanbanTask from "./KanbanTask";
 import Sidebar from "./Sidebar";
+import useBoard from "../hooks/h_useBoard"; 
 
 export default function KanbanBoard() {
-  const { id } = useParams();
+  const { boardId } = useParams();
+  const { columns, setColumns, projectData, loading, error, saveColumnPositions } = useBoard(boardId);
+
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
   const [activeNav, setActiveNav] = useState('board'); // Активный пункт навигации
   const [selectedTask, setSelectedTask] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isModalRightAligned, setIsModalRightAligned] = useState(false);
 
-  const [columns, setColumns] = useState([
-    {
-      id: 1,
-      title: 'TO DO',
-      tasks: [
-        { id: 1, title: 'Создать дизайн', description: 'Разработать макет приложения', priority: 'high' },
-        { id: 2, title: 'Настроить API', description: 'Подключить бэкенд', priority: 'medium' }
-      ]
-    },
-    {
-      id: 2,
-      title: 'IN PROGRESS',
-      tasks: [
-        { id: 3, title: 'Разработка фронтенда', description: 'Создать React компоненты', priority: 'high' }
-      ]
-    },
-    {
-      id: 3,
-      title: 'REVIEW',
-      tasks: []
-    },
-    {
-      id: 4,
-      title: 'DONE',
-      tasks: [
-        { id: 4, title: 'Инициализация проекта', description: 'Создать базовую структуру', priority: 'low' }
-      ]
-    }
-  ]);
-
-  // Пример данных проекта и доски
-  const projectData = {
-    name: 'Разработка Kanban доски',
-    boardName: 'Активная разработка'
-  };
+  if (loading) return <div className="loading">Загрузка доски...</div>;
+  if (error) return <div className="error">Ошибка: {error.message}</div>;
+  if (!projectData) return <div className="empty">Нет данных по доске</div>;
 
   // Функция для добавления задачи в колонку
   const addTaskToColumn = (columnId, newTask) => {
@@ -108,6 +79,24 @@ export default function KanbanBoard() {
     });
   };
 
+  const moveColumn = (dragIndex, hoverIndex) => {
+    if (dragIndex === hoverIndex) return;
+
+    setColumns(prevColumns => {
+      const updatedColumns = [...prevColumns];
+      const [movedColumn] = updatedColumns.splice(dragIndex, 1);
+      updatedColumns.splice(hoverIndex, 0, movedColumn);
+
+      // обновляем позицию локально
+      const reordered = updatedColumns.map((col, i) => ({ ...col, position: i }));
+
+      // Сохраняем позиции на сервере (fire-and-forget)
+      saveColumnPositions(reordered);
+
+      return reordered;
+    });
+  };
+
   // Функция для открытия задачи
   const handleTaskClick = (task, columnTitle) => {
     setSelectedTask({ ...task, columnTitle });
@@ -137,10 +126,12 @@ export default function KanbanBoard() {
       case 'board':
         return (
           <div className="columns-container">
-            {columns.map(column => (
+            {columns.map((column, index) => (
               <KanbanColumn 
                 key={column.id} 
                 column={column}
+                index={index}   
+                moveColumn={moveColumn}
                 moveTaskBetweenColumns={moveTaskBetweenColumns}
                 moveTaskInColumn={moveTaskInColumn}
                 onTaskClick={handleTaskClick}

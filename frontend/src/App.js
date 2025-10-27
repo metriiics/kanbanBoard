@@ -6,7 +6,6 @@ import Home from "./components/Home";
 import Login from "./components/Login";
 import Registration from "./components/Registration";
 import KanbanBoard from "./components/KanbanBoard";
-import Workspace from "./components/Workspace";
 import WorkspaceHome from "./components/WorkspaceHome";
 import './App.css';
 import "./css/Home.css";
@@ -25,10 +24,10 @@ export default function App() {
             <Route path="/" element={<Home />} />
             <Route path="/login" element={<Login />} />
             <Route path="/registration" element={<Registration />} />
-            <Route path="/:username/board1" element={<KanbanBoard />} />
-            <Route path="/:username/board" element={<WorkspaceHome />} />
+            <Route path="/:username/project/:projectId/board/:boardId" element={<KanbanBoard />} />
+            <Route path="/:username/" element={<WorkspaceHome />} />
 
-            <Route path="/workspace" element={<ProtectedRoute> <Workspace /> </ProtectedRoute>} />
+            {/* <Route path="/workspace" element={<ProtectedRoute> <Workspace /> </ProtectedRoute>} /> */}
          </Routes>
     </AuthProvider>
   );

@@ -1,23 +1,27 @@
 import { useEffect, useState } from 'react';
 import { getProjectsByWorkspace } from '../api/workspaces';
 
-export function useProjects(workspaceId) {
+export function useProjects() {
   const [projects, setProjects] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    if (!workspaceId) return;
-    setLoading(true);
-
-    getProjectsByWorkspace(workspaceId)
-      .then((data) => setProjects(data))
-      .catch((err) => {
+    const fetchProjects = async () => {
+      try {
+        setLoading(true);
+        const data = await getProjectsByWorkspace();
+        setProjects(data);
+      } catch (err) {
         console.error('Ошибка при загрузке проектов:', err);
         setError(err);
-      })
-      .finally(() => setLoading(false));
-  }, [workspaceId]);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchProjects();
+  }, []);
 
   return { projects, loading, error };
 }

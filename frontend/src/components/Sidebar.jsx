@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Link, useLocation, useParams } from 'react-router-dom';
-import { useProjects } from '../hooks/useProjects';
+import { useProjects } from '../hooks/h_workspace';
+import { useCurrentUser } from '../hooks/h_useCurrentUser';
 
 export default function Sidebar({ isCollapsed, onToggle }) {
   const [expandedProjects, setExpandedProjects] = useState({});
@@ -8,10 +9,9 @@ export default function Sidebar({ isCollapsed, onToggle }) {
   const location = useLocation();
   const { id } = useParams();
 
-  const workspaceId = 1;
-  const workspaceName = 'mertiics';
-  const { projects, loading, error } = useProjects(workspaceId);
-
+  const { projects, loading, error } = useProjects();
+  const { user, loading: userLoading } = useCurrentUser();
+  const workspaceName = user?.username || 'Загрузка...';
 
   const handleProjectClick = (project) => {
     setSelectedProject(project);
@@ -27,8 +27,8 @@ export default function Sidebar({ isCollapsed, onToggle }) {
     console.log('Создать новую доску в проекте:', selectedProject?.name);
   };
 
-  const isBoardActive = (boardPath) => {
-    return location.pathname === boardPath;
+  const isBoardActive = (boardId) => {
+    return location.pathname.includes(`/boards/${boardId}`);
   };
 
   if (loading) return <div className="sidebar">Загрузка...</div>;
@@ -52,82 +52,94 @@ export default function Sidebar({ isCollapsed, onToggle }) {
   }
 
   return (
-    <div className="sidebar">
-      <div className="sidebar-header">
-        <div className="workspace-info">
-          <h3>{workspaceName}</h3>
-        </div>
-        <button className="toggle-btn" onClick={onToggle}>
-          ◀
-        </button>
-      </div>
-
-      <div className="sidebar-content">
-        <div className="sidebar-sections">
-          <div className="section">
-            <div className="section-header">
-              <h4 className="section-title">ПРОЕКТЫ</h4>
-              <button 
-                className="create-btn"
-                onClick={handleCreateProject}
-                title="Создать проект"
-              >
-                +
-              </button>
-            </div>
-            
-            {projects.map(project => (
-              <div key={project.id} className="project-item">
-                <div 
-                  className={`project-header ${selectedProject?.id === project.id ? 'selected' : ''}`}
-                  onClick={() => handleProjectClick(project)}
-                >
-                  <span className="project-icon">📁</span>
-                  <span className="project-name">{project.title}</span>
-                  <span className="project-boards-count">({project.boards?.length || 0})</span>
-                </div>
-              </div>
-            ))}
+      <div className="sidebar">
+        <div className="sidebar-header">
+          <div className="workspace-info">
+            <h3>{workspaceName}</h3>
           </div>
+          <button className="toggle-btn" onClick={onToggle}>
+            ◀
+          </button>
+        </div>
 
-          {selectedProject && (
+        <div className="sidebar-content">
+          <div className="sidebar-sections">
+
+            {/* === ПРОЕКТЫ === */}
             <div className="section">
               <div className="section-header">
-                <div className="boards-header">
-                  <h4 className="section-title">ДОСКИ</h4>
-                  <span className="selected-project-name">{selectedProject.name}</span>
-                </div>
-                <button 
+                <h4 className="section-title">ПРОЕКТЫ</h4>
+                <button
                   className="create-btn"
-                  onClick={handleCreateBoard}
-                  title="Создать доску"
+                  onClick={handleCreateProject}
+                  title="Создать проект"
                 >
                   +
                 </button>
               </div>
-              
-              <div className="boards-list">
-                {selectedProject.boards?.map(board => (
-                  <Link
-                    key={board.id}
-                    to={board.path}
-                    className={`board-link ${isBoardActive(board.path) ? 'active' : ''}`}
+
+              {projects.map((project) => (
+                <div key={project.id} className="project-item">
+                  <div
+                    className={`project-header ${
+                      selectedProject?.id === project.id ? 'selected' : ''
+                    }`}
+                    onClick={() => handleProjectClick(project)}
                   >
-                    <span className="board-icon">📋</span>
-                    <span className="board-name">{board.name}</span>
-                  </Link>
-                ))}
-              </div>
+                    <span className="project-icon">📁</span>
+                    <span className="project-name">{project.title}</span>
+                    <span className="project-boards-count">
+                      ({project.boards?.length || 0})
+                    </span>
+                  </div>
+                </div>
+              ))}
             </div>
-          )}
+
+            {/* === ДОСКИ === */}
+            {selectedProject && (
+              <div className="section">
+                <div className="section-header">
+                  <div className="boards-header">
+                    <h4 className="section-title">ДОСКИ</h4>
+                    <span className="selected-project-name">
+                      {selectedProject.title}
+                    </span>
+                  </div>
+                  <button
+                    className="create-btn"
+                    onClick={handleCreateBoard}
+                    title="Создать доску"
+                  >
+                    +
+                  </button>
+                </div>
+
+                <div className="boards-list">
+                  {selectedProject.boards?.map((board) => (
+                    <Link
+                      key={board.id}
+                      to={`/${user.username}/project/${selectedProject.id}/board/${board.id}`}
+                      className={`board-link ${
+                        isBoardActive(board.id) ? 'active' : ''
+                      }`}
+                    >
+                      <span className="board-icon">📋</span>
+                      <span className="board-name">{board.title}</span>
+                    </Link>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* === ОБЩЕЕ === */}
+        <div className="general-section-bottom">
+          <h4 className="section-title">ОБЩЕЕ</h4>
+          <div className="general-item">Дашборд</div>
+          <div className="general-item">Поиск задач</div>
         </div>
       </div>
-
-      <div className="general-section-bottom">
-        <h4 className="section-title">ОБЩЕЕ</h4>
-        <div className="general-item">Дашборд</div>
-        <div className="general-item">Поиск задач</div>
-      </div>
-    </div>
-  );
-}
+    );
+  }

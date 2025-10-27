@@ -2,12 +2,15 @@ from fastapi import APIRouter, Depends, HTTPException
 
 from core.security import get_current_user
 from api.models.tasks import BoardTasksOut, TaskFilledFieldsOut
+from db.OrmQuery import OrmQuery
+
+from db.dbstruct import Task as TaskModel
+
 
 router = APIRouter()
 
-@router.get("/boards/{board_id}/tasks_by_columns", response_model=BoardTasksOut)
+@router.get("/api/boards/{board_id}/columns", response_model=BoardTasksOut)
 def get_tasks_by_board(board_id: int, current_user = Depends(get_current_user)):
-    from db.OrmQuery import OrmQuery
 
     columns = OrmQuery.get_columns_with_tasks_by_board_id(board_id) or []
 
@@ -59,10 +62,8 @@ def get_tasks_by_board(board_id: int, current_user = Depends(get_current_user)):
         "columns": cols_out
     }
 
-@router.get("/tasks/{task_id}/filled_fields", response_model=TaskFilledFieldsOut)
+@router.get("/api/tasks/{task_id}", response_model=TaskFilledFieldsOut)
 def get_task_filled_fields(task_id: int, current_user = Depends(get_current_user)):
-    from db.OrmQuery import OrmQuery
-    from db.dbstruct import Task as TaskModel
 
     task = OrmQuery.get_task_by_id(task_id)
     if not task:

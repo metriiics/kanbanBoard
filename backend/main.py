@@ -1,6 +1,6 @@
 from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
-from api.endpoints import users, auth, projects, tasks
+from api.endpoints import users, auth, projects, tasks, columns
 from db.database import Base, engine
 from core.logger import logger
 import time
@@ -10,7 +10,7 @@ app.include_router(users.router) # Подключение роутеров
 app.include_router(auth.router) # Подключение роутеров
 app.include_router(projects.router) # Подключение роутеров
 app.include_router(tasks.router) # Подключение роутеров
-
+app.include_router(columns.router) # Подключение роутеров
 
 origins = ["http://localhost:3000"]
 
