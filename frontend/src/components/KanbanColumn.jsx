@@ -1,15 +1,33 @@
-import React, { useRef, useState } from 'react';
+import React, { useRef, useState, useEffect  } from 'react';
 import { useDrop, useDrag } from 'react-dnd';
 import KanbanTask from "./KanbanTask";
 
 export default function KanbanColumn({ column, onUpdateColumns, index, onTaskClick, moveColumn, moveTaskInColumn, moveTaskBetweenColumns, onAddTask }) {
   const [isAddingTask, setIsAddingTask] = useState(false);
   const [newTaskTitle, setNewTaskTitle] = useState('');
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isEditingTitle, setIsEditingTitle] = useState(false);
+  const [editedTitle, setEditedTitle] = useState(column.title);
+  const [color, setColor] = useState(column.color || '#f3f3f3');
   const taskCount = column.tasks.length;
 
+  const COLORS = ['#f3f3f3', '#ffd6a5', '#caffbf', '#a0c4ff', '#ffc6ff', '#ffffc0'];
+
   const ref = useRef(null);
+  const menuRef = useRef(null);
+
+  // закрытие меню по клику вне его
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (menuRef.current && !menuRef.current.contains(e.target)) {
+        setIsMenuOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
   
- // drag для самой колонки
+ // drag для колонки
   const [{ isDragging }, drag] = useDrag({
     type: 'column',
     item: { type: 'column', id: column.id, index },
@@ -92,6 +110,33 @@ export default function KanbanColumn({ column, onUpdateColumns, index, onTaskCli
     }
   };
 
+  // Изменение названия колонки
+  const handleTitleEdit = () => {
+    setIsEditingTitle(true);
+    setEditedTitle(column.title);
+  };
+
+  const handleTitleSave = () => {
+    setIsEditingTitle(false);
+    if (editedTitle.trim() && editedTitle !== column.title) {
+      onUpdateColumns((prev) =>
+        prev.map((col) =>
+          col.id === column.id ? { ...col, title: editedTitle } : col
+        )
+      );
+    }
+  };
+
+  // Изменение цвета
+  const handleColorChange = (newColor) => {
+    setColor(newColor);
+    onUpdateColumns((prev) =>
+      prev.map((col) =>
+        col.id === column.id ? { ...col, color: newColor } : col
+      )
+    );
+  };
+
   // Функция для отмены добавления
   const handleCancelAdd = () => {
     setNewTaskTitle('');
@@ -117,17 +162,55 @@ export default function KanbanColumn({ column, onUpdateColumns, index, onTaskCli
         transition: 'opacity 0.2s ease',
       }}
     >
-      <div className="column-header">
+      <div className="column-header" style={{ backgroundColor: color }}>
 
         <div ref={drag} className="column-drag-handle" title="Перетащить колонку">
           ⋮⋮
         </div>
 
         <div className="column-title">
-          <h3>{column.title}</h3>
+          {isEditingTitle ? (
+            <input
+              type="text"
+              value={editedTitle}
+              onChange={(e) => setEditedTitle(e.target.value)}
+              onBlur={handleTitleSave}
+              onKeyDown={(e) => e.key === 'Enter' && handleTitleSave()}
+              autoFocus
+              className="column-title-input"
+            />
+          ) : (
+            <h3 onClick={handleTitleEdit} title="Нажмите, чтобы переименовать">
+              {column.title}
+            </h3>
+          )}
           <span className="task-count">{column.tasks.length}</span>
         </div>
-        <button className="column-menu">⋯</button>
+
+        <button
+          className="column-menu"
+          onClick={() => setIsMenuOpen(!isMenuOpen)}
+          ref={menuRef}
+        >
+          ⋯
+        </button>
+
+        {isMenuOpen && (
+          <div className="column-dropdown" ref={menuRef}>
+            <button onClick={handleTitleEdit}>✏️ Переименовать</button>
+            <div className="color-picker">
+              {COLORS.map((c) => (
+                <div
+                  key={c}
+                  className={`color-dot ${color === c ? 'active' : ''}`}
+                  style={{ backgroundColor: c }}
+                  onClick={() => handleColorChange(c)}
+                />
+              ))}
+            </div>
+            <button className="delete-column-btn">🗑 Удалить</button>
+          </div>
+        )}
       </div>
 
       <div className="tasks-container">

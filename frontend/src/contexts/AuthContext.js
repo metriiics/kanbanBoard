@@ -50,21 +50,20 @@ export default function AuthProvider({ children }) {
       setError('');
       setLoading(true);
 
-      // fastapi эндпоинт для логина
       const response = await fetch('http://localhost:8000/api/auth/login', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, password }),
       });
 
       const data = await response.json();
 
       if (response.ok) {
-        // fastapi возвращает access_token и user данные
         localStorage.setItem('token', data.access_token);
-        setUser(data.user);
+
+        // сразу обновляем user через сервер
+        await checkAuth();
+
         return { success: true };
       } else {
         setError(data.detail || 'Ошибка авторизации');
@@ -77,6 +76,7 @@ export default function AuthProvider({ children }) {
       setLoading(false);
     }
   };
+
 
   const register = async (first_name, last_name, username, email, password) => {
     try {

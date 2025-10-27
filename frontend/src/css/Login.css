@@ -1,19 +1,20 @@
 .login-container {
   display: flex;
-  justify-content: center;
+  flex-direction: column;
   align-items: center;
+  justify-content: flex-start;
   min-height: 100vh;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  padding: 20px;
+  padding: 40px 20px;
 }
 
 .login-form {
-  background: white;
-  padding: 40px;
-  border-radius: 10px;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
   width: 100%;
   max-width: 400px;
+  background: #fff;
+  border-radius: 16px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+  padding: 32px;
+  margin-bottom: 24px;
 }
 
 .login-form h2 {
@@ -99,4 +100,57 @@
   border: 1px solid #fcc;
   text-align: center;
   font-size: 14px;
+}
+
+.politic-confirmation {
+  max-width: 420px;
+  text-align: center;
+}
+
+.terms-text {
+  font-size: 13px;
+  color: #666;
+  line-height: 1.5;
+}
+
+.terms-text a {
+  color: #007bff;
+  text-decoration: none;
+}
+
+.terms-text a:hover {
+  text-decoration: underline;
+}
+
+.brand {
+  font-weight: 600;
+}
+
+.password-group {
+  position: relative;
+}
+
+.password-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.password-wrapper input {
+  width: 100%;
+  padding-right: 38px; /* чтобы иконка не налезала на текст */
+}
+
+.password-toggle {
+  position: absolute;
+  right: 10px;
+  cursor: pointer;
+  color: #6b778c;
+  transition: color 0.3s ease;
+  display: flex;
+  align-items: center;
+}
+
+.password-toggle:hover {
+  color: #0747a6;
 }

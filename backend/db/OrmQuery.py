@@ -37,7 +37,7 @@ class OrmQuery:
             session.add(new_user)
 
             # создаём дефолтный воркспейс и связываем с пользователем
-            ws_name = f"{user.username}'s workspace" if user.username else "Workspace"
+            ws_name = user.username if user.username else "Workspace"
             new_workspace = Workspace(
                 name=ws_name,
                 description="Рабочее пространство созданное по умолчанию"

@@ -1,3 +1,4 @@
+/* === GLOBAL === */
 body {
   margin: 0;
   font-family: 'Inter', 'Segoe UI', Roboto, sans-serif;
@@ -5,7 +6,18 @@ body {
   color: #172b4d;
 }
 
-/* === Header === */
+.home-page {
+  max-width: 1400px;
+  margin: 0 auto;
+  background: #f4f5f7;
+}
+
+section {
+  margin-top: 80px;
+  margin-bottom: 80px;
+}
+
+/* === HEADER === */
 .home-header {
   display: flex;
   justify-content: space-between;
@@ -47,7 +59,7 @@ body {
   color: #0052cc;
 }
 
-/* === Аватар и меню пользователя === */
+/* === USER MENU === */
 .user-menu-container {
   position: relative;
   cursor: pointer;
@@ -120,18 +132,7 @@ body {
   background: #fff2f0;
 }
 
-/* === Анимация === */
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-    transform: translateY(-10px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-/* === Главная часть === */
+/* === HERO SECTION === */
 .home-main {
   flex-grow: 1;
   display: flex;
@@ -140,6 +141,39 @@ body {
   justify-content: center;
   padding: 3rem 1.5rem;
   text-align: center;
+  background: linear-gradient(180deg, #ffffff 0%, #f4f5f7 100%);
+}
+
+.hero-content {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 60px;
+  max-width: 1200px;
+  width: 100%;
+  margin: 0 auto;
+  flex-wrap: wrap;
+}
+
+.hero-text {
+  flex: 1 1 480px;
+  text-align: left;
+}
+
+.hero-image {
+  flex: 1 1 480px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.hero-image img {
+  width: 100%;
+  max-width: 520px;
+  height: auto;
+  border-radius: 18px;
+  box-shadow: 0 8px 24px rgba(9, 30, 66, 0.15);
+  object-fit: cover;
 }
 
 .main-title {
@@ -158,7 +192,7 @@ body {
   line-height: 1.6;
 }
 
-/* === CTA кнопки === */
+/* === CTA BUTTONS === */
 .cta-buttons {
   display: flex;
   gap: 1.2rem;
@@ -193,7 +227,7 @@ body {
   background: #d1deff;
 }
 
-/* === Workspace Card === */
+/* === WORKSPACE CARD === */
 .workspace-card {
   background: white;
   border-radius: 16px;
@@ -231,54 +265,7 @@ body {
   background: #0747a6;
 }
 
-/* === Авторы === */
-.authors-section {
-  background: white;
-  padding: 2rem;
-  text-align: center;
-  border-top: 1px solid #e0e0e0;
-}
-
-.authors-section h3 {
-  color: #0747a6;
-  margin-bottom: 0.8rem;
-}
-
-.authors-section ul {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-}
-
-.authors-section li {
-  display: inline-block;
-  margin: 0.3rem 0.8rem;
-  color: #172b4d;
-  font-weight: 500;
-}
-
-/* === Footer === */
-.home-footer {
-  text-align: center;
-  padding: 1rem 0;
-  font-size: 0.9rem;
-  color: #7a869a;
-  background: #f4f5f7;
-}
-
-/* === Анимация === */
-@keyframes fadeInUp {
-  from {
-    opacity: 0;
-    transform: translateY(30px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-/* --- MARQUEE SECTION --- */
+/* === MARQUEE === */
 .marquee-section {
   background: linear-gradient(90deg, #007bff, #4b9fff);
   color: white;
@@ -291,6 +278,123 @@ body {
 .marquee-item {
   margin-right: 50px;
   display: inline-block;
+}
+
+/* === ABOUT SECTION === */
+.about-section {
+  background: white;
+  padding: 80px 5%;
+  text-align: center;
+  box-shadow: 0 0 30px rgba(9, 30, 66, 0.05);
+  border-radius: 20px;
+}
+
+.about-content {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 50px;
+  flex-wrap: wrap;
+  max-width: 1200px;
+  margin: 0 auto 3rem auto;
+}
+
+.about-text {
+  flex: 1 1 500px;
+  text-align: left;
+}
+
+.about-image {
+  flex: 1 1 450px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.about-image img {
+  width: 100%;
+  max-width: 480px;
+  height: auto;
+  border-radius: 16px;
+  box-shadow: 0 8px 20px rgba(9, 30, 66, 0.12);
+}
+
+.about-grid {
+  display: flex;
+  justify-content: center;
+  gap: 2rem;
+  flex-wrap: wrap;
+  margin-top: 3rem;
+}
+
+.about-card {
+  background: #f9fbff;
+  border-radius: 16px;
+  padding: 1.5rem;
+  box-shadow: 0 5px 15px rgba(9, 30, 66, 0.08);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  width: 280px;
+  text-align: left;
+}
+
+.about-card:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 10px 25px rgba(9, 30, 66, 0.15);
+}
+
+.about-card img {
+  width: 100%;
+  height: 180px;
+  object-fit: cover;
+  border-radius: 12px;
+  margin-bottom: 1rem;
+}
+
+/* === FEATURES === */
+.features {
+  background: linear-gradient(180deg, #e9efff 0%, #f9fbff 100%);
+  text-align: center;
+  padding: 80px 5%;
+}
+
+.features h2 {
+  font-size: 2rem;
+  color: #0747a6;
+  margin-bottom: 3rem;
+}
+
+.feature-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 2rem;
+}
+
+.feature-card {
+  background: white;
+  padding: 1.8rem;
+  border-radius: 14px;
+  box-shadow: 0 5px 15px rgba(9, 30, 66, 0.07);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.feature-card:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 10px 25px rgba(9, 30, 66, 0.12);
+}
+
+.feature-card img {
+  width: 100%;
+  max-width: 300px;
+  height: auto;
+  margin-bottom: 1rem;
+  border-radius: 10px;
+  object-fit: cover;
+  box-shadow: 0 4px 12px rgba(9, 30, 66, 0.1);
+}
+
+.feature-card h3 {
+  color: #0747a6;
+  margin-bottom: 0.6rem;
 }
 
 /* === TEAM SECTION === */
@@ -308,10 +412,10 @@ body {
 }
 
 .team-grid {
-  display: flex;
-  justify-content: center;
-  flex-wrap: wrap;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
   gap: 40px;
+  justify-items: center;
 }
 
 .team-card {
@@ -347,7 +451,16 @@ body {
   color: #fff;
 }
 
-/* Анимация свечения */
+/* === FOOTER === */
+.home-footer {
+  text-align: center;
+  padding: 1rem 0;
+  font-size: 0.9rem;
+  color: #7a869a;
+  background: #f4f5f7;
+}
+
+/* === ANIMATIONS === */
 @keyframes glow {
   from {
     box-shadow: 0 0 10px #007bff, 0 0 20px #00e0ff;
@@ -355,4 +468,40 @@ body {
   to {
     box-shadow: 0 0 30px #00e0ff, 0 0 50px #007bff;
   }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* === FULL-WIDTH FIX === */
+body, html {
+  padding: 0;
+  margin: 0;
+  width: 100%;
+  overflow-x: hidden;
+}
+
+.home-page {
+  max-width: 100%;
+  margin: 0;
+  padding: 0;
 }

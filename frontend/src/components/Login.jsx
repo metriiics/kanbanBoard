@@ -1,14 +1,15 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
-
+import { Eye, EyeOff } from 'lucide-react';
 
 export default function Login() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const { login, user, loading, error, setError } = useAuth();
+  const [showPassword, setShowPassword] = useState(false);
   const navigate = useNavigate();
-
+  
   useEffect(() => {
     if (user) {
       navigate('/');
@@ -19,19 +20,22 @@ export default function Login() {
     return () => setError('');
   }, [setError]);
 
-  function handleSubmit(e) {
+  async function handleSubmit(e) {
     e.preventDefault();
-    
+
     if (!email || !password) {
       setError('Все поля обязательны для заполнения');
       return;
     }
 
-    login(email, password).then(result => {
-      if (result.success) {
+    const result = await login(email, password);
+
+    if (result.success) {
+      // подождём пока AuthContext обновится
+      setTimeout(() => {
         navigate('/');
-      }
-    });
+      }, 0);
+    }
   }
 
   return (
@@ -58,16 +62,24 @@ export default function Login() {
             />
           </div>
 
-          <div className="form-group">
+          <div className="form-group password-group">
             <label htmlFor="password">Пароль:</label>
-            <input 
-              type="password" 
-              id="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              placeholder="Введите пароль" 
-              disabled={loading}
-            />
+            <div className="password-wrapper">
+              <input 
+                type={showPassword ? "text" : "password"}
+                id="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                placeholder="Введите пароль"
+                disabled={loading}
+              />
+              <span
+                className="password-toggle"
+                onClick={() => setShowPassword(!showPassword)}
+              >
+                {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+              </span>
+            </div>
           </div>
 
           <button 
@@ -81,6 +93,12 @@ export default function Login() {
 
         <p className="register-link">
           Нет аккаунта? <Link to="/registration">Зарегистрируйтесь</Link>
+        </p>
+      </div>
+      <div className='politic-confirmation'>
+        <p className="terms-text">
+          Продолжая использовать <span className="brand">TaskFusion</span>, Вы принимаете условия{' '}
+          <Link to="/documents/privacy" target="_blank">Политики конфиденциальности</Link>.
         </p>
       </div>
     </div>

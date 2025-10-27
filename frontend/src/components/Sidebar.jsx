@@ -6,8 +6,13 @@ import { useCurrentUser } from '../hooks/h_useCurrentUser';
 export default function Sidebar({ isCollapsed, onToggle }) {
   const [expandedProjects, setExpandedProjects] = useState({});
   const [selectedProject, setSelectedProject] = useState(null);
+  const [showProjectModal, setShowProjectModal] = useState(false);
+  const [showBoardModal, setShowBoardModal] = useState(false);
   const location = useLocation();
   const { id } = useParams();
+
+  const [projectTitle, setProjectTitle] = useState('');
+  const [boardTitle, setBoardTitle] = useState('');
 
   const { projects, loading, error } = useProjects();
   const { user, loading: userLoading } = useCurrentUser();
@@ -19,12 +24,29 @@ export default function Sidebar({ isCollapsed, onToggle }) {
 
   const handleCreateProject = (e) => {
     e.stopPropagation();
-    console.log('Создать новый проект');
+    setShowProjectModal(true);
   };
 
   const handleCreateBoard = (e) => {
     e.stopPropagation();
-    console.log('Создать новую доску в проекте:', selectedProject?.name);
+    if (!selectedProject) return;
+    setShowBoardModal(true);
+  };
+
+  const handleProjectSubmit = async (e) => {
+    e.preventDefault();
+    console.log('Создать проект:', projectTitle);
+    // TODO: вызывать API (например useCreateProject hook)
+    setShowProjectModal(false);
+    setProjectTitle('');
+  };
+
+  const handleBoardSubmit = async (e) => {
+    e.preventDefault();
+    console.log('Создать доску:', boardTitle, 'в проекте:', selectedProject?.id);
+    // TODO: вызывать API (например useCreateBoard hook)
+    setShowBoardModal(false);
+    setBoardTitle('');
   };
 
   const isBoardActive = (boardId) => {
@@ -52,6 +74,7 @@ export default function Sidebar({ isCollapsed, onToggle }) {
   }
 
   return (
+    <>
       <div className="sidebar">
         <div className="sidebar-header">
           <div className="workspace-info">
@@ -89,7 +112,7 @@ export default function Sidebar({ isCollapsed, onToggle }) {
                     <span className="project-icon">📁</span>
                     <span className="project-name">{project.title}</span>
                     <span className="project-boards-count">
-                      ({project.boards?.length || 0})
+                      {project.boards?.length || 0}
                     </span>
                   </div>
                 </div>
@@ -141,5 +164,50 @@ export default function Sidebar({ isCollapsed, onToggle }) {
           <div className="general-item">Поиск задач</div>
         </div>
       </div>
-    );
-  }
+
+      {/* === МОДАЛКА: Создание проекта === */}
+      {showProjectModal && (
+        <div className="modal-overlay" onClick={() => setShowProjectModal(false)}>
+          <div className="modal-window" onClick={(e) => e.stopPropagation()}>
+            <h3>Создать проект</h3>
+            <form onSubmit={handleProjectSubmit}>
+              <input
+                type="text"
+                placeholder="Название проекта"
+                value={projectTitle}
+                onChange={(e) => setProjectTitle(e.target.value)}
+                required
+              />
+              <div className="modal-actions">
+                <button type="button" onClick={() => setShowProjectModal(false)}>Отмена</button>
+                <button type="submit">Создать</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* === МОДАЛКА: Создание доски === */}
+      {showBoardModal && (
+        <div className="modal-overlay" onClick={() => setShowBoardModal(false)}>
+          <div className="modal-window" onClick={(e) => e.stopPropagation()}>
+            <h3>Создать доску</h3>
+            <form onSubmit={handleBoardSubmit}>
+              <input
+                type="text"
+                placeholder="Название доски"
+                value={boardTitle}
+                onChange={(e) => setBoardTitle(e.target.value)}
+                required
+              />
+              <div className="modal-actions">
+                <button type="button" onClick={() => setShowBoardModal(false)}>Отмена</button>
+                <button type="submit">Создать</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+    </>
+  );
+}

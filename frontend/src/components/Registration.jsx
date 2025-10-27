@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
+import { Eye, EyeOff } from 'lucide-react';
 
 export default function Registration() {
   const [formData, setFormData] = useState({
@@ -11,6 +12,7 @@ export default function Registration() {
     password: '',
   });
 
+  const [showPassword, setShowPassword] = useState(false);
   const { register, user, loading, error, setError } = useAuth();
   const navigate = useNavigate();
 
@@ -101,16 +103,24 @@ export default function Registration() {
             />
           </div>
 
-          <div className="form-group">
+          <div className="form-group password-group">
             <label htmlFor="password">Пароль:</label>
-            <input
-              type="password"
-              id="password"
-              value={formData.password}
-              onChange={handleChange}
-              placeholder="Введите пароль"
-              disabled={loading}
-            />
+            <div className="password-wrapper">
+              <input
+                type={showPassword ? "text" : "password"}
+                id="password"
+                value={formData.password}
+                onChange={handleChange}
+                placeholder="Введите пароль"
+                disabled={loading}
+              />
+              <span
+                className="password-toggle"
+                onClick={() => setShowPassword(!showPassword)}
+              >
+                {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+              </span>
+            </div>
           </div>
 
           <button type="submit" className="register-btn" disabled={loading}>
@@ -120,6 +130,13 @@ export default function Registration() {
 
         <p className="login-link">
           Уже есть аккаунт? <Link to="/login">Войдите</Link>
+        </p>
+      </div>
+      
+      <div className='politic-confirmation'>
+        <p className="terms-text">
+          Продолжая использовать <span className="brand">TaskFusion</span>, Вы принимаете условия{' '}
+          <Link to="/documents/privacy" target="_blank">Политики конфиденциальности</Link>.
         </p>
       </div>
     </div>

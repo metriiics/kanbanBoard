@@ -136,6 +136,7 @@ export default function KanbanBoard() {
                 moveTaskInColumn={moveTaskInColumn}
                 onTaskClick={handleTaskClick}
                 onAddTask={addTaskToColumn}
+                onUpdateColumns={setColumns}
               />
             ))}
             <div className="add-column">

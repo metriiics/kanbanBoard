@@ -8,8 +8,8 @@
 /* Основной контент доски */
 .board-content {
   flex: 1;
-  margin-left: 240px;
-  transition: margin-left 0.3s ease;
+  margin-left: 280px;
+  transition: margin-left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   overflow: auto;
 }
 
@@ -463,4 +463,82 @@
 
 .column-drag-handle:hover {
   color: #000;
+}
+
+.column-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px;
+  border-radius: 8px 8px 0 0;
+  position: relative;
+}
+
+.column-title h3 {
+  margin: 0;
+  cursor: pointer;
+  transition: color 0.2s;
+}
+
+.column-title h3:hover {
+  color: #333;
+}
+
+.column-title-input {
+  font-size: 16px;
+  padding: 2px 4px;
+  width: 100%;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+.column-menu {
+  background: transparent;
+  border: none;
+  font-size: 20px;
+  cursor: pointer;
+}
+
+.column-dropdown {
+  position: absolute;
+  top: 38px;
+  right: 8px;
+  background: white;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+  padding: 6px;
+  display: flex;
+  flex-direction: column;
+  z-index: 10;
+}
+
+.column-dropdown button {
+  background: none;
+  border: none;
+  padding: 6px;
+  text-align: left;
+  cursor: pointer;
+}
+
+.column-dropdown button:hover {
+  background-color: #f3f3f3;
+}
+
+.color-picker {
+  display: flex;
+  justify-content: space-between;
+  padding: 4px;
+}
+
+.color-dot {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  cursor: pointer;
+  border: 2px solid transparent;
+}
+
+.color-dot.active {
+  border: 2px solid #333;
 }

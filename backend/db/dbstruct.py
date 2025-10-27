@@ -23,7 +23,7 @@ class User(Base):
 class Workspace(Base):
     __tablename__ = 'workspaces'
     
-    id: Mapped[int] = mapped_column(primary_key=True)
+    id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
     name: Mapped[Optional[str]] = mapped_column(String, nullable=True)
     description: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
     created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
@@ -82,7 +82,6 @@ class Task(Base):
     column: Mapped["Column"] = relationship(back_populates="tasks")
     comments: Mapped[List["Comment"]] = relationship(back_populates="task")
     labels: Mapped[List["Label"]] = relationship("Label", secondary="task_labels", back_populates="tasks")
-
 
 
 class TaskLabel(Base):
