@@ -1,5 +1,5 @@
 from pydantic import BaseModel, Field
-from typing import List, Optional
+from typing import List, Optional, Dict, Any
 from datetime import datetime
 
 class TaskOut(BaseModel):
@@ -27,3 +27,7 @@ class BoardTasksOut(BaseModel):
     board_title: Optional[str] = None
     project: Optional[ProjectInfo] = None
     columns: List[ColumnWithTasksOut] = Field(default_factory=list)
+
+class TaskFilledFieldsOut(BaseModel):
+    task_id: int
+    filled_fields: Dict[str, Any] = Field(default_factory=dict, description="Заполненные поля задачи: имя поля -> значение")

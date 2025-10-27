@@ -4,7 +4,7 @@ from fastapi import Depends
 from core.security import hash_password
 
 from db.database import engine, Base, session_factory
-from db.dbstruct import User, Workspace, Project, Board, Column
+from db.dbstruct import User, Workspace, Project, Board, Column, Task
 from api.models.user import UserCreate
 
 from sqlalchemy.orm import joinedload
@@ -74,3 +74,8 @@ class OrmQuery:
                 )
                 .all()
             )
+        
+    @staticmethod
+    def get_task_by_id(task_id: int):
+        with session_factory() as session:
+            return session.query(Task).filter(Task.id == task_id).first()

@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends, HTTPException
 
 from core.security import get_current_user
-from ..models.tasks import BoardTasksOut
+from api.models.tasks import BoardTasksOut, TaskFilledFieldsOut
 
 router = APIRouter()
 
@@ -58,3 +58,29 @@ def get_tasks_by_board(board_id: int, current_user = Depends(get_current_user)):
         "project": project_info,
         "columns": cols_out
     }
+
+@router.get("/tasks/{task_id}/filled_fields", response_model=TaskFilledFieldsOut)
+def get_task_filled_fields(task_id: int, current_user = Depends(get_current_user)):
+    from db.OrmQuery import OrmQuery
+    from db.dbstruct import Task as TaskModel
+
+    task = OrmQuery.get_task_by_id(task_id)
+    if not task:
+        raise HTTPException(status_code=404, detail="Задача не найдена")
+
+    filled: dict = {}
+    for col in TaskModel.__table__.columns:
+        name = col.name
+        value = getattr(task, name, None)
+        if value is None:
+            continue
+        # сериализуем datetime
+        if hasattr(value, "isoformat"):
+            try:
+                filled[name] = value.isoformat()
+            except Exception:
+                filled[name] = str(value)
+        else:
+            filled[name] = value
+
+    return {"task_id": task.id, "filled_fields": filled}
