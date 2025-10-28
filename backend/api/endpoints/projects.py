@@ -3,7 +3,7 @@ from typing import List
 
 from core.security import get_current_user
 from db.OrmQuery import OrmQuery
-from api.models.projects import ProjectWithBoardsOut
+from api.models.projects import ProjectWithBoardsOut, ProjectCreate, ProjectOut
 
 router = APIRouter()
 
@@ -27,3 +27,15 @@ def get_workspace_projects(
     # Получаем проекты по workspace_id
     projects = OrmQuery.get_projects_by_workspace_id(workspace.id)
     return projects or []
+
+@router.post("/api/projects/create", response_model=ProjectOut)
+def create_project_endpoint(
+    project: ProjectCreate,
+    current_user=Depends(get_current_user)
+):
+    workspace = OrmQuery.get_workspace_by_user_id(current_user.id)
+    if not workspace or workspace.id != project.workspaces_id:
+        raise HTTPException(status_code=403, detail="Нет доступа к рабочему пространству")
+
+    new_project = OrmQuery.create_project(project)
+    return new_project

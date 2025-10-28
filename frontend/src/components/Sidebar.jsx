@@ -1,6 +1,12 @@
-import React, { useState } from 'react';
-import { Link, useLocation, useParams } from 'react-router-dom';
-import { useProjects } from '../hooks/h_workspace';
+import React, { useState, useEffect, useRef } from 'react';
+import { Link, useLocation } from 'react-router-dom';
+import { createPortal } from 'react-dom';
+import {
+  useProjects,
+  useCreateProject,
+  useWorkspace,
+  useCreateBoard,
+} from '../hooks/h_workspace';
 import { useCurrentUser } from '../hooks/h_useCurrentUser';
 
 export default function Sidebar({ isCollapsed, onToggle }) {
@@ -8,19 +14,40 @@ export default function Sidebar({ isCollapsed, onToggle }) {
   const [selectedProject, setSelectedProject] = useState(null);
   const [showProjectModal, setShowProjectModal] = useState(false);
   const [showBoardModal, setShowBoardModal] = useState(false);
+  const [modalType, setModalType] = useState(null);
+  const [targetItem, setTargetItem] = useState(null);
+  const [newTitle, setNewTitle] = useState('');
+
+  const [dropdownData, setDropdownData] = useState(null); // { id, x, y, type }
+  const dropdownRef = useRef(null);
+
+  const createBoard = useCreateBoard();
+  const createProject = useCreateProject();
+  const { workspace } = useWorkspace();
+  const { projects, loading, error } = useProjects();
+  const { user } = useCurrentUser();
   const location = useLocation();
-  const { id } = useParams();
+
+  const workspaceName = user?.username || 'Загрузка...';
 
   const [projectTitle, setProjectTitle] = useState('');
   const [boardTitle, setBoardTitle] = useState('');
 
-  const { projects, loading, error } = useProjects();
-  const { user, loading: userLoading } = useCurrentUser();
-  const workspaceName = user?.username || 'Загрузка...';
+  // === Клик вне меню закрывает дропдаун ===
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (
+        dropdownRef.current &&
+        !dropdownRef.current.contains(e.target)
+      ) {
+        setDropdownData(null);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
 
-  const handleProjectClick = (project) => {
-    setSelectedProject(project);
-  };
+  const handleProjectClick = (project) => setSelectedProject(project);
 
   const handleCreateProject = (e) => {
     e.stopPropagation();
@@ -35,26 +62,134 @@ export default function Sidebar({ isCollapsed, onToggle }) {
 
   const handleProjectSubmit = async (e) => {
     e.preventDefault();
-    console.log('Создать проект:', projectTitle);
-    // TODO: вызывать API (например useCreateProject hook)
-    setShowProjectModal(false);
-    setProjectTitle('');
+    if (!workspace) return alert('Рабочее пространство не определено');
+    try {
+      const newProject = await createProject.mutateAsync({
+        title: projectTitle,
+        workspaces_id: workspace.id,
+      });
+      console.log('Проект создан:', newProject);
+      setShowProjectModal(false);
+      setProjectTitle('');
+      window.location.reload();
+    } catch (err) {
+      console.error('Ошибка при создании проекта:', err);
+      alert('Не удалось создать проект');
+    }
   };
 
   const handleBoardSubmit = async (e) => {
     e.preventDefault();
-    console.log('Создать доску:', boardTitle, 'в проекте:', selectedProject?.id);
-    // TODO: вызывать API (например useCreateBoard hook)
-    setShowBoardModal(false);
-    setBoardTitle('');
+    if (!selectedProject) return alert('Проект не выбран');
+    try {
+      const newBoard = await createBoard.mutateAsync({
+        title: boardTitle,
+        projects_id: selectedProject.id,
+      });
+      console.log('Доска создана:', newBoard);
+      setShowBoardModal(false);
+      setBoardTitle('');
+      window.location.reload();
+    } catch (err) {
+      console.error('Ошибка при создании доски:', err);
+      alert('Не удалось создать доску');
+    }
   };
 
-  const isBoardActive = (boardId) => {
-    return location.pathname.includes(`/boards/${boardId}`);
+  // === Универсальные модалки ===
+  const openRenameModal = (item, type) => {
+    setTargetItem(item);
+    setNewTitle(item.title);
+    setModalType(`rename-${type}`);
+    setDropdownData(null);
   };
+
+  const openDeleteModal = (item, type) => {
+    setTargetItem(item);
+    setModalType(`delete-${type}`);
+    setDropdownData(null);
+  };
+
+  const closeModal = () => {
+    setModalType(null);
+    setTargetItem(null);
+    setNewTitle('');
+  };
+
+  const handleRenameSubmit = (e) => {
+    e.preventDefault();
+    if (!newTitle.trim()) return;
+    console.log('Переименовать', modalType, 'в', newTitle);
+    closeModal();
+  };
+
+  const handleDeleteConfirm = () => {
+    console.log('Удалить', modalType, targetItem);
+    closeModal();
+  };
+
+  const isBoardActive = (boardId) =>
+    location.pathname.includes(`/boards/${boardId}`);
+
+  // === Открытие дропдауна (через портал) ===
+  const openDropdown = (e, id, type) => {
+    const rect = e.currentTarget.getBoundingClientRect();
+    setDropdownData({
+      id,
+      type,
+      x: rect.left,
+      y: rect.bottom + 4, // чуть ниже кнопки
+    });
+  };
+
+  // === Контент дропдауна ===
+  const dropdownMenu =
+    dropdownData &&
+    createPortal(
+      <div
+        ref={dropdownRef}
+        className="dropdown-menu"
+        style={{
+          position: 'absolute',
+          top: dropdownData.y,
+          left: dropdownData.x,
+        }}
+      >
+        <button
+          onClick={() =>
+            openRenameModal(
+              dropdownData.type === 'project'
+                ? projects.find((p) => p.id === dropdownData.id)
+                : selectedProject.boards.find((b) => b.id === dropdownData.id),
+              dropdownData.type
+            )
+          }
+        >
+          Переименовать
+        </button>
+        <button
+          onClick={() =>
+            openDeleteModal(
+              dropdownData.type === 'project'
+                ? projects.find((p) => p.id === dropdownData.id)
+                : selectedProject.boards.find((b) => b.id === dropdownData.id),
+              dropdownData.type
+            )
+          }
+        >
+          Удалить
+        </button>
+      </div>,
+      document.body
+    );
 
   if (loading) return <div className="sidebar">Загрузка...</div>;
-  if (error) return <div className="sidebar">Ошибка загрузки проектов {error.message || JSON.stringify(error, null, 2)}</div>;
+  if (error)
+    return (
+      <div className="sidebar">
+        Ошибка загрузки проектов: {error.message || JSON.stringify(error)}
+      </div>
+    );
 
   if (isCollapsed) {
     return (
@@ -87,7 +222,6 @@ export default function Sidebar({ isCollapsed, onToggle }) {
 
         <div className="sidebar-content">
           <div className="sidebar-sections">
-
             {/* === ПРОЕКТЫ === */}
             <div className="section">
               <div className="section-header">
@@ -111,9 +245,18 @@ export default function Sidebar({ isCollapsed, onToggle }) {
                   >
                     <span className="project-icon">📁</span>
                     <span className="project-name">{project.title}</span>
-                    <span className="project-boards-count">
-                      {project.boards?.length || 0}
-                    </span>
+
+                    <div
+                      className="menu-wrapper"
+                      onClick={(e) => e.stopPropagation()}
+                    >
+                      <button
+                        className="menu-button"
+                        onClick={(e) => openDropdown(e, project.id, 'project')}
+                      >
+                        ⋮
+                      </button>
+                    </div>
                   </div>
                 </div>
               ))}
@@ -140,16 +283,33 @@ export default function Sidebar({ isCollapsed, onToggle }) {
 
                 <div className="boards-list">
                   {selectedProject.boards?.map((board) => (
-                    <Link
-                      key={board.id}
-                      to={`/${user.username}/project/${selectedProject.id}/board/${board.id}`}
-                      className={`board-link ${
-                        isBoardActive(board.id) ? 'active' : ''
-                      }`}
-                    >
-                      <span className="board-icon">📋</span>
-                      <span className="board-name">{board.title}</span>
-                    </Link>
+                    <div key={board.id} className="board-item">
+                      <div
+                        className={`board-link-wrapper ${
+                          isBoardActive(board.id) ? 'active' : ''
+                        }`}
+                      >
+                        <Link
+                          to={`/${user.username}/project/${selectedProject.id}/board/${board.id}`}
+                          className="board-link"
+                        >
+                          <span className="board-icon">📋</span>
+                          <span className="board-name">{board.title}</span>
+                        </Link>
+
+                        <div
+                          className="menu-wrapper"
+                          onClick={(e) => e.stopPropagation()}
+                        >
+                          <button
+                            className="menu-button"
+                            onClick={(e) => openDropdown(e, board.id, 'board')}
+                          >
+                            ⋮
+                          </button>
+                        </div>
+                      </div>
+                    </div>
                   ))}
                 </div>
               </div>
@@ -165,6 +325,9 @@ export default function Sidebar({ isCollapsed, onToggle }) {
         </div>
       </div>
 
+      {/* === Дропдаун через Portal === */}
+      {dropdownMenu}
+
       {/* === МОДАЛКА: Создание проекта === */}
       {showProjectModal && (
         <div className="modal-overlay" onClick={() => setShowProjectModal(false)}>
@@ -179,7 +342,9 @@ export default function Sidebar({ isCollapsed, onToggle }) {
                 required
               />
               <div className="modal-actions">
-                <button type="button" onClick={() => setShowProjectModal(false)}>Отмена</button>
+                <button type="button" onClick={() => setShowProjectModal(false)}>
+                  Отмена
+                </button>
                 <button type="submit">Создать</button>
               </div>
             </form>
@@ -201,10 +366,72 @@ export default function Sidebar({ isCollapsed, onToggle }) {
                 required
               />
               <div className="modal-actions">
-                <button type="button" onClick={() => setShowBoardModal(false)}>Отмена</button>
+                <button type="button" onClick={() => setShowBoardModal(false)}>
+                  Отмена
+                </button>
                 <button type="submit">Создать</button>
               </div>
             </form>
+          </div>
+        </div>
+      )}
+
+      {/* === Универсальная модалка (переимен/удаление) === */}
+      {modalType && (
+        <div className="modal-overlay" onClick={closeModal}>
+          <div className="modal-window" onClick={(e) => e.stopPropagation()}>
+            {modalType.startsWith('rename') ? (
+              <>
+                <h3>
+                  {modalType.includes('project')
+                    ? 'Редактирование проекта'
+                    : 'Редактирование доски'}
+                </h3>
+                <form onSubmit={handleRenameSubmit}>
+                  <label>
+                    Название {modalType.includes('project') ? 'проекта' : 'доски'}
+                  </label>
+                  <input
+                    type="text"
+                    value={newTitle}
+                    onChange={(e) => setNewTitle(e.target.value)}
+                    placeholder="Введите новое название"
+                    required
+                  />
+                  <div className="modal-actions">
+                    <button type="button" onClick={closeModal}>
+                      Отмена
+                    </button>
+                    <button type="submit">Сохранить</button>
+                  </div>
+                </form>
+              </>
+            ) : (
+              <>
+                <h3>
+                  {modalType.includes('project')
+                    ? 'Удаление проекта'
+                    : 'Удаление доски'}
+                </h3>
+                <p>
+                  Вы уверены, что хотите удалить{' '}
+                  {modalType.includes('project') ? 'проект' : 'доску'}{' '}
+                  <strong>"{targetItem?.title}"</strong>?
+                </p>
+                <div className="modal-actions">
+                  <button type="button" onClick={closeModal}>
+                    Отмена
+                  </button>
+                  <button
+                    type="button"
+                    onClick={handleDeleteConfirm}
+                    style={{ background: '#ef4444', color: 'white' }}
+                  >
+                    Удалить
+                  </button>
+                </div>
+              </>
+            )}
           </div>
         </div>
       )}

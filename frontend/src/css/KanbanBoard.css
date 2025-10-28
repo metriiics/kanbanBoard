@@ -542,3 +542,111 @@
 .color-dot.active {
   border: 2px solid #333;
 }
+
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.55);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2000;
+  animation: fadeIn 0.2s ease-in-out;
+}
+
+.modal-window {
+  background: #1e2024;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 12px;
+  padding: 24px;
+  width: 320px;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.4);
+  animation: scaleIn 0.25s ease-out;
+  color: #e2e8f0;
+}
+
+.modal-window h3 {
+  margin: 0 0 16px;
+  font-size: 18px;
+  font-weight: 600;
+  color: #f8fafc;
+  text-align: center;
+}
+
+.modal-window form {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.modal-window input {
+  padding: 10px 12px;
+  border-radius: 8px;
+  border: 1px solid #374151;
+  background: #111214;
+  color: #f8fafc;
+  font-size: 14px;
+  outline: none;
+}
+
+.modal-window input:focus {
+  border-color: #3b82f6;
+}
+
+.modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.modal-actions button {
+  padding: 8px 16px;
+  border-radius: 6px;
+  border: none;
+  cursor: pointer;
+  font-weight: 500;
+  font-size: 14px;
+  transition: all 0.2s ease;
+}
+
+.modal-actions button[type="button"] {
+  background: rgba(255, 255, 255, 0.08);
+  color: #94a3b8;
+}
+
+.modal-actions button[type="button"]:hover {
+  background: rgba(255, 255, 255, 0.15);
+}
+
+.modal-actions button[type="submit"] {
+  background: #3b82f6;
+  color: white;
+}
+
+.modal-actions button[type="submit"]:hover {
+  background: #2563eb;
+}
+
+.color-picker-modal {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, 28px);
+  gap: 10px;
+  justify-content: center;
+  margin-bottom: 12px;
+}
+
+.color-picker-modal .color-dot {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  cursor: pointer;
+  border: 2px solid transparent;
+  transition: transform 0.2s ease, border-color 0.2s ease;
+}
+
+.color-picker-modal .color-dot.active {
+  border-color: #3b82f6;
+  transform: scale(1.15);
+}

@@ -3,6 +3,7 @@ from sqlalchemy.orm import Session
 from db.database import session_factory, get_db
 from db.OrmQuery import OrmQuery
 from api.models.user import UserRead
+from api.models.workspace import WorkspaceOut
 from db.dbstruct import User 
 from core.security import get_current_user
 
@@ -25,4 +26,10 @@ def get_user_endpoint(user_id: int):
         raise HTTPException(status_code=404, detail="Пользователь не найден")
     return UserRead.model_validate(db_user)
 
-   
+
+@router.get("/api/workspace/me", response_model=WorkspaceOut)
+def get_user_workspace(current_user = Depends(get_current_user)):
+    workspace = OrmQuery.get_workspace_by_user_id(current_user.id)
+    if not workspace:
+        raise HTTPException(status_code=404, detail="Рабочее пространство не найдено")
+    return workspace

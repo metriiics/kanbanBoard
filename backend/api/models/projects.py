@@ -11,3 +11,8 @@ class ProjectOut(BaseModel):
 
 class ProjectWithBoardsOut(ProjectOut):
     boards: List[BoardOut] = Field(default_factory=list, description="Список досок проекта")
+
+class ProjectCreate(BaseModel):
+    title: str = Field(..., description="Название проекта")
+    workspaces_id: int = Field(..., description="ID рабочего пространства, в котором создаётся проект")
+

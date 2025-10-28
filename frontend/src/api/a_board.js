@@ -9,3 +9,10 @@ export const getTaskDetails = async (taskId) => {
   const response = await api.get(`/api/tasks/${taskId}`);
   return response.data;
 };
+
+export const createBoard = async (data) => {
+  const response = await api.post("/api/boards/create", data, {
+    withCredentials: true,
+  });
+  return response.data;
+};

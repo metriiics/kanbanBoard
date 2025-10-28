@@ -6,6 +6,8 @@ from core.security import hash_password
 from db.database import engine, Base, session_factory
 from db.dbstruct import User, Workspace, Project, Board, Column, Task, UserWorkspace
 from api.models.user import UserCreate
+from api.models.projects import ProjectCreate
+from api.models.boards import BoardCreate
 
 from sqlalchemy.orm import joinedload
 
@@ -116,3 +118,42 @@ class OrmQuery:
                     {"position": col_data["position"]}
                 )
             session.commit()
+
+    @staticmethod
+    def get_project_by_id(projects_id: int):
+        with session_factory() as session:
+            project = session.query(Project).filter(Project.id == projects_id).first()
+            return project
+
+
+    @staticmethod
+    def create_project(project: ProjectCreate):
+        with session_factory() as session:
+            new_project = Project(
+                title=project.title,
+                workspaces_id=project.workspaces_id
+            )
+            session.add(new_project)
+            session.commit()
+            session.refresh(new_project)
+            return new_project
+
+    @staticmethod
+    def create_board(board: BoardCreate):
+        with session_factory() as session:
+            # Создаем доску
+            new_board = Board(
+                title=board.title,
+                projects_id=board.projects_id
+            )
+            session.add(new_board)
+            session.flush()  # получаем new_board.id
+
+            # Добавляем стандартные колонки
+            default_columns = ["Open", "Progress", "Review", "Done", "Backlog"]
+            for idx, col_title in enumerate(default_columns):
+                session.add(Column(title=col_title, board_id=new_board.id, position=idx))
+
+            session.commit()
+            session.refresh(new_board)
+            return new_board

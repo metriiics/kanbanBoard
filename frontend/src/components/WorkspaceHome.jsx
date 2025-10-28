@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { getProjectsByWorkspace } from "../api/workspaces";
+import { getProjectsByWorkspace } from "../api/a_workspaces";
 import { useAuth } from "../contexts/AuthContext";
 import Sidebar from "./Sidebar"; 
 

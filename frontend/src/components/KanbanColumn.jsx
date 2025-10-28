@@ -2,7 +2,17 @@ import React, { useRef, useState, useEffect  } from 'react';
 import { useDrop, useDrag } from 'react-dnd';
 import KanbanTask from "./KanbanTask";
 
-export default function KanbanColumn({ column, onUpdateColumns, index, onTaskClick, moveColumn, moveTaskInColumn, moveTaskBetweenColumns, onAddTask }) {
+export default function KanbanColumn({ 
+  column, 
+  onUpdateColumns, 
+  index, 
+  onTaskClick, 
+  moveColumn, 
+  moveTaskInColumn, 
+  moveTaskBetweenColumns, 
+  onAddTask,
+  onDeleteColumn }) {
+    
   const [isAddingTask, setIsAddingTask] = useState(false);
   const [newTaskTitle, setNewTaskTitle] = useState('');
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -10,6 +20,9 @@ export default function KanbanColumn({ column, onUpdateColumns, index, onTaskCli
   const [editedTitle, setEditedTitle] = useState(column.title);
   const [color, setColor] = useState(column.color || '#f3f3f3');
   const taskCount = column.tasks.length;
+
+  const [showColorModal, setShowColorModal] = useState(false);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
 
   const COLORS = ['#f3f3f3', '#ffd6a5', '#caffbf', '#a0c4ff', '#ffc6ff', '#ffffc0'];
 
@@ -131,10 +144,14 @@ export default function KanbanColumn({ column, onUpdateColumns, index, onTaskCli
   const handleColorChange = (newColor) => {
     setColor(newColor);
     onUpdateColumns((prev) =>
-      prev.map((col) =>
-        col.id === column.id ? { ...col, color: newColor } : col
-      )
+      prev.map((col) => (col.id === column.id ? { ...col, color: newColor } : col))
     );
+    setShowColorModal(false);
+  };
+
+  const confirmDelete = () => {
+    if (onDeleteColumn) onDeleteColumn(column.id);
+    setShowDeleteModal(false);
   };
 
   // Функция для отмены добавления
@@ -197,18 +214,11 @@ export default function KanbanColumn({ column, onUpdateColumns, index, onTaskCli
 
         {isMenuOpen && (
           <div className="column-dropdown" ref={menuRef}>
-            <button onClick={handleTitleEdit}>✏️ Переименовать</button>
-            <div className="color-picker">
-              {COLORS.map((c) => (
-                <div
-                  key={c}
-                  className={`color-dot ${color === c ? 'active' : ''}`}
-                  style={{ backgroundColor: c }}
-                  onClick={() => handleColorChange(c)}
-                />
-              ))}
-            </div>
-            <button className="delete-column-btn">🗑 Удалить</button>
+            <button onClick={handleTitleEdit}>Переименовать</button>
+            <button onClick={() => setShowColorModal(true)}>Цвет</button>
+            <button className="delete-column-btn" onClick={() => setShowDeleteModal(true)}>
+              Удалить
+            </button>
           </div>
         )}
       </div>
@@ -264,6 +274,50 @@ export default function KanbanColumn({ column, onUpdateColumns, index, onTaskCli
           </div>
         )}
       </div>
+      
+      {/* === МОДАЛКА: выбор цвета === */}
+      {showColorModal && (
+        <div className="modal-overlay" onClick={() => setShowColorModal(false)}>
+          <div className="modal-window" onClick={(e) => e.stopPropagation()}>
+            <h3>Выберите цвет</h3>
+            <div className="color-picker-modal">
+              {COLORS.map((c) => (
+                <div
+                  key={c}
+                  className={`color-dot ${color === c ? 'active' : ''}`}
+                  style={{ backgroundColor: c }}
+                  onClick={() => handleColorChange(c)}
+                />
+              ))}
+            </div>
+            <div className="modal-actions">
+              <button type="button" onClick={() => setShowColorModal(false)}>
+                Закрыть
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* === МОДАЛКА: подтверждение удаления === */}
+      {showDeleteModal && (
+        <div className="modal-overlay" onClick={() => setShowDeleteModal(false)}>
+          <div className="modal-window" onClick={(e) => e.stopPropagation()}>
+            <h3>Удаление колонки</h3>
+            <p style={{ textAlign: 'center', marginBottom: '16px', color: '#94a3b8' }}>
+              Вы уверены, что хотите удалить колонку «{column.title}»?
+            </p>
+            <div className="modal-actions">
+              <button type="button" onClick={() => setShowDeleteModal(false)}>
+                Отмена
+              </button>
+              <button type="submit" onClick={confirmDelete}>
+                Удалить
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

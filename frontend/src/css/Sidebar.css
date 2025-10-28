@@ -145,7 +145,9 @@
   transition: all 0.3s ease;
   user-select: none;
   position: relative;
-  overflow: hidden;
+
+  overflow: visible; 
+  z-index: 1;
 }
 
 .project-header::before {
@@ -247,16 +249,24 @@
   margin-bottom: 12px;
 }
 
+.board-link-wrapper {
+  display: flex;
+  align-items: center; /* центрируем всё по вертикали */
+  justify-content: space-between;
+  padding-right: 8px;
+  position: relative;
+}
+
 .board-link {
   display: flex;
   align-items: center;
-  padding: 8px 12px 8px 32px;
+  flex: 1;
+  padding: 8px 0 8px 32px;
   color: #8b9cb1;
   text-decoration: none;
   border-radius: 6px;
   transition: all 0.3s ease;
   font-size: 13px;
-  margin-bottom: 4px;
   position: relative;
 }
 
@@ -276,8 +286,10 @@
 }
 
 .board-link:hover::before {
-  color: #667eea;
-  transform: scale(1.5);
+  background-color: #e6f3ff;
+  border-left: 4px solid #007bff;
+  font-weight: 600;
+  color: #007bff;
 }
 
 .board-link.active {
@@ -343,6 +355,74 @@
   font-size: 16px;
   width: 20px;
   text-align: center;
+}
+
+/* Троеточия */
+.menu-wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+}
+
+.menu-button {
+  background: transparent;
+  border: none;
+  font-size: 18px;
+  color: white;
+  cursor: pointer;
+  padding: 4px 6px;
+  border-radius: 6px;
+  transition: background 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.menu-button:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.dropdown-menu {
+  position: absolute;
+  top: 100%; /* сразу под кнопкой */
+  left: 0;   /* левый край меню совпадает с левым краем троеточия */
+  background: #ffffff;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+  display: flex;
+  flex-direction: column;
+  min-width: 140px;
+  z-index: 9999;
+  overflow: hidden;
+  animation: fadeIn 0.12s ease-out;
+}
+
+.dropdown-menu button {
+  background: none;
+  border: none;
+  text-align: left;
+  padding: 8px 12px;
+  cursor: pointer;
+  font-size: 14px;
+  color: #222;
+  transition: background 0.2s ease;
+}
+
+.dropdown-menu button:hover {
+  background: #f5f5f5;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 /* Свернутое состояние */
