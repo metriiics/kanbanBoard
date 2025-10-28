@@ -1,0 +1,59 @@
+services:
+  backend:
+    build:
+      context: ./backend
+    env_file:
+      - ./backend/.env.docker
+    secrets:
+      - db_pass
+      - secret_key
+      - salt
+    volumes:
+      - ./backend/media:/backend/media
+      - ./backend/static:/backend/static
+    ports:
+      - "8000:8000"
+    expose:
+      - 8000
+    depends_on:
+      - db
+
+  frontend:
+    build:
+      context: ./frontend
+    expose:
+      - 80
+
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: kanbandb
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD_FILE: /run/secrets/db_pass
+    secrets:
+      - db_pass
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  nginx:
+    image: nginx:alpine
+    ports:
+      - "80:80"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./backend/static:/backend/static
+      - ./backend/media:/media
+    depends_on:
+      - backend
+      - frontend
+
+volumes:
+  postgres_data:
+
+secrets:
+  db_pass:
+    file: ./secrets/db_pass
+  secret_key:
+    file: ./secrets/secret_key
+  salt:
+    file: ./secrets/salt
