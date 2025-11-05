@@ -2,6 +2,11 @@ from pydantic import BaseModel, Field
 from typing import List, Optional, Dict, Any
 from datetime import datetime
 
+class ColorOut(BaseModel):
+    id: int
+    name: str
+    hex_code: str
+
 class TaskOut(BaseModel):
     id: int
     title: Optional[str] = None
@@ -14,6 +19,7 @@ class ColumnWithTasksOut(BaseModel):
     id: int
     title: Optional[str] = None
     board_id: int
+    color: Optional[ColorOut] = None 
     tasks: List[TaskOut] = Field(default_factory=list)
 
 class ProjectInfo(BaseModel):

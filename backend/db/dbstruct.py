@@ -54,6 +54,16 @@ class Board(Base):
     project: Mapped["Project"] = relationship(back_populates="boards")
     columns: Mapped[List["Column"]] = relationship(back_populates="board")
 
+class ColorPalette(Base):
+    __tablename__ = 'color_palettes'
+    
+    id: Mapped[int] = mapped_column(primary_key=True)
+    name: Mapped[str] = mapped_column(String, unique=True)
+    hex_code: Mapped[str] = mapped_column(String)
+    is_active: Mapped[bool] = mapped_column(Boolean, default=True)
+
+    columns: Mapped[List["Column"]] = relationship(back_populates="color")
+
 class Column(Base):
     __tablename__ = 'columns'
     
@@ -61,9 +71,11 @@ class Column(Base):
     title: Mapped[Optional[str]] = mapped_column(String, nullable=True)
     position: Mapped[Optional[int]] = mapped_column(Integer, nullable=True)
     board_id: Mapped[int] = mapped_column(ForeignKey("boards.id"))
+    color_id: Mapped[int] = mapped_column(ForeignKey("color_palettes.id"))
     
     board: Mapped["Board"] = relationship(back_populates="columns")
     tasks: Mapped[List["Task"]] = relationship(back_populates="column")
+    color: Mapped["ColorPalette"] = relationship(back_populates="columns")
 
 class Task(Base):
     __tablename__ = 'tasks'

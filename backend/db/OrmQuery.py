@@ -4,7 +4,7 @@ from fastapi import Depends
 from core.security import hash_password
 
 from db.database import engine, Base, session_factory
-from db.dbstruct import User, Workspace, Project, Board, Column, Task, UserWorkspace, Comment, Label
+from db.dbstruct import User, Workspace, Project, Board, Column, Task, UserWorkspace, Comment, Label, ColorPalette
 from api.models.user import UserCreate
 from api.models.projects import ProjectCreate
 from api.models.boards import BoardCreate
@@ -133,7 +133,8 @@ class OrmQuery:
                 .filter(Column.board_id == board_id)
                 .options(
                     joinedload(Column.tasks),                         # подгружаем задачи колонки
-                    joinedload(Column.board).joinedload(Board.project) # подгружаем board -> project
+                    joinedload(Column.board).joinedload(Board.project),
+                    joinedload(Column.color) 
                 )
                 .order_by(Column.position.asc())
                 .all()
@@ -296,3 +297,33 @@ class OrmQuery:
             session.commit()
             session.refresh(new_board)
             return new_board
+        
+    @classmethod
+    def get_available_colors(cls):
+        with session_factory() as session:
+            return session.query(ColorPalette).filter_by(is_active=True).all()
+        
+    @classmethod
+    def get_column_by_id(cls, column_id: int):
+        """Получить колонку по ID"""
+        with session_factory() as session:
+            return session.query(Column).filter(Column.id == column_id).first()
+
+    @classmethod
+    def get_color_by_id(cls, color_id: int):
+        """Получить цвет по ID"""
+        with session_factory() as session:
+            return session.query(ColorPalette).filter(ColorPalette.id == color_id).first()
+
+    @classmethod
+    def update_column_color(cls, column_id: int, color_id: int):
+        """Обновить цвет колонки"""
+        with session_factory() as session:
+            column = session.query(Column).filter(Column.id == column_id).first()
+            if column:
+                column.color_id = color_id
+                session.commit()
+                session.refresh(column)
+                # Загружаем связанные данные цвета
+                column.color
+            return column

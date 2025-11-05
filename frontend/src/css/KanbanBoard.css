@@ -481,6 +481,43 @@
   border-bottom: 1px solid #f1f3f4;
 }
 
+.color-picker-modal {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 8px;
+  margin-bottom: 16px;
+  padding: 8px;
+  border-radius: 8px;
+  background: #f8f9fa;
+}
+
+.color-dot {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  cursor: pointer;
+  border: 3px solid transparent;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.color-dot:hover {
+  transform: scale(1.1);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.color-dot.active {
+  border-color: #111;
+  transform: scale(1.1);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+}
+
+/* Дополнительные стили для улучшения внешнего вида модального окна */
+.modal-window .color-picker-modal {
+  max-height: 200px;
+  overflow-y: auto;
+}
+
 .column-dropdown button:last-child {
   border-bottom: none;
 }

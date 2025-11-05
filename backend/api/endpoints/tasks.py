@@ -58,10 +58,21 @@ def get_tasks_by_board(board_id: int, current_user = Depends(get_current_user)):
     cols_out = []
     for c in columns:
         board_id_val = getattr(c, "board_id", None) or getattr(c, "boards_id", None) or (getattr(c, "board", None).id if getattr(c, "board", None) else None)
+        
+        # Добавляем информацию о цвете
+        color_info = None
+        if hasattr(c, 'color') and c.color:
+            color_info = {
+                "id": c.color.id,
+                "name": c.color.name,
+                "hex_code": c.color.hex_code
+            }
+        
         cols_out.append({
             "id": c.id,
             "title": getattr(c, "title", None),
             "board_id": board_id_val,
+            "color": color_info,  # ← ДОБАВЛЯЕМ ЦВЕТ
             "tasks": [
                 {
                     "id": t.id,

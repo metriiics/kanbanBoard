@@ -1,5 +1,7 @@
+
 import React, { useRef, useState, useEffect  } from 'react';
 import { useDrop, useDrag } from 'react-dnd';
+import { useColors } from '../hooks/h_useColors';
 import KanbanTask from "./KanbanTask";
 
 export default function KanbanColumn({ 
@@ -24,7 +26,7 @@ export default function KanbanColumn({
   const [showColorModal, setShowColorModal] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
 
-  const COLORS = ['#f3f3f3', '#ffd6a5', '#caffbf', '#a0c4ff', '#ffc6ff', '#ffffc0'];
+  const { colors, loading: colorsLoading } = useColors();
 
   const ref = useRef(null);
   const menuRef = useRef(null);
@@ -141,12 +143,22 @@ export default function KanbanColumn({
   };
 
   // Изменение цвета
-  const handleColorChange = (newColor) => {
-    setColor(newColor);
-    onUpdateColumns((prev) =>
-      prev.map((col) => (col.id === column.id ? { ...col, color: newColor } : col))
-    );
-    setShowColorModal(false);
+  const handleColorChange = (colorId) => {
+  // Находим цвет по ID
+    const selectedColor = colors.find(color => color.id === colorId);
+    
+    if (selectedColor) {
+      // Обновляем локальное состояние с объектом цвета
+      onUpdateColumns((prev) =>
+        prev.map((col) => 
+          col.id === column.id ? { 
+            ...col, 
+            color: selectedColor  // ← Сохраняем объект цвета, а не только hex
+          } : col
+        )
+      );
+      setShowColorModal(false);
+    }
   };
 
   const confirmDelete = () => {
@@ -170,6 +182,8 @@ export default function KanbanColumn({
     }
   };
 
+  const currentColor = column.color?.hex_code || '#f3f3f3';
+
   return (
     <div
       ref={ref}
@@ -179,7 +193,7 @@ export default function KanbanColumn({
         transition: 'opacity 0.2s ease',
       }}
     >
-      <div className="column-header" style={{ backgroundColor: color }}>
+      <div className="column-header" style={{ backgroundColor: currentColor  }}>
 
         <div ref={drag} className="column-drag-handle" title="Перетащить колонку">
           ⋮⋮
@@ -280,16 +294,21 @@ export default function KanbanColumn({
         <div className="modal-overlay" onClick={() => setShowColorModal(false)}>
           <div className="modal-window" onClick={(e) => e.stopPropagation()}>
             <h3>Выберите цвет</h3>
-            <div className="color-picker-modal">
-              {COLORS.map((c) => (
-                <div
-                  key={c}
-                  className={`color-dot ${color === c ? 'active' : ''}`}
-                  style={{ backgroundColor: c }}
-                  onClick={() => handleColorChange(c)}
-                />
-              ))}
-            </div>
+            {colorsLoading ? (
+              <div>Загрузка цветов...</div>
+            ) : (
+              <div className="color-picker-modal">
+                {colors.map((color) => (
+                  <div
+                    key={color.id}
+                    className={`color-dot ${column.color?.id === color.id ? 'active' : ''}`}
+                    style={{ backgroundColor: color.hex_code }}
+                    onClick={() => handleColorChange(color.id)}
+                    title={color.name}
+                  />
+                ))}
+              </div>
+            )}
             <div className="modal-actions">
               <button type="button" onClick={() => setShowColorModal(false)}>
                 Закрыть
