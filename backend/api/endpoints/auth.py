@@ -10,19 +10,29 @@ from db.dbstruct import User
 
 router = APIRouter()
 
-@router.post("/api/auth/register", response_model=UserRead) # Создание нового пользователя
+@router.post("/api/auth/register", response_model=UserRead)
 def create_user_endpoint(user: UserCreate):
-    db_user = OrmQuery.get_user_by_email(email=user.email) # Проверка, что пользователь с таким email не существует
+
+    '''
+    Регистрация нового пользователя
+    '''
+
+    db_user = OrmQuery.get_user_by_email(email=user.email)
     if db_user:
         raise HTTPException(status_code=400, detail="Имя пользователя или email уже заняты")
 
     new_user = OrmQuery.create_user(user=user)
     return UserRead.model_validate(new_user)
 
-@router.post("/api/auth/login") # Вход пользователя и получение JWT токена
+@router.post("/api/auth/login")
 def login(user: UserLogin):
+
+    '''
+    Аутентификация пользователя и получение токена
+    '''
+
     db_user = OrmQuery.get_user_by_email(email=user.email)
-    if not db_user or not verify_password(user.password, db_user.password): # Проверка email и пароля
+    if not db_user or not verify_password(user.password, db_user.password):
         raise HTTPException(status_code=400, detail="Неверные учетные данные")
     
     access_token = create_access_token(data={"sub": db_user.email})

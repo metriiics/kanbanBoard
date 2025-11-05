@@ -9,8 +9,13 @@ from core.security import get_current_user
 
 router = APIRouter()
     
-@router.get("/api/users/me") # Получение информации о текущем пользователе (защищенная ручка для проверки токена) - работает
+@router.get("/api/users/me")
 def read_users_me(current_user: User = Depends(get_current_user)):
+
+    """
+    Возвращает информацию о текущем пользователе.
+    """
+
     return {
         "id": current_user.id,
         "email": current_user.email,
@@ -19,8 +24,13 @@ def read_users_me(current_user: User = Depends(get_current_user)):
         "username": current_user.username
     }  
 
-@router.get("/api/users/{user_id}", response_model=UserRead) # Получение информации о пользователе по ID
+@router.get("/api/users/{user_id}", response_model=UserRead)
 def get_user_endpoint(user_id: int):
+
+    """
+    Возвращает информацию о пользователе по его ID.
+    """
+
     db_user = OrmQuery.get_user_by_id(user_id=user_id)
     if db_user is None:
         raise HTTPException(status_code=404, detail="Пользователь не найден")

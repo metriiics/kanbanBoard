@@ -11,7 +11,6 @@ def create_board_endpoint(board: BoardCreate, current_user=Depends(get_current_u
     """
     Создает доску и автоматически добавляет стандартные колонки.
     """
-    # Проверим, что проект существует и принадлежит пользователю
     project = OrmQuery.get_project_by_id(board.projects_id)
     if not project:
         raise HTTPException(status_code=404, detail="Проект не найден")
