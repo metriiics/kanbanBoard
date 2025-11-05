@@ -11,19 +11,19 @@ router = APIRouter()
 def get_workspace_projects(
         current_user = Depends(get_current_user)
     ):
+
     """
     Возвращает проекты текущего пользователя по его workspace_id.
     workspace_id берётся из связанной таблицы user_workspaces.
     """
+    
     current_user_id = getattr(current_user, "id", None)
     if not current_user_id:
         raise HTTPException(status_code=401, detail="Невалидные учетные данные")
 
-    # Получаем workspace_id по user_id
     workspace = OrmQuery.get_workspace_by_user_id(current_user_id)
     if not workspace:
         raise HTTPException(status_code=404, detail="Рабочее пространство не найдено")
 
-    # Получаем проекты по workspace_id
     projects = OrmQuery.get_projects_by_workspace_id(workspace.id)
     return projects or []
