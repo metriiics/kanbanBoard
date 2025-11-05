@@ -201,7 +201,7 @@ export default function Sidebar({ isCollapsed, onToggle }) {
         </div>
         <div className="sidebar-content">
           <div className="workspace-icon">
-            <span title={workspaceName}>🏢</span>
+            <span title={workspaceName}></span>
           </div>
         </div>
       </div>
@@ -254,7 +254,7 @@ export default function Sidebar({ isCollapsed, onToggle }) {
                         className="menu-button"
                         onClick={(e) => openDropdown(e, project.id, 'project')}
                       >
-                        ⋮
+                        ...
                       </button>
                     </div>
                   </div>
@@ -272,43 +272,25 @@ export default function Sidebar({ isCollapsed, onToggle }) {
                       {selectedProject.title}
                     </span>
                   </div>
-                  <button
-                    className="create-btn"
-                    onClick={handleCreateBoard}
-                    title="Создать доску"
-                  >
-                    +
-                  </button>
+                  <button className="create-btn" onClick={handleCreateBoard}>+</button>
                 </div>
 
                 <div className="boards-list">
                   {selectedProject.boards?.map((board) => (
                     <div key={board.id} className="board-item">
-                      <div
-                        className={`board-link-wrapper ${
-                          isBoardActive(board.id) ? 'active' : ''
-                        }`}
+                      <Link
+                        to={`/${user.username}/project/${selectedProject.id}/board/${board.id}`}
+                        className={`board-link-wrapper ${isBoardActive(board.id) ? 'active' : ''}`}
                       >
-                        <Link
-                          to={`/${user.username}/project/${selectedProject.id}/board/${board.id}`}
-                          className="board-link"
-                        >
-                          <span className="board-icon">📋</span>
-                          <span className="board-name">{board.title}</span>
-                        </Link>
-
-                        <div
-                          className="menu-wrapper"
-                          onClick={(e) => e.stopPropagation()}
-                        >
-                          <button
-                            className="menu-button"
-                            onClick={(e) => openDropdown(e, board.id, 'board')}
-                          >
-                            ⋮
+                        <span className="board-icon">📋</span>
+                        <span className="board-name">{board.title}</span>
+                        
+                        <div className="menu-wrapper" onClick={(e) => e.stopPropagation()}>
+                          <button className="menu-button" onClick={(e) => openDropdown(e, board.id, 'board')}>
+                            ...
                           </button>
                         </div>
-                      </div>
+                      </Link>
                     </div>
                   ))}
                 </div>
@@ -319,9 +301,8 @@ export default function Sidebar({ isCollapsed, onToggle }) {
 
         {/* === ОБЩЕЕ === */}
         <div className="general-section-bottom">
-          <h4 className="section-title">ОБЩЕЕ</h4>
-          <div className="general-item">Дашборд</div>
-          <div className="general-item">Поиск задач</div>
+          <div className="general-item">Настройки</div>
+          <div className="general-item">Пригласить</div>
         </div>
       </div>
 

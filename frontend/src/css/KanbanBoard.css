@@ -2,7 +2,8 @@
 .kanban-board-with-sidebar {
   display: flex;
   height: 100vh;
-  background-color: #f4f5f7;
+  background-color: #ffffff;
+  overflow: hidden; /* Убираем скролл всей страницы */
 }
 
 /* Основной контент доски */
@@ -10,17 +11,24 @@
   flex: 1;
   margin-left: 280px;
   transition: margin-left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  overflow: auto;
+  overflow: hidden; /* Убираем скролл */
+  background: #ffffff;
+  display: flex;
+  flex-direction: column;
 }
 
 .board-content.sidebar-collapsed {
   margin-left: 60px;
 }
 
-/* Стили самой доски (перенесены из предыдущей версии) */
+/* Стили самой доски */
 .kanban-board {
-  min-height: 100vh;
+  flex: 1;
   padding: 20px;
+  background: #ffffff;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden; /* Убираем скролл */
 }
 
 /* Хедер доски */
@@ -30,10 +38,11 @@
   align-items: center;
   margin-bottom: 24px;
   padding: 0 16px;
+  flex-shrink: 0; /* Запрещаем сжатие */
 }
 
 .board-header h1 {
-  color: #172b4d;
+  color: #111;
   font-size: 24px;
   font-weight: 600;
   margin: 0;
@@ -47,30 +56,33 @@
 .btn {
   padding: 8px 16px;
   border: none;
-  border-radius: 3px;
+  border-radius: 8px;
   font-size: 14px;
   font-weight: 500;
   cursor: pointer;
-  transition: background-color 0.2s;
+  transition: all 0.3s ease;
 }
 
 .btn-primary {
-  background-color: #0052cc;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   color: white;
+  box-shadow: 0 2px 8px rgba(102, 126, 234, 0.2);
 }
 
 .btn-primary:hover {
-  background-color: #0065ff;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
 }
 
 .btn-secondary {
-  background-color: #ffffff;
-  color: #172b4d;
-  border: 1px solid #dfe1e6;
+  background: #f8f9fa;
+  color: #111;
+  border: 1px solid #e9ecef;
 }
 
 .btn-secondary:hover {
-  background-color: #f4f5f7;
+  background: #e9ecef;
+  transform: translateY(-1px);
 }
 
 /* Контейнер колонок */
@@ -79,19 +91,23 @@
   gap: 16px;
   overflow-x: auto;
   padding: 8px;
-  min-height: 600px;
+  flex: 1; /* Занимает все доступное пространство */
+  min-height: 0; /* Важно для flex-скролла */
+  align-items: flex-start;
 }
 
 /* Стили колонки */
 .kanban-column {
-  background-color: #ebecf0;
-  border-radius: 8px;
+  background: #ffffff;
+  border-radius: 12px;
   width: 272px;
   min-width: 272px;
-  padding: 8px;
+  padding: 12px;
   display: flex;
   flex-direction: column;
-  max-height: 100%;
+  max-height: 100%; /* Максимальная высота колонки */
+  border: 1px solid #f1f3f4;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
 }
 
 .column-header {
@@ -99,7 +115,10 @@
   justify-content: space-between;
   align-items: center;
   padding: 8px 12px;
-  margin-bottom: 8px;
+  margin-bottom: 12px;
+  border-radius: 8px;
+  background: #ffffff;
+  flex-shrink: 0; /* Запрещаем сжатие заголовка */
 }
 
 .column-title {
@@ -111,93 +130,92 @@
 .column-title h3 {
   font-size: 14px;
   font-weight: 600;
-  color: #172b4d;
+  color: #111;
   margin: 0;
 }
 
 .task-count {
-  background-color: #dfe1e6;
-  color: #5e6c84;
+  background: rgba(102, 126, 234, 0.1);
+  color: #667eea;
   border-radius: 10px;
-  padding: 2px 6px;
+  padding: 2px 8px;
   font-size: 12px;
-  font-weight: 500;
+  font-weight: 600;
 }
 
 .column-menu {
   background: none;
   border: none;
   font-size: 16px;
-  color: #5e6c84;
+  color: #666;
   cursor: pointer;
-  padding: 4px;
-  border-radius: 3px;
+  padding: 6px;
+  border-radius: 6px;
+  transition: all 0.2s ease;
 }
 
 .column-menu:hover {
-  background-color: #dfe1e6;
+  background: #f8f9fa;
+  color: #111;
 }
 
-/* Контейнер задач */
+/* Контейнер задач с прокруткой */
 .tasks-container {
   flex: 1;
-  overflow-y: auto;
+  overflow-y: auto; /* Скролл только для задач */
   padding: 0 4px;
   margin-bottom: 8px;
   display: flex;
   flex-direction: column;
   gap: 8px;
+  min-height: 0; /* Важно для flex-скролла */
 }
 
-/* Стили задачи */
+/* Стили задачи - СЕРЫЙ ФОН */
 .kanban-task {
-  background-color: white;
-  border-radius: 6px;
-  padding: 12px;
-  box-shadow: 0 1px 1px rgba(0, 0, 0, 0.1);
+  background: #f8f9fa; /* Серый фон для задач */
+  border-radius: 10px;
+  padding: 16px;
   cursor: pointer;
-  transition: box-shadow 0.2s;
-}
-
-.kanban-task:hover {
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  background-color: #f8f9fa;
+  border: 1px solid #e9ecef;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+  flex-shrink: 0; /* Запрещаем сжатие задач */
 }
 
 .task-priority {
   height: 4px;
   border-radius: 2px;
-  margin-bottom: 8px;
+  margin-bottom: 12px;
 }
 
 .priority-high {
-  background-color: #ff5630;
+  background: linear-gradient(135deg, #ff6b6b, #ee5a52);
 }
 
 .priority-medium {
-  background-color: #ffab00;
+  background: linear-gradient(135deg, #ffd93d, #ff9a3d);
 }
 
 .priority-low {
-  background-color: #36b37e;
+  background: linear-gradient(135deg, #6bcf7f, #4da1a9);
 }
 
 .task-header {
-  margin-bottom: 8px;
+  margin-bottom: 12px;
 }
 
 .task-title {
   font-size: 14px;
-  font-weight: 500;
-  color: #172b4d;
+  font-weight: 600;
+  color: #111;
   margin: 0;
   line-height: 1.4;
 }
 
 .task-description {
-  font-size: 12px;
-  color: #5e6c84;
-  margin: 0 0 12px 0;
+  font-size: 13px;
+  color: #666;
+  margin: 8px 0 0 0;
   line-height: 1.4;
 }
 
@@ -205,14 +223,16 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
+  margin-top: 12px;
 }
 
 .task-type {
   font-size: 11px;
-  color: #5e6c84;
-  background-color: #dfe1e6;
-  padding: 2px 6px;
-  border-radius: 3px;
+  color: #667eea;
+  background: rgba(102, 126, 234, 0.1);
+  padding: 4px 8px;
+  border-radius: 6px;
+  font-weight: 500;
 }
 
 .task-actions {
@@ -225,36 +245,40 @@
   border: none;
   font-size: 14px;
   cursor: pointer;
-  padding: 4px;
-  border-radius: 3px;
-  opacity: 0.6;
+  padding: 6px;
+  border-radius: 6px;
+  color: #666;
+  transition: all 0.2s ease;
 }
 
 .task-action-btn:hover {
-  opacity: 1;
-  background-color: #dfe1e6;
+  background: rgba(102, 126, 234, 0.1);
+  color: #667eea;
 }
 
 /* Футер колонки */
 .column-footer {
   padding: 8px 4px;
+  flex-shrink: 0; /* Запрещаем сжатие футера */
 }
 
 .add-task-btn {
   width: 100%;
-  background: none;
-  border: none;
-  color: #5e6c84;
-  padding: 8px;
-  border-radius: 3px;
+  background: #ffffff;
+  border: 1px solid #e9ecef;
+  color: #666;
+  padding: 12px;
+  border-radius: 8px;
   cursor: pointer;
   font-size: 14px;
-  text-align: left;
+  text-align: center;
+  transition: all 0.3s ease;
 }
 
 .add-task-btn:hover {
-  background-color: #dfe1e6;
-  color: #172b4d;
+  background: #f8f9fa;
+  color: #111;
+  border-color: #667eea;
 }
 
 /* Добавление новой колонки */
@@ -264,37 +288,21 @@
 
 .add-column-btn {
   width: 100%;
-  background-color: #ffffff3d;
-  border: none;
-  color: white;
-  padding: 12px;
-  border-radius: 8px;
+  background: #ffffff;
+  border: 1px dashed #dee2e6;
+  color: #666;
+  padding: 16px;
+  border-radius: 12px;
   cursor: pointer;
   font-size: 14px;
   text-align: center;
+  transition: all 0.3s ease;
 }
 
 .add-column-btn:hover {
-  background-color: #a1bdd914;
-}
-
-/* Скроллбар */
-.columns-container::-webkit-scrollbar {
-  height: 8px;
-}
-
-.columns-container::-webkit-scrollbar-track {
-  background: #f1f1f1;
-  border-radius: 4px;
-}
-
-.columns-container::-webkit-scrollbar-thumb {
-  background: #c1c1c1;
-  border-radius: 4px;
-}
-
-.columns-container::-webkit-scrollbar-thumb:hover {
-  background: #a8a8a8;
+  background: #f8f9fa;
+  color: #111;
+  border-color: #667eea;
 }
 
 /* Заголовки проекта и доски */
@@ -304,6 +312,7 @@
   align-items: flex-start;
   margin-bottom: 20px;
   padding: 0 16px;
+  flex-shrink: 0; /* Запрещаем сжатие */
 }
 
 .project-info {
@@ -311,14 +320,14 @@
 }
 
 .project-name {
-  color: #172b4d;
+  color: #111;
   font-size: 24px;
   font-weight: 600;
   margin: 0 0 8px 0;
 }
 
 .board-name {
-  color: #5e6c84;
+  color: #666;
   font-size: 18px;
   font-weight: 400;
   margin: 0;
@@ -327,81 +336,89 @@
 /* Навигационная панель */
 .board-navbar {
   display: flex;
-  border-bottom: 1px solid #dfe1e6;
   margin-bottom: 24px;
   padding: 0 16px;
+  flex-shrink: 0; /* Запрещаем сжатие */
 }
 
 .nav-item {
-  background: none;
-  border: none;
+  background: #ffffff;
+  border: 1px solid #e9ecef;
   padding: 12px 20px;
   font-size: 14px;
   font-weight: 500;
-  color: #5e6c84;
+  color: #666;
   cursor: pointer;
-  border-bottom: 2px solid transparent;
-  transition: all 0.2s;
+  border-radius: 8px;
+  transition: all 0.3s ease;
   margin-right: 8px;
 }
 
 .nav-item:hover {
-  color: #172b4d;
-  background-color: #f4f5f7;
+  background: #f8f9fa;
+  color: #111;
+  border-color: #667eea;
 }
 
 .nav-item.active {
-  color: #0052cc;
-  border-bottom-color: #0052cc;
-  background-color: #f4f5f7;
+  background: rgba(102, 126, 234, 0.1);
+  color: #667eea;
+  border-color: #667eea;
 }
 
 /* Основной контент */
 .board-main-content {
   padding: 0 16px;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden; /* Убираем скролл */
 }
 
 .content-placeholder {
   text-align: center;
   padding: 60px 20px;
-  color: #5e6c84;
+  color: #666;
   font-size: 16px;
-  background-color: #fafbfc;
-  border-radius: 8px;
-  border: 1px dashed #dfe1e6;
+  background: #f8f9fa;
+  border-radius: 12px;
+  border: 1px dashed #dee2e6;
+  flex: 1;
 }
 
 /* Форма добавления новой задачи */
 .add-task-form {
-  background: white;
-  border: 1px solid #dfe1e6;
-  border-radius: 6px;
-  padding: 12px;
+  background: #ffffff;
+  border: 1px solid #e9ecef;
+  border-radius: 10px;
+  padding: 16px;
   margin-bottom: 8px;
-  box-shadow: 0 1px 1px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
 .new-task-input {
   width: 100%;
-  padding: 8px;
-  border: 1px solid #dfe1e6;
-  border-radius: 3px;
+  padding: 12px;
+  border: 1px solid #e9ecef;
+  border-radius: 8px;
   font-family: inherit;
   font-size: 14px;
   resize: vertical;
   line-height: 1.4;
-  min-height: 60px;
-  margin-bottom: 8px;
+  min-height: 80px;
+  margin-bottom: 12px;
+  background: #ffffff;
+  transition: all 0.3s ease;
 }
 
 .new-task-input:focus {
   outline: none;
-  border-color: #0052cc;
-  box-shadow: 0 0 0 2px rgba(0, 82, 204, 0.1);
+  border-color: #764ba2;
+  box-shadow: 0 0 0 2px rgba(118, 75, 162, 0.1);
 }
 
 .new-task-input::placeholder {
-  color: #5e6c84;
+  color: #888;
 }
 
 .add-task-actions {
@@ -411,138 +428,91 @@
 }
 
 .btn-small {
-  padding: 6px 12px;
-  font-size: 12px;
+  padding: 8px 16px;
+  font-size: 13px;
   min-width: auto;
 }
 
-/* Кнопка добавления задачи */
-.add-task-btn {
-  width: 100%;
+/* Стили для меню колонки (троеточие) */
+.column-menu {
   background: none;
   border: none;
-  color: #5e6c84;
-  padding: 8px;
-  border-radius: 3px;
+  font-size: 16px;
+  color: #666;
   cursor: pointer;
-  font-size: 14px;
-  text-align: left;
+  padding: 6px;
+  border-radius: 6px;
   transition: all 0.2s ease;
-}
-
-.add-task-btn:hover {
-  background-color: #dfe1e6;
-  color: #172b4d;
-}
-
-/* Улучшенный дизайн для формы добавления */
-.add-task-form {
-  animation: slideDown 0.2s ease;
-}
-
-@keyframes slideDown {
-  from {
-    opacity: 0;
-    transform: translateY(-10px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-.column-drag-handle {
-  cursor: grab;
-  font-size: 18px;
-  padding: 0 6px;
-  margin-right: 6px;
-  user-select: none;
-  color: #888;
-  transition: color 0.2s ease;
-}
-
-.column-drag-handle:hover {
-  color: #000;
-}
-
-.column-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 8px;
-  border-radius: 8px 8px 0 0;
   position: relative;
 }
 
-.column-title h3 {
-  margin: 0;
-  cursor: pointer;
-  transition: color 0.2s;
+.column-menu:hover {
+  background: #f8f9fa;
+  color: #111;
 }
 
-.column-title h3:hover {
-  color: #333;
-}
-
-.column-title-input {
-  font-size: 16px;
-  padding: 2px 4px;
-  width: 100%;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-}
-
-.column-menu {
-  background: transparent;
-  border: none;
-  font-size: 20px;
-  cursor: pointer;
-}
-
+/* Выпадающее меню колонки */
 .column-dropdown {
   position: absolute;
-  top: 38px;
-  right: 8px;
-  background: white;
-  border: 1px solid #ddd;
+  top: 100%;
+  right: 0;
+  background: #ffffff;
+  border: 1px solid rgba(0,0,0,0.8);
   border-radius: 8px;
-  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-  padding: 6px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
   display: flex;
   flex-direction: column;
-  z-index: 10;
+  min-width: 140px;
+  z-index: 1000;
+  overflow: hidden;
+  animation: fadeIn 0.12s ease-out;
+  margin-top: 4px;
 }
 
 .column-dropdown button {
   background: none;
   border: none;
-  padding: 6px;
   text-align: left;
+  padding: 8px 12px;
   cursor: pointer;
+  font-size: 14px;
+  color: #111;
+  transition: background 0.2s ease;
+  border-bottom: 1px solid #f1f3f4;
+}
+
+.column-dropdown button:last-child {
+  border-bottom: none;
 }
 
 .column-dropdown button:hover {
-  background-color: #f3f3f3;
+  background: rgba(102, 126, 234, 0.08);
+  color: #667eea;
 }
 
-.color-picker {
+.column-dropdown .delete-column-btn {
+  color: #ff6b6b;
+}
+
+.column-dropdown .delete-column-btn:hover {
+  background: rgba(255, 107, 107, 0.08);
+  color: #ff6b6b;
+}
+
+/* Позиционирование для заголовка колонки */
+.column-header {
   display: flex;
   justify-content: space-between;
-  padding: 4px;
+  align-items: center;
+  padding: 8px 12px;
+  margin-bottom: 12px;
+  border-radius: 8px;
+  background: #ffffff;
+  flex-shrink: 0;
+  position: relative; /* Для позиционирования выпадающего меню */
 }
 
-.color-dot {
-  width: 20px;
-  height: 20px;
-  border-radius: 50%;
-  cursor: pointer;
-  border: 2px solid transparent;
-}
-
-.color-dot.active {
-  border: 2px solid #333;
-}
-
+/* Модальные окна */
 .modal-overlay {
   position: fixed;
   inset: 0;
@@ -556,21 +526,21 @@
 }
 
 .modal-window {
-  background: #1e2024;
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: #fff;
+  border: 1px solid rgba(0,0,0,0.8);
   border-radius: 12px;
   padding: 24px;
   width: 320px;
-  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.4);
+  box-shadow: 0 4px 32px rgba(0, 0, 0, 0.1);
   animation: scaleIn 0.25s ease-out;
-  color: #e2e8f0;
+  color: #111;
 }
 
 .modal-window h3 {
   margin: 0 0 16px;
   font-size: 18px;
   font-weight: 600;
-  color: #f8fafc;
+  color: #111;
   text-align: center;
 }
 
@@ -583,15 +553,18 @@
 .modal-window input {
   padding: 10px 12px;
   border-radius: 8px;
-  border: 1px solid #374151;
-  background: #111214;
-  color: #f8fafc;
+  border: 1.5px solid #ddd;
+  background: #fafbff;
+  color: #111;
   font-size: 14px;
   outline: none;
+  transition: all 0.3s ease;
 }
 
 .modal-window input:focus {
-  border-color: #3b82f6;
+  outline: none;
+  border-color: #764ba2;
+  box-shadow: 0 0 0 2px rgba(118, 75, 162, 0.10);
 }
 
 .modal-actions {
@@ -612,41 +585,92 @@
 }
 
 .modal-actions button[type="button"] {
-  background: rgba(255, 255, 255, 0.08);
-  color: #94a3b8;
+  background: rgba(0, 0, 0, 0.05);
+  color: #666;
 }
 
 .modal-actions button[type="button"]:hover {
-  background: rgba(255, 255, 255, 0.15);
+  background: rgba(0, 0, 0, 0.1);
 }
 
 .modal-actions button[type="submit"] {
-  background: #3b82f6;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   color: white;
 }
 
 .modal-actions button[type="submit"]:hover {
-  background: #2563eb;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
 }
 
-.color-picker-modal {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, 28px);
-  gap: 10px;
-  justify-content: center;
-  margin-bottom: 12px;
+/* Анимации */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
-.color-picker-modal .color-dot {
-  width: 24px;
-  height: 24px;
-  border-radius: 50%;
-  cursor: pointer;
-  border: 2px solid transparent;
-  transition: transform 0.2s ease, border-color 0.2s ease;
+@keyframes scaleIn {
+  from {
+    transform: scale(0.95);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
 }
 
-.color-picker-modal .color-dot.active {
-  border-color: #3b82f6;
-  transform: scale(1.15);
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Скроллбар для контейнера колонок */
+.columns-container::-webkit-scrollbar {
+  height: 8px;
+}
+
+.columns-container::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 4px;
+}
+
+.columns-container::-webkit-scrollbar-thumb {
+  background: linear-gradient(135deg, #667eea, #764ba2);
+  border-radius: 4px;
+}
+
+.columns-container::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(135deg, #764ba2, #667eea);
+}
+
+/* Скроллбар для контейнера задач */
+.tasks-container::-webkit-scrollbar {
+  width: 6px;
+}
+
+.tasks-container::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 3px;
+}
+
+.tasks-container::-webkit-scrollbar-thumb {
+  background: linear-gradient(135deg, #667eea, #764ba2);
+  border-radius: 3px;
+}
+
+.tasks-container::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(135deg, #764ba2, #667eea);
 }
