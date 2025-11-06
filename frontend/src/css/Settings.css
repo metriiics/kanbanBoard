@@ -1,0 +1,107 @@
+.settings-page {
+  min-height: 100vh;
+  background: radial-gradient(ellipse 80% 60% at 80% 10%, #fff7e0 0%, transparent 70%),
+              radial-gradient(ellipse 60% 50% at 20% 80%, #e0e0ff 0%, transparent 70%),
+              radial-gradient(ellipse 60% 50% at 80% 80%, #fbeaff 0%, transparent 70%),
+              #fff;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  padding: 60px 40px;
+  font-family: 'Inter', sans-serif;
+}
+
+.settings-wrapper {
+  display: flex;
+  background: #fff;
+  border: 1px solid rgba(0,0,0,0.08);
+  box-shadow: 0 4px 32px rgba(0,0,0,0.1), 0 1.5px 6px rgba(0,0,0,0.08);
+  border-radius: 24px;
+  width: 1000px;
+  min-height: 800px;
+  overflow: hidden;
+}
+
+/* === SIDEBAR === */
+.settings-menu {
+  width: 260px;
+  background: #fafbff;
+  border-right: 1px solid rgba(0,0,0,0.1);
+  padding: 40px 28px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+/* Кнопка Назад */
+.back-button-settings {
+  align-self: flex-start;
+  margin-bottom: 20px;
+  font-size: 15px;
+  color: #555;
+  text-decoration: none;
+  transition: all 0.25s ease;
+  font-weight: 500;
+}
+
+.back-button-settings:hover {
+  color: #764ba2;
+  transform: translateX(-8px);
+  text-decoration: none;
+}
+
+/* Заголовок */
+.settings-menu h2 {
+  font-size: 22px;
+  font-weight: 600;
+  color: #111;
+  margin-bottom: 24px;
+}
+
+/* Навигация */
+.settings-menu ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  width: 100%;
+}
+
+.settings-menu li {
+  padding: 12px 16px;
+  border-radius: 12px;
+  margin-bottom: 10px;
+  color: #444;
+  font-size: 16px;
+  cursor: pointer;
+  transition: all 0.25s ease;
+}
+
+.settings-menu li:hover {
+  background: rgba(118, 75, 162, 0.08);
+  color: #764ba2;
+}
+
+.settings-menu li.active {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: #fff;
+  font-weight: 600;
+  box-shadow: 0 2px 6px rgba(118, 75, 162, 0.15);
+}
+
+/* === CONTENT === */
+.settings-content {
+  flex: 1;
+  padding: 50px 60px;
+}
+
+.settings-content h3 {
+  font-size: 24px;
+  margin-bottom: 12px;
+  color: #111;
+}
+
+.settings-content p {
+  font-size: 16px;
+  color: #555;
+  line-height: 1.6;
+}

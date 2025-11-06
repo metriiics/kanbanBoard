@@ -286,7 +286,14 @@ export default function Sidebar({ isCollapsed, onToggle }) {
                         <span className="board-name">{board.title}</span>
                         
                         <div className="menu-wrapper" onClick={(e) => e.stopPropagation()}>
-                          <button className="menu-button" onClick={(e) => openDropdown(e, board.id, 'board')}>
+                          <button
+                            className="menu-button"
+                            onClick={(e) => {
+                              e.preventDefault();
+                              e.stopPropagation();
+                              openDropdown(e, board.id, 'board');
+                            }}
+                          >
                             ...
                           </button>
                         </div>
@@ -301,7 +308,9 @@ export default function Sidebar({ isCollapsed, onToggle }) {
 
         {/* === ОБЩЕЕ === */}
         <div className="general-section-bottom">
-          <div className="general-item">Настройки</div>
+          <Link to={`/${user.username}/settings`} className="general-item">
+            Настройки
+          </Link>
           <div className="general-item">Пригласить</div>
         </div>
       </div>

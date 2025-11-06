@@ -7,6 +7,8 @@ import TaskModal from "./TaskModal";
 import KanbanTask from "./KanbanTask";
 import Sidebar from "./Sidebar";
 import useBoard from "../hooks/h_useBoard"; 
+import CalendarView from './CalendarView';
+import MyTaskView from './MyTaskView';
 
 export default function KanbanBoard() {
   const { boardId } = useParams();
@@ -145,9 +147,9 @@ export default function KanbanBoard() {
           </div>
         );
       case 'my-tasks':
-        return <div className="content-placeholder">Мои задачи - скоро здесь будет список ваших задач</div>;
+        return <MyTaskView />;
       case 'calendar':
-        return <div className="content-placeholder">Календарь - скоро здесь будет календарь задач</div>;
+        return <CalendarView />;
       case 'documents':
         return <div className="content-placeholder">Документы - скоро здесь будут документы проекта</div>;
       default:

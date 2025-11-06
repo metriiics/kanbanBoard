@@ -171,25 +171,16 @@ export default function Home() {
         </div>
       </section>
 
-      {/* === TEAM SECTION === */}
-      <section className="team-section">
-        <h2>Наша команда</h2>
-        <div className="team-grid">
-          {[
-            { name: "Alexsey Go Pro", img: "/img/me.png" },
-            { name: "Dmitro Sckrinik", img: "/img/dimm.png" },
-            { name: "Alexandro MGS", img: "/img/ssh.png" },
-            { name: "Vlad ******", img: "/img/vlad.png" },
-            { name: "Angel", img: "/img/angel.png" },
-          ].map((member, idx) => (
-            <div className="team-card" key={idx}>
-              <div className="team-photo">
-                <img src={member.img} alt={member.name} />
-              </div>
-              <p className="team-name">{member.name}</p>
-            </div>
-          ))}
-        </div>
+      {/* === WIKI SECTION === */}
+      <section className="wiki-section">
+        <h2>📚 Узнай больше о TaskFusion</h2>
+        <p>
+          Мы подробно описали все возможности платформы, принципы работы и советы по повышению эффективности в нашей Wiki.  
+          Изучи гайды, чтобы максимально использовать потенциал TaskFusion.
+        </p>
+        <Link to="/wiki" className="btn-wiki">
+          Перейти в Wiki →
+        </Link>
       </section>
 
       <footer className="home-footer">

@@ -8,6 +8,8 @@ import Registration from "./components/Registration";
 import KanbanBoard from "./components/KanbanBoard";
 import WorkspaceHome from "./components/WorkspaceHome";
 import PrivacyPolicy from "./components/PrivacyPolicy";
+import Settings from "./components/Settings";
+import Wiki from "./components/WikiResources";
 import './App.css';
 import "./css/Home.css";
 import './css/Login.css';
@@ -18,6 +20,10 @@ import './css/TaskModal.css';
 import './css/Home.css';
 import './css/WorkspaceHome.css';
 import "./css/PrivacyPolicy.css"
+import "./css/Settings.css"
+import "./css/Wiki.css"
+import "./css/CalendarView.css";
+import "./css/MyTaskView.css";
 
 export default function App() {
   return (
@@ -28,6 +34,8 @@ export default function App() {
             <Route path="/registration" element={<Registration />} />
             <Route path="/:username/project/:projectId/board/:boardId" element={<KanbanBoard />} />
             <Route path="/:username/" element={<WorkspaceHome />} />
+            <Route path="/:username/settings" element={<Settings />} />
+            <Route path="wiki" element={<Wiki />} />
 
             <Route path="/documents/privacy" element={<PrivacyPolicy />} />
 
