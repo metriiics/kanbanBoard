@@ -11,3 +11,6 @@ class BoardOut(BaseModel):
 class BoardCreate(BaseModel):
     title: str = Field(...)
     projects_id: int = Field(...)
+
+class BoardUpdateTitle(BaseModel):
+    title: str = Field(..., description="Новое название доски")

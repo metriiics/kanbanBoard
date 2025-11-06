@@ -261,6 +261,9 @@ class OrmQuery:
 
     @staticmethod
     def get_project_by_id(projects_id: int):
+        """
+        Возвращает проект по его ID.
+        """
         with session_factory() as session:
             project = session.query(Project).filter(Project.id == projects_id).first()
             return project
@@ -268,6 +271,9 @@ class OrmQuery:
 
     @staticmethod
     def create_project(project: ProjectCreate):
+        """
+        Создает новый проект.
+        """
         with session_factory() as session:
             new_project = Project(
                 title=project.title,
@@ -279,7 +285,24 @@ class OrmQuery:
             return new_project
 
     @staticmethod
+    def update_project_title(project_id: int, new_title: str):
+        """
+        Обновляет название проекта.
+        """
+        with session_factory() as session:
+            project = session.query(Project).filter(Project.id == project_id).first()
+            if not project:
+                return None
+            project.title = new_title
+            session.commit()
+            session.refresh(project)
+            return project
+
+    @staticmethod
     def create_board(board: BoardCreate):
+        """
+        Создает доску и добавляет стандартные колонки.
+        """
         with session_factory() as session:
             # Создаем доску
             new_board = Board(
@@ -297,6 +320,20 @@ class OrmQuery:
             session.commit()
             session.refresh(new_board)
             return new_board
+        
+    @staticmethod
+    def update_board_title(board_id: int, new_title: str):
+        """
+        Обновляет название доски.
+        """
+        with session_factory() as session:
+            board = session.query(Board).filter(Board.id == board_id).first()
+            if not board:
+                return None
+            board.title = new_title
+            session.commit()
+            session.refresh(board)
+            return board
         
     @classmethod
     def get_available_colors(cls):
