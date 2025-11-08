@@ -307,7 +307,7 @@ class OrmQuery:
             # Создаем доску
             new_board = Board(
                 title=board.title,
-                projects_id=board.projects_id
+                projects_id=board.projects_id,
             )
             session.add(new_board)
             session.flush()  # получаем new_board.id
@@ -315,7 +315,7 @@ class OrmQuery:
             # Добавляем стандартные колонки
             default_columns = ["Open", "Progress", "Review", "Done", "Backlog"]
             for idx, col_title in enumerate(default_columns):
-                session.add(Column(title=col_title, board_id=new_board.id, position=idx))
+                session.add(Column(title=col_title, board_id=new_board.id, position=idx, color_id=1))
 
             session.commit()
             session.refresh(new_board)
@@ -363,4 +363,18 @@ class OrmQuery:
                 session.refresh(column)
                 # Загружаем связанные данные цвета
                 column.color
+            return column
+        
+    @staticmethod
+    def update_column_title(column_id: int, new_title: str):
+        """
+        Обновляет название колонки.
+        """
+        with session_factory() as session:
+            column = session.query(Column).filter(Column.id == column_id).first()
+            if not column:
+                return None
+            column.title = new_title
+            session.commit()
+            session.refresh(column)
             return column
