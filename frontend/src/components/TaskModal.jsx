@@ -1,15 +1,27 @@
 import React, { useState, useRef, useEffect } from 'react';
+import Calendar from 'react-calendar';
 
 export default function TaskModal({ task, isOpen, onClose, isRightAligned, onToggleAlignment }) {
   const [description, setDescription] = useState(task?.description || '');
   const [isCommentExpanded, setIsCommentExpanded] = useState(false);
   const [comment, setComment] = useState('');
   const [dueDate, setDueDate] = useState(task?.dueDate || '');
-  const [priority, setPriority] = useState(task?.priority || 'medium');
   const [tags, setTags] = useState(task?.labels || []);
   const [newTag, setNewTag] = useState('');
   const [isTagsDropdownOpen, setIsTagsDropdownOpen] = useState(false);
   const dropdownRef = useRef(null);
+
+  // Для полей исполнителя и приоритета
+  const [assignee, setAssignee] = useState(task?.assignee || '');
+  const [priority, setPriority] = useState(task?.priority || '');
+  const [availableAssignees] = useState(['Алексей', 'Марина', 'Игорь', 'София', 'Дмитрий']);
+  const [assigneeSearch, setAssigneeSearch] = useState('');
+  const filteredAssignees = availableAssignees.filter(user =>
+    user.toLowerCase().includes(assigneeSearch.toLowerCase())
+  );
+  const [isAssigneeDropdownOpen, setIsAssigneeDropdownOpen] = useState(false);
+  const [isPriorityDropdownOpen, setIsPriorityDropdownOpen] = useState(false);
+  const [isDateDropdownOpen, setIsDateDropdownOpen] = useState(false);
 
   const [existingTags] = useState([
     'срочно', 'важно', 'баг', 'фича', 'дизайн', 
@@ -69,12 +81,26 @@ export default function TaskModal({ task, isOpen, onClose, isRightAligned, onTog
         <div className="modal-header">
           <div className="modal-title">
             <h2>{task.title}</h2>
+
             <div className="task-meta-header">
               <span className="created-date">
                 Создано: {new Date(task.createdAt).toLocaleDateString()}
               </span>
+
+              <div className="meta-separator">•</div>
+
+              <span className="meta-project">
+                Проект: <strong>{task.projectName || 'Без проекта'}</strong>
+              </span>
+
+              <div className="meta-separator">•</div>
+
+              <span className="meta-board">
+                Доска: <strong>{task.boardName || 'Без доски'}</strong>
+              </span>
             </div>
           </div>
+
           <div className="modal-actions">
             <button 
               className="align-btn"
@@ -87,6 +113,7 @@ export default function TaskModal({ task, isOpen, onClose, isRightAligned, onTog
           </div>
         </div>
 
+
         {/* Контент модалки */}
         <div className="modal-content">
 
@@ -95,38 +122,190 @@ export default function TaskModal({ task, isOpen, onClose, isRightAligned, onTog
             {/* Исполнитель */}
             <div className="detail-item">
               <span className="detail-label">Исполнитель</span>
-              <span className="detail-value">{task.assignee || 'Не назначен'}</span>
-            </div>
+              <div className="tags-dropdown-container" ref={dropdownRef}>
+                {/* Основная строка */}
+                <div
+                  className="tags-main-row"
+                  onClick={() => setIsAssigneeDropdownOpen(!isAssigneeDropdownOpen)}
+                >
+                  <div className="tags-list">
+                    {assignee ? (
+                      <span className="tag-item assignee-tag">
+                        {assignee}
+                        <button
+                          className="tag-remove"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setAssignee('');
+                          }}
+                        >
+                          ×
+                        </button>
+                      </span>
+                    ) : (
+                      <span className="tags-placeholder">Назначить...</span>
+                    )}
+                  </div>
+                </div>
 
-            {/* Дата выполнения */}
-            <div className="detail-item">
-              <span className="detail-label">Проект</span>
-              <span className="detail-value">{task.assignee || 'Не назначен'}</span>
+                {/* Выпадающее меню с поиском */}
+                {isAssigneeDropdownOpen && (
+                  <div className="tags-dropdown">
+                    {/* Поле поиска */}
+                    <div className="assignee-search">
+                      <input
+                        type="text"
+                        className="assignee-search-input"
+                        placeholder="Поиск исполнителя..."
+                        value={assigneeSearch}
+                        onChange={(e) => setAssigneeSearch(e.target.value)}
+                        autoFocus
+                      />
+                    </div>
+
+                    {/* Список исполнителей */}
+                    <div className="existing-tags">
+                      <div className="existing-tags-list">
+                        {filteredAssignees.length > 0 ? (
+                          filteredAssignees.map((user, index) => (
+                            <label
+                              key={index}
+                              className="existing-tag-item"
+                              onClick={() => {
+                                setAssignee(user);
+                                setIsAssigneeDropdownOpen(false);
+                              }}
+                            >
+                              <input
+                                type="radio"
+                                checked={assignee === user}
+                                onChange={() => setAssignee(user)}
+                              />
+                              <span className="tag-label">{user}</span>
+                            </label>
+                          ))
+                        ) : (
+                          <div className="no-results">Нет совпадений</div>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </div>
             </div>
 
             {/* Дата выполнения */}
             <div className="detail-item">
               <span className="detail-label">Дата</span>
-              <input
-                type="date"
-                className="date-input"
-                value={dueDate}
-                onChange={(e) => setDueDate(e.target.value)}
-              />
+              <div className="tags-dropdown-container">
+                <div
+                  className="tags-main-row"
+                  onClick={() => setIsDateDropdownOpen(!isDateDropdownOpen)}
+                >
+                  <div className="tags-list">
+                    {dueDate ? (
+                      <span className="tag-item date-tag">
+                        {new Date(dueDate).toLocaleDateString()}
+                        <button
+                          className="tag-remove"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setDueDate('');
+                          }}
+                        >
+                          ×
+                        </button>
+                      </span>
+                    ) : (
+                      <span className="tags-placeholder">Выбрать дату...</span>
+                    )}
+                  </div>
+                </div>
+
+                {isDateDropdownOpen && (
+                  <div className="tags-dropdown calendar-dropdown">
+                    <Calendar
+                      onChange={(date) => {
+                        setDueDate(date.toISOString());
+                        setIsDateDropdownOpen(false);
+                      }}
+                      value={dueDate ? new Date(dueDate) : new Date()}
+                      locale="ru-RU"
+                    />
+                  </div>
+                )}
+              </div>
             </div>
 
             {/* Приоритет */}
             <div className="detail-item">
               <span className="detail-label">Приоритет</span>
-              <select 
-                className="priority-select"
-                value={priority}
-                onChange={(e) => setPriority(e.target.value)}
-              >
-                <option value="low">Низкий</option>
-                <option value="medium">Средний</option>
-                <option value="high">Высокий</option>
-              </select>
+              <div className="tags-dropdown-container" ref={dropdownRef}>
+                {/* Основная строка */}
+                <div
+                  className="tags-main-row"
+                  onClick={() => setIsPriorityDropdownOpen(!isPriorityDropdownOpen)}
+                >
+                  <div className="tags-list">
+                    {priority ? (
+                      <span
+                        className={`tag-item priority-tag ${
+                          priority === 'high'
+                            ? 'priority-high'
+                            : priority === 'medium'
+                            ? 'priority-medium'
+                            : 'priority-low'
+                        }`}
+                      >
+                        {priority === 'high'
+                          ? 'Высокий'
+                          : priority === 'medium'
+                          ? 'Средний'
+                          : 'Низкий'}
+                        <button
+                          className="tag-remove"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setPriority('');
+                          }}
+                        >
+                          ×
+                        </button>
+                      </span>
+                    ) : (
+                      <span className="tags-placeholder">Пусто...</span>
+                    )}
+                  </div>
+                </div>
+
+                {/* Выпадающее меню */}
+                {isPriorityDropdownOpen && (
+                  <div className="tags-dropdown">
+                    <div className="existing-tags">
+                      <div className="existing-tags-list">
+                        {['high', 'medium', 'low'].map((level) => (
+                          <div
+                            key={level}
+                            className={`existing-tag-item ${priority === level ? 'selected' : ''}`}
+                            onClick={() => {
+                              setPriority(level);
+                              setIsPriorityDropdownOpen(false);
+                            }}
+                          >
+                            <span className="tag-label">
+                              {level === 'high'
+                                ? 'Высокий'
+                                : level === 'medium'
+                                ? 'Средний'
+                                : 'Низкий'}
+                            </span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </div>
             </div>
 
           </div>

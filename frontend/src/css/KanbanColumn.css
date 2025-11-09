@@ -1,0 +1,286 @@
+/* Контейнер колонок */
+.columns-container {
+  display: flex;
+  gap: 16px;
+  overflow-x: auto;
+  padding: 8px;
+  flex: 1;
+  min-height: 0;
+  align-items: flex-start;
+}
+
+/* Стили колонки */
+.kanban-column {
+  background: #ffffff;
+  border-radius: 12px;
+  width: 272px;
+  min-width: 272px;
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  max-height: 100%;
+  border: 1px solid #f1f3f4;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+}
+
+.column-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 12px;
+  margin-bottom: 12px;
+  border-radius: 8px;
+  background: #ffffff;
+  flex-shrink: 0;
+  position: relative;
+}
+
+.column-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.column-title h3 {
+  font-size: 14px;
+  font-weight: 600;
+  color: #111;
+  margin: 0;
+}
+
+.task-count {
+  background: rgba(102, 126, 234, 0.1);
+  color: #667eea;
+  border-radius: 10px;
+  padding: 2px 8px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.column-menu {
+  background: none;
+  border: none;
+  font-size: 16px;
+  color: #666;
+  cursor: pointer;
+  padding: 6px;
+  border-radius: 6px;
+  transition: all 0.2s ease;
+}
+
+.column-menu:hover {
+  background: #f8f9fa;
+  color: #111;
+}
+
+/* Контейнер задач */
+.tasks-container {
+  flex: 1;
+  overflow-y: auto;
+  padding: 0 4px;
+  margin-bottom: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-height: 0;
+}
+
+.color-picker-modal {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 8px;
+  margin-bottom: 16px;
+  padding: 8px;
+  border-radius: 8px;
+  background: #f8f9fa;
+}
+
+.color-dot {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  cursor: pointer;
+  border: 3px solid transparent;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.color-dot:hover {
+  transform: scale(1.1);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.color-dot.active {
+  border-color: #111;
+  transform: scale(1.1);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+}
+
+
+/* Футер колонки */
+.column-footer {
+  padding: 8px 4px;
+  flex-shrink: 0;
+}
+
+.add-task-btn {
+  width: 100%;
+  background: #ffffff;
+  border: 1px solid #e9ecef;
+  color: #666;
+  padding: 12px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 14px;
+  text-align: center;
+  transition: all 0.3s ease;
+}
+
+.add-task-btn:hover {
+  background: #f8f9fa;
+  color: #111;
+  border-color: #667eea;
+}
+
+/* Добавление новой колонки */
+.add-column {
+  min-width: 272px;
+}
+
+.add-column-btn {
+  width: 100%;
+  background: #ffffff;
+  border: 1px dashed #dee2e6;
+  color: #666;
+  padding: 16px;
+  border-radius: 12px;
+  cursor: pointer;
+  font-size: 14px;
+  text-align: center;
+  transition: all 0.3s ease;
+}
+
+.add-column-btn:hover {
+  background: #f8f9fa;
+  color: #111;
+  border-color: #667eea;
+}
+
+/* Выпадающее меню колонки */
+.column-dropdown {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  background: #ffffff;
+  border: 1px solid rgba(0,0,0,0.8);
+  border-radius: 8px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+  display: flex;
+  flex-direction: column;
+  min-width: 140px;
+  z-index: 1000;
+  overflow: hidden;
+  animation: fadeIn 0.12s ease-out;
+  margin-top: 4px;
+}
+
+.column-dropdown button {
+  background: none;
+  border: none;
+  text-align: left;
+  padding: 8px 12px;
+  cursor: pointer;
+  font-size: 14px;
+  color: #111;
+  transition: background 0.2s ease;
+  border-bottom: 1px solid #f1f3f4;
+}
+
+.column-dropdown button:last-child {
+  border-bottom: none;
+}
+
+.column-dropdown button:hover {
+  background: rgba(102, 126, 234, 0.08);
+  color: #667eea;
+}
+
+.column-dropdown .delete-column-btn {
+  color: #ff6b6b;
+}
+
+.column-dropdown .delete-column-btn:hover {
+  background: rgba(255, 107, 107, 0.08);
+  color: #ff6b6b;
+}
+
+/* Скроллбар */
+.columns-container::-webkit-scrollbar {
+  height: 8px;
+}
+
+.columns-container::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 4px;
+}
+
+.columns-container::-webkit-scrollbar-thumb {
+  background: linear-gradient(135deg, #667eea, #764ba2);
+  border-radius: 4px;
+}
+
+.new-task-input {
+  box-sizing: border-box; /* ✅ исправляет вылезание за границы */
+  width: 100%;
+  min-height: 60px;
+  max-height: 120px;
+  padding: 8px 12px;
+  font-size: 14px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  resize: none;
+  outline: none;
+  transition: border-color 0.2s ease;
+}
+
+.new-task-input:focus {
+  border-color: #667eea;
+  box-shadow: 0 0 0 2px rgba(102, 126, 234, 0.15);
+}
+
+/* Пока колонка тянется */
+.column-dragging {
+  transform: scale(1.04) rotate(1deg);
+  box-shadow: 0 8px 18px rgba(0, 0, 0, 0.15);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  z-index: 20;
+  cursor: grabbing;
+}
+
+/* Колонка, над которой держат другую */
+.column-drop-target {
+  outline: 2px dashed rgba(102, 126, 234, 0.4);
+  outline-offset: 4px;
+  background: rgba(102, 126, 234, 0.05);
+  transition: background 0.2s ease;
+}
+
+.column-drag-handle {
+  cursor: grab; /* ← делает курсор "рукой", но подходящей для перетаскивания */
+  user-select: none; /* ← отключает выделение текста */
+  font-size: 18px;
+  line-height: 1;
+  color: #666;
+  padding: 6px;
+  border-radius: 6px;
+  transition: background 0.2s ease, color 0.2s ease;
+}
+
+.column-drag-handle:hover {
+  background: #f1f3f4;
+  color: #111;
+}
+
+.column-drag-handle:active {
+  cursor: grabbing; /* ← при удержании кнопки мыши */
+}

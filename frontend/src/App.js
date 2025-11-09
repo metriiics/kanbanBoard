@@ -15,6 +15,8 @@ import "./css/Home.css";
 import './css/Login.css';
 import './css/Registration.css';
 import './css/KanbanBoard.css';
+import './css/KanbanColumn.css';
+import './css/KanbanTask.css';
 import './css/Sidebar.css';
 import './css/TaskModal.css';
 import './css/Home.css';

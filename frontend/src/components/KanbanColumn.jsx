@@ -1,4 +1,3 @@
-
 import React, { useRef, useState, useEffect  } from 'react';
 import { useDrop, useDrag } from 'react-dnd';
 import { useColors } from '../hooks/h_useColors';
@@ -108,7 +107,7 @@ export default function KanbanColumn({
         priority: 'medium',
         assignee: '',
         dueDate: '',
-        labels: [],
+        labels: ['Общее'],
         createdAt: new Date().toISOString()
       };
 
@@ -262,8 +261,7 @@ export default function KanbanColumn({
               className="new-task-input"
               value={newTaskTitle}
               onChange={(e) => setNewTaskTitle(e.target.value)}
-              placeholder="Введите название задачи..."
-              rows="3"
+              rows="2"
               autoFocus
             />
             <div className="add-task-actions">
@@ -271,7 +269,12 @@ export default function KanbanColumn({
                 className="btn btn-primary btn-small"
                 onClick={() => {
                   if (!newTaskTitle.trim()) return;
-                  onAddTask(column.id, { id: Date.now(), title: newTaskTitle });
+                  onAddTask(column.id, { 
+                    id: Date.now(), 
+                    title: newTaskTitle, 
+                    priority: 'medium', // ← добавляем
+                    labels: ['Общее']   // ← добавляем
+                  });
                   setNewTaskTitle('');
                   setIsAddingTask(false);
                 }}
