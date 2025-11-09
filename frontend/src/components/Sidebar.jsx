@@ -6,6 +6,8 @@ import {
   useCreateProject,
   useWorkspace,
   useCreateBoard,
+  useUpdateBoard,
+  useUpdateProject
 } from '../hooks/h_workspace';
 import { useCurrentUser } from '../hooks/h_useCurrentUser';
 
@@ -21,10 +23,13 @@ export default function Sidebar({ isCollapsed, onToggle }) {
   const [dropdownData, setDropdownData] = useState(null); // { id, x, y, type }
   const dropdownRef = useRef(null);
 
+  const updateBoard = useUpdateBoard();
+  const updateProject = useUpdateProject();
+
   const createBoard = useCreateBoard();
   const createProject = useCreateProject();
   const { workspace } = useWorkspace();
-  const { projects, loading, error } = useProjects();
+  const { projects, setProjects, loading, error } = useProjects();
   const { user } = useCurrentUser();
   const location = useLocation();
 
@@ -116,11 +121,48 @@ export default function Sidebar({ isCollapsed, onToggle }) {
     setNewTitle('');
   };
 
-  const handleRenameSubmit = (e) => {
+  const handleRenameSubmit = async (e) => {
     e.preventDefault();
-    if (!newTitle.trim()) return;
-    console.log('Переименовать', modalType, 'в', newTitle);
-    closeModal();
+    if (!newTitle.trim() || !targetItem) return;
+
+    try {
+      if (modalType.includes('board')) {
+        await updateBoard.mutateAsync({
+          boardId: targetItem.id,
+          title: newTitle.trim(),
+        });
+
+        // обновляем локально название доски без reload
+        setSelectedProject((prev) => ({
+          ...prev,
+          boards: prev.boards.map((b) =>
+            b.id === targetItem.id ? { ...b, title: newTitle.trim() } : b
+          ),
+        }));
+      } else if (modalType.includes('project')) {
+        await updateProject.mutateAsync({
+          projectId: targetItem.id,
+          title: newTitle.trim(),
+        });
+
+        setSelectedProject((prev) =>
+          prev && prev.id === targetItem.id
+            ? { ...prev, title: newTitle.trim() }
+            : prev
+        );
+        
+        setProjects((prev) =>
+          prev.map((p) =>
+            p.id === targetItem.id ? { ...p, title: newTitle.trim() } : p
+          )
+        );
+      }
+
+      closeModal();
+    } catch (err) {
+      console.error('Ошибка при переименовании:', err);
+      alert('Не удалось переименовать');
+    }
   };
 
   const handleDeleteConfirm = () => {

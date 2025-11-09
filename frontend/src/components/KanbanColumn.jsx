@@ -12,7 +12,8 @@ export default function KanbanColumn({
   moveTaskInColumn, 
   moveTaskBetweenColumns, 
   onAddTask,
-  onDeleteColumn }) {
+  onDeleteColumn,
+  saveColumnTitle }) {
     
   const [isAddingTask, setIsAddingTask] = useState(false);
   const [newTaskTitle, setNewTaskTitle] = useState('');
@@ -25,7 +26,7 @@ export default function KanbanColumn({
   const [showColorModal, setShowColorModal] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
 
-  const { colors, loading: colorsLoading } = useColors();
+  const { colors, loading: colorsLoading, saveColumnColor } = useColors();
 
   const ref = useRef(null);
   const menuRef = useRef(null);
@@ -130,33 +131,36 @@ export default function KanbanColumn({
     setEditedTitle(column.title);
   };
 
-  const handleTitleSave = () => {
+  const handleTitleSave = async () => {
     setIsEditingTitle(false);
-    if (editedTitle.trim() && editedTitle !== column.title) {
-      onUpdateColumns((prev) =>
-        prev.map((col) =>
-          col.id === column.id ? { ...col, title: editedTitle } : col
-        )
-      );
+    const trimmed = editedTitle.trim();
+    if (!trimmed || trimmed === column.title) return;
+
+    try {
+      await saveColumnTitle(column.id, trimmed);
+    } catch {
+      alert('Ошибка при сохранении названия колонки');
     }
   };
 
   // Изменение цвета
-  const handleColorChange = (colorId) => {
-  // Находим цвет по ID
-    const selectedColor = colors.find(color => color.id === colorId);
-    
-    if (selectedColor) {
-      // Обновляем локальное состояние с объектом цвета
-      onUpdateColumns((prev) =>
-        prev.map((col) => 
-          col.id === column.id ? { 
-            ...col, 
-            color: selectedColor  // ← Сохраняем объект цвета, а не только hex
-          } : col
+  const handleColorChange = async (colorId) => {
+    const selectedColor = colors.find(c => c.id === colorId);
+    if (!selectedColor) return;
+
+    try {
+      // ✅ Обновляем локально
+      onUpdateColumns(prev =>
+        prev.map(col =>
+          col.id === column.id ? { ...col, color: selectedColor } : col
         )
       );
       setShowColorModal(false);
+
+      // ✅ Сохраняем в БД через хук
+      await saveColumnColor(column.id, colorId);
+    } catch (err) {
+      alert('Ошибка при сохранении цвета. Попробуйте позже.');
     }
   };
 
@@ -267,14 +271,9 @@ export default function KanbanColumn({
             <div className="add-task-actions">
               <button
                 className="btn btn-primary btn-small"
-                onClick={() => {
+                onClick={async () => {
                   if (!newTaskTitle.trim()) return;
-                  onAddTask(column.id, { 
-                    id: Date.now(), 
-                    title: newTaskTitle, 
-                    priority: 'medium', // ← добавляем
-                    labels: ['Общее']   // ← добавляем
-                  });
+                  await onAddTask(column.id, { title: newTaskTitle });
                   setNewTaskTitle('');
                   setIsAddingTask(false);
                 }}

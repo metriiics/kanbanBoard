@@ -1,5 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import Calendar from 'react-calendar';
+import { useTasks } from "../hooks/h_useTasks";
 
 export default function TaskModal({ task, isOpen, onClose, isRightAligned, onToggleAlignment }) {
   const [description, setDescription] = useState(task?.description || '');
@@ -10,6 +11,9 @@ export default function TaskModal({ task, isOpen, onClose, isRightAligned, onTog
   const [newTag, setNewTag] = useState('');
   const [isTagsDropdownOpen, setIsTagsDropdownOpen] = useState(false);
   const dropdownRef = useRef(null);
+
+  const { updateTask } = useTasks();
+  const [isSaving, setIsSaving] = useState(false);
 
   // Для полей исполнителя и приоритета
   const [assignee, setAssignee] = useState(task?.assignee || '');

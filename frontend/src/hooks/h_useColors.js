@@ -1,11 +1,12 @@
 import { useState, useEffect } from 'react';
-import { getAvailableColors } from '../api/a_colors';
+import { getAvailableColors, updateColumnColor } from '../api/a_colors';
 
 export const useColors = () => {
   const [colors, setColors] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
+  /** Загрузка доступных цветов */
   const fetchColors = async () => {
     setLoading(true);
     setError(null);
@@ -15,8 +16,22 @@ export const useColors = () => {
     } catch (err) {
       console.error('Ошибка загрузки цветов:', err);
       setError(err);
-      // Просто оставляем пустой массив вместо fallback
       setColors([]);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  /** Обновление цвета колонки на сервере */
+  const saveColumnColor = async (columnId, colorId) => {
+    try {
+      setLoading(true);
+      const updatedColumn = await updateColumnColor(columnId, colorId);
+      return updatedColumn; // возвращаем ответ от API (для синхронизации состояния)
+    } catch (err) {
+      console.error('Ошибка при сохранении цвета колонки:', err);
+      setError(err);
+      throw err;
     } finally {
       setLoading(false);
     }
@@ -31,5 +46,6 @@ export const useColors = () => {
     loading,
     error,
     refetch: fetchColors,
+    saveColumnColor,
   };
 };

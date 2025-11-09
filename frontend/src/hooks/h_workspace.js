@@ -1,8 +1,8 @@
 import { useEffect, useState } from 'react';
 import { getProjectsByWorkspace, getCurrentWorkspace } from '../api/a_workspaces';
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { createProject } from "../api/a_projects";
-import { createBoard } from "../api/a_board";
+import { createProject, updateProjectTitle } from "../api/a_projects";
+import { createBoard, updateBoardTitle } from "../api/a_board";
 
 export function useProjects() {
   const [projects, setProjects] = useState([]);
@@ -26,7 +26,7 @@ export function useProjects() {
     fetchProjects();
   }, []);
 
-  return { projects, loading, error };
+  return { projects, setProjects, loading, error };
 }
 
 export function useWorkspace() {
@@ -75,3 +75,25 @@ export const useCreateBoard = () => {
   });
 };
 
+export const useUpdateBoard = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: ({ boardId, title }) => updateBoardTitle(boardId, title),
+    onSuccess: () => {
+      // автоматически обновляем список проектов и досок
+      queryClient.invalidateQueries(["projects"]);
+    },
+  });
+};
+
+export const useUpdateProject = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: ({ projectId, title }) => updateProjectTitle(projectId, title),
+    onSuccess: () => {
+      queryClient.invalidateQueries(["projects"]);
+    },
+  });
+};

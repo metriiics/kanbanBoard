@@ -12,7 +12,7 @@ import MyTaskView from './MyTaskView';
 
 export default function KanbanBoard() {
   const { boardId } = useParams();
-  const { columns, setColumns, projectData, loading, error, saveColumnPositions } = useBoard(boardId);
+  const { columns, setColumns, projectData, loading, error, saveColumnPositions, saveColumnTitle, onAddTask } = useBoard(boardId);
 
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
   const [activeNav, setActiveNav] = useState('board'); // Активный пункт навигации
@@ -137,8 +137,9 @@ export default function KanbanBoard() {
                 moveTaskBetweenColumns={moveTaskBetweenColumns}
                 moveTaskInColumn={moveTaskInColumn}
                 onTaskClick={handleTaskClick}
-                onAddTask={addTaskToColumn}
+                onAddTask={onAddTask}
                 onUpdateColumns={setColumns}
+                saveColumnTitle={saveColumnTitle}
               />
             ))}
             <div className="add-column">
