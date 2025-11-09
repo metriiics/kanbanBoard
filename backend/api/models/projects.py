@@ -16,3 +16,5 @@ class ProjectCreate(BaseModel):
     title: str = Field(..., description="Название проекта")
     workspaces_id: int = Field(..., description="ID рабочего пространства, в котором создаётся проект")
 
+class ProjectUpdateTitle(BaseModel):
+    title: str = Field(..., description="Новое название проекта")

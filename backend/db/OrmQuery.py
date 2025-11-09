@@ -261,6 +261,9 @@ class OrmQuery:
 
     @staticmethod
     def get_project_by_id(projects_id: int):
+        """
+        Возвращает проект по его ID.
+        """
         with session_factory() as session:
             project = session.query(Project).filter(Project.id == projects_id).first()
             return project
@@ -268,6 +271,9 @@ class OrmQuery:
 
     @staticmethod
     def create_project(project: ProjectCreate):
+        """
+        Создает новый проект.
+        """
         with session_factory() as session:
             new_project = Project(
                 title=project.title,
@@ -279,12 +285,29 @@ class OrmQuery:
             return new_project
 
     @staticmethod
+    def update_project_title(project_id: int, new_title: str):
+        """
+        Обновляет название проекта.
+        """
+        with session_factory() as session:
+            project = session.query(Project).filter(Project.id == project_id).first()
+            if not project:
+                return None
+            project.title = new_title
+            session.commit()
+            session.refresh(project)
+            return project
+
+    @staticmethod
     def create_board(board: BoardCreate):
+        """
+        Создает доску и добавляет стандартные колонки.
+        """
         with session_factory() as session:
             # Создаем доску
             new_board = Board(
                 title=board.title,
-                projects_id=board.projects_id
+                projects_id=board.projects_id,
             )
             session.add(new_board)
             session.flush()  # получаем new_board.id
@@ -292,11 +315,25 @@ class OrmQuery:
             # Добавляем стандартные колонки
             default_columns = ["Open", "Progress", "Review", "Done", "Backlog"]
             for idx, col_title in enumerate(default_columns):
-                session.add(Column(title=col_title, board_id=new_board.id, position=idx))
+                session.add(Column(title=col_title, board_id=new_board.id, position=idx, color_id=1))
 
             session.commit()
             session.refresh(new_board)
             return new_board
+        
+    @staticmethod
+    def update_board_title(board_id: int, new_title: str):
+        """
+        Обновляет название доски.
+        """
+        with session_factory() as session:
+            board = session.query(Board).filter(Board.id == board_id).first()
+            if not board:
+                return None
+            board.title = new_title
+            session.commit()
+            session.refresh(board)
+            return board
         
     @classmethod
     def get_available_colors(cls):
@@ -326,4 +363,18 @@ class OrmQuery:
                 session.refresh(column)
                 # Загружаем связанные данные цвета
                 column.color
+            return column
+        
+    @staticmethod
+    def update_column_title(column_id: int, new_title: str):
+        """
+        Обновляет название колонки.
+        """
+        with session_factory() as session:
+            column = session.query(Column).filter(Column.id == column_id).first()
+            if not column:
+                return None
+            column.title = new_title
+            session.commit()
+            session.refresh(column)
             return column
