@@ -2,12 +2,15 @@ from sqlalchemy import select, and_
 from fastapi import Depends
 
 from core.security import hash_password
+from core.avatar_generator import generate_avatar
 
 from db.database import engine, Base, session_factory
 from db.dbstruct import User, Workspace, Project, Board, Column, Task, UserWorkspace, Comment, Label, ColorPalette
 from api.models.user import UserCreate
 from api.models.projects import ProjectCreate
 from api.models.boards import BoardCreate
+
+from typing import Optional
 
 from sqlalchemy.orm import joinedload
 
@@ -42,19 +45,23 @@ class OrmQuery:
             return session.query(User).filter(User.email == email).first()
     
     @staticmethod
-    def create_user(user: UserCreate) -> User:
+    def create_user(user: UserCreate, avatar_url: Optional[str] = None) -> User:
 
         '''
         Создает нового пользователя.
         '''
 
         with session_factory() as session:
+            avatar_path = generate_avatar(user.first_name, user.last_name)
+            avatar_url = f"http://localhost:8000/{avatar_path}"
+
             new_user = User(
                 email=user.email,
                 username=user.username,
                 first_name=user.first_name,
                 last_name=user.last_name,
-                password=hash_password(user.password)
+                password=hash_password(user.password),
+                avatar_url=avatar_url
             )
             session.add(new_user)
 

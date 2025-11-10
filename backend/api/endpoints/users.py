@@ -21,7 +21,8 @@ def read_users_me(current_user: User = Depends(get_current_user)):
         "email": current_user.email,
         "first_name": current_user.first_name,
         "last_name": current_user.last_name,
-        "username": current_user.username
+        "username": current_user.username,
+        "avatar_url": current_user.avatar_url
     }  
 
 @router.get("/api/users/{user_id}", response_model=UserRead)

@@ -41,7 +41,18 @@ export default function Home() {
                 onClick={() => setMenuOpen(!menuOpen)}
                 title={user?.email}
               >
-                {getInitials(user?.first_name || user?.username || 'U')}
+                {user?.avatar_url ? (
+                  <img
+                    src={user.avatar_url}
+                    alt="User avatar"
+                    className="avatar-image"
+                    onError={(e) => (e.target.style.display = 'none')} // если изображение не найдено
+                  />
+                ) : (
+                  <span className="avatar-initials">
+                    {getInitials(user?.first_name || user?.username || 'U')}
+                  </span>
+                )}
               </div>
 
               {menuOpen && (

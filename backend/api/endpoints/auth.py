@@ -1,4 +1,5 @@
 from fastapi import APIRouter, Depends, HTTPException
+from core.avatar_generator import generate_avatar
 from sqlalchemy.orm import Session
 from api.models.user import UserLogin
 from db.OrmQuery import OrmQuery
@@ -20,8 +21,11 @@ def create_user_endpoint(user: UserCreate):
     db_user = OrmQuery.get_user_by_email(email=user.email)
     if db_user:
         raise HTTPException(status_code=400, detail="Имя пользователя или email уже заняты")
+    
+    avatar_path = generate_avatar(user.first_name, user.last_name)
+    avatar_url = f"http://localhost:8000/{avatar_path}"
 
-    new_user = OrmQuery.create_user(user=user)
+    new_user = OrmQuery.create_user(user=user, avatar_url=avatar_url)
     return UserRead.model_validate(new_user)
 
 @router.post("/api/auth/login")
