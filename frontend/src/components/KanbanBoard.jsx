@@ -20,28 +20,12 @@ export default function KanbanBoard() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isModalRightAligned, setIsModalRightAligned] = useState(false);
 
+  const [isAddingColumn, setIsAddingColumn] = useState(false);
+  const [newColumnTitle, setNewColumnTitle] = useState("");
+
   if (loading) return <div className="loading">Загрузка доски...</div>;
   if (error) return <div className="error">Ошибка: {error.message}</div>;
   if (!projectData) return <div className="empty">Нет данных по доске</div>;
-
-  // Функция для добавления задачи в колонку
-  const addTaskToColumn = (columnId, newTask) => {
-    console.log('addTaskToColumn вызвана для колонки:', columnId, 'задача:', newTask);
-    setColumns(prevColumns => {
-      const newColumns = [...prevColumns];
-      const column = newColumns.find(col => col.id === columnId);
-      
-      if (column) {
-        console.log('Добавляю задачу в колонку:', column.title);
-        const taskExists = column.tasks.some(task => task.id === newTask.id);
-        if (!taskExists) {
-        column.tasks.push(newTask);
-        }
-      }
-      
-      return newColumns;
-    });
-  };
 
   // Функция для перемещения задачи между колонками
   const moveTaskBetweenColumns = (taskId, fromColumnId, toColumnId) => {
@@ -99,6 +83,22 @@ export default function KanbanBoard() {
     });
   };
 
+  const handleAddColumn = (e) => {
+    e.preventDefault();
+    if (!newColumnTitle.trim()) return;
+
+    const newColumn = {
+      id: Date.now(), // временный id
+      title: newColumnTitle,
+      tasks: [],
+      position: columns.length,
+    };
+
+    setColumns((prev) => [...prev, newColumn]);
+    setNewColumnTitle("");
+    setIsAddingColumn(false);
+  };
+
   // Функция для открытия задачи
   const handleTaskClick = (task, columnTitle) => {
     setSelectedTask({ ...task, columnTitle });
@@ -142,8 +142,39 @@ export default function KanbanBoard() {
                 saveColumnTitle={saveColumnTitle}
               />
             ))}
+            
+            {/* 🔹 Блок добавления новой колонки */}
             <div className="add-column">
-              <button className="add-column-btn">+ Добавить колонку</button>
+              {isAddingColumn ? (
+                <form onSubmit={handleAddColumn} className="add-column-form">
+                  <input
+                    type="text"
+                    placeholder="Введите название колонки..."
+                    value={newColumnTitle}
+                    onChange={(e) => setNewColumnTitle(e.target.value)}
+                    autoFocus
+                  />
+                  <div className="add-column-actions">
+                    <button type="submit" className="btn-save">
+                      Добавить
+                    </button>
+                    <button
+                      type="button"
+                      className="btn-cancel"
+                      onClick={() => setIsAddingColumn(false)}
+                    >
+                      Отмена
+                    </button>
+                  </div>
+                </form>
+              ) : (
+                <button
+                  className="add-column-btn"
+                  onClick={() => setIsAddingColumn(true)}
+                >
+                  + Добавить колонку
+                </button>
+              )}
             </div>
           </div>
         );

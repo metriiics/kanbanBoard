@@ -26,6 +26,7 @@ import "./css/Settings.css"
 import "./css/Wiki.css"
 import "./css/CalendarView.css";
 import "./css/MyTaskView.css";
+import "./css/InviteModal.css";
 import "./css/SectionSettings/ProfileSettings.css";
 import "./css/SectionSettings/MembersSettings.css";
 

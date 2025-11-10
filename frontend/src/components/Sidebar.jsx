@@ -10,6 +10,7 @@ import {
   useUpdateProject
 } from '../hooks/h_workspace';
 import { useCurrentUser } from '../hooks/h_useCurrentUser';
+import InviteModal from "../components/InviteModal";
 
 export default function Sidebar({ isCollapsed, onToggle }) {
   const [expandedProjects, setExpandedProjects] = useState({});
@@ -22,6 +23,8 @@ export default function Sidebar({ isCollapsed, onToggle }) {
 
   const [dropdownData, setDropdownData] = useState(null); // { id, x, y, type }
   const dropdownRef = useRef(null);
+
+  const [showInviteModal, setShowInviteModal] = useState(false);
 
   const updateBoard = useUpdateBoard();
   const updateProject = useUpdateProject();
@@ -353,7 +356,13 @@ export default function Sidebar({ isCollapsed, onToggle }) {
           <Link to={`/${user.username}/settings`} className="general-item">
             Настройки
           </Link>
-          <div className="general-item">Пригласить</div>
+          <div
+            className="general-item"
+            onClick={() => setShowInviteModal(true)}
+            style={{ cursor: "pointer" }}
+          >
+            Пригласить
+          </div>
         </div>
       </div>
 
@@ -466,6 +475,14 @@ export default function Sidebar({ isCollapsed, onToggle }) {
             )}
           </div>
         </div>
+      )}
+
+      {/* === МОДАЛКА: Приглашение === */}
+      {showInviteModal && (
+        <InviteModal
+          onClose={() => setShowInviteModal(false)}
+          workspace={workspace}
+        />
       )}
     </>
   );
