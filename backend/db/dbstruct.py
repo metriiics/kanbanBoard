@@ -2,6 +2,7 @@ from sqlalchemy import Integer, String, Boolean, ForeignKey, Column, DateTime, T
 from sqlalchemy.orm import relationship, Mapped, mapped_column
 from typing import Optional, List
 from datetime import datetime
+import uuid
 
 from db.database import Base
 
@@ -178,3 +179,22 @@ class Label(Base):
     
     workspace: Mapped["Workspace"] = relationship(back_populates="labels")
     tasks: Mapped[List["Task"]] = relationship("Task", secondary="task_labels", back_populates="labels")
+
+class WorkspaceInvite(Base):
+    __tablename__ = "workspace_invites"
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+    workspace_id: Mapped[int] = mapped_column(ForeignKey("workspaces.id"))
+    token: Mapped[str] = mapped_column(String, unique=True, index=True)
+    created_by_id: Mapped[int] = mapped_column(ForeignKey("users.id"))
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+    is_active: Mapped[bool] = mapped_column(Boolean, default=True)
+    used_count: Mapped[int] = mapped_column(Integer, default=0)
+
+    workspace: Mapped["Workspace"] = relationship("Workspace", backref="invites")
+    creator: Mapped["User"] = relationship("User")
+
+    @staticmethod
+    def generate_token() -> str:
+        """Генерирует уникальный токен для приглашения"""
+        return uuid.uuid4().hex
