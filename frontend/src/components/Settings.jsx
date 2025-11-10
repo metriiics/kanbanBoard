@@ -1,18 +1,44 @@
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { useState } from 'react';
+import ProfileSettings from './SectionSettings/ProfileSettings';
+import AppearanceSettings from './SectionSettings/AppearanceSettings';
+import MembersSettings from './SectionSettings/MembersSettings';
+import NotificationsSettings from './SectionSettings/NotificationsSettings';
+import BillingSettings from './SectionSettings/BillingSettings';
+import BoardsSettings from './SectionSettings/BoardsSettings';
+import SettingsWorkspace from './SectionSettings/SettingsWorkspace';
 
 export default function Settings() {
   const { user, isAuthenticated, logout } = useAuth();
   const [activeSection, setActiveSection] = useState('profile');
   const navigate = useNavigate();
 
-  const sections = [
+  const personalSections = [
     { key: 'profile', label: 'Профиль' },
-    { key: 'security', label: 'Безопасность' },
-    { key: 'notifications', label: 'Уведомления' },
     { key: 'appearance', label: 'Оформление' },
   ];
+
+  const workspaceSections = [
+    { key: 'boards', label: 'Доски' },
+    { key: 'members', label: 'Участники' },
+    { key: 'settings_workspace', label: 'Настройки' },
+    { key: 'notifications', label: 'Уведомления' },
+    { key: 'billing', label: 'Оплата' },
+  ];
+
+  const renderSection = () => {
+    switch (activeSection) {
+      case 'profile': return <ProfileSettings />;
+      case 'appearance': return <AppearanceSettings />;
+      case 'members': return <MembersSettings />;
+      case 'boards': return <BoardsSettings />;
+      case 'settings_workspace': return <SettingsWorkspace />;
+      case 'notifications': return <NotificationsSettings />;
+      case 'billing': return <BillingSettings />;
+      default: return null;
+    }
+  };
 
   return (
     <div className="settings-page">
@@ -22,10 +48,24 @@ export default function Settings() {
             <Link to={`/${user.username}`} className="back-button-settings">
               ← Назад
             </Link>
-            <h2>Настройки</h2>
           </div>
+
+          <h3 className="menu-group-title">Персональные настройки</h3>
           <ul>
-            {sections.map((item) => (
+            {personalSections.map((item) => (
+              <li
+                key={item.key}
+                className={activeSection === item.key ? 'active' : ''}
+                onClick={() => setActiveSection(item.key)}
+              >
+                {item.label}
+              </li>
+            ))}
+          </ul>
+
+          <h3 className="menu-group-title">Рабочее пространство</h3>
+          <ul>
+            {workspaceSections.map((item) => (
               <li
                 key={item.key}
                 className={activeSection === item.key ? 'active' : ''}
@@ -37,32 +77,7 @@ export default function Settings() {
           </ul>
         </aside>
 
-        <main className="settings-content">
-          {activeSection === 'profile' && (
-            <div>
-              <h3>Профиль</h3>
-              <p>Здесь вы можете изменить имя, email и другие личные данные.</p>
-            </div>
-          )}
-          {activeSection === 'security' && (
-            <div>
-              <h3>Безопасность</h3>
-              <p>Управляйте паролем и двухфакторной аутентификацией.</p>
-            </div>
-          )}
-          {activeSection === 'notifications' && (
-            <div>
-              <h3>Уведомления</h3>
-              <p>Настройте, какие уведомления вы хотите получать.</p>
-            </div>
-          )}
-          {activeSection === 'appearance' && (
-            <div>
-              <h3>Оформление</h3>
-              <p>Выберите тему, шрифт и цветовую схему приложения.</p>
-            </div>
-          )}
-        </main>
+        <main className="settings-content">{renderSection()}</main>
       </div>
     </div>
   );
