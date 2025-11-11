@@ -385,3 +385,24 @@ class OrmQuery:
             session.commit()
             session.refresh(column)
             return column
+        
+    @staticmethod
+    def create_column(board_id: int, title: str, position: int, color_id: int = 1):
+        """
+        Создает новую колонку в доске.
+        Всегда устанавливает color_id == 1.
+        """
+        with session_factory() as session:
+            if session.get(Board, board_id) is None:
+                return None
+
+            new_column = Column(
+                title=title,
+                board_id=board_id,
+                position=position,
+                color_id=1,  # жёстко — всегда 1
+            )
+            session.add(new_column)
+            session.commit()
+            session.refresh(new_column)
+            return new_column
