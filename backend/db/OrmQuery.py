@@ -5,7 +5,7 @@ from core.security import hash_password
 from core.avatar_generator import generate_avatar
 
 from db.database import engine, Base, session_factory
-from db.dbstruct import User, Workspace, Project, Board, Column, Task, UserWorkspace, Comment, Label, ColorPalette
+from db.dbstruct import User, Workspace, Project, Board, Column, Task, UserWorkspace, Comment, Label, ColorPalette, WorkspaceInvite
 from api.models.user import UserCreate
 from api.models.projects import ProjectCreate
 from api.models.boards import BoardCreate
@@ -406,3 +406,48 @@ class OrmQuery:
             session.commit()
             session.refresh(new_column)
             return new_column
+        
+    @staticmethod
+    def accept_invite(token: str, user_id: int):
+        """
+        Принимает приглашение по токену и связывает пользователя с воркспейсом.
+        Возвращает:
+         - {"status":"ok", "link": UserWorkspace} при успешном добавлении
+         - {"status":"already_member", "workspace_id": ..., "user_workspace_id": ...} если пользователь уже в воркспейсе
+         - None если токен недействителен/неактивен
+        """
+        # Проверяем токен приглашения
+        with session_factory() as session:
+            invite = session.query(WorkspaceInvite).filter(
+                WorkspaceInvite.token == token,
+                WorkspaceInvite.is_active == True
+            ).first()
+            if not invite:
+                return None
+            # Проверяем, что пользователь не является уже участником воркспейса
+            existing = session.query(UserWorkspace).filter(
+                UserWorkspace.user_id == user_id,
+                UserWorkspace.workspace_id == invite.workspace_id
+            ).first()
+            if existing:
+                return {
+                    "status": "already_member",
+                    "workspace_id": existing.workspace_id,
+                    "user_workspace_id": existing.id
+                }
+            # Создаем связь пользователя с воркспейсом
+            link = UserWorkspace(
+                user_id=user_id,
+                workspace_id=invite.workspace_id,
+                role="member"
+            )
+            session.add(link)
+            # Обновляем счетчик использований приглашения
+            try:
+                invite.used_count = (invite.used_count or 0) + 1
+            except AttributeError:
+                pass
+
+            session.commit()
+            session.refresh(link)
+            return {"status": "ok", "link": link}
