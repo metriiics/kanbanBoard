@@ -1,10 +1,12 @@
+from typing import Union, Any
 from fastapi import APIRouter, Depends, HTTPException
 from core.security import get_current_user
 from db.OrmQuery import OrmQuery
+from api.models.invites import InviteCreate, InviteAccept, InviteAcceptMessage
 
 router = APIRouter()
 
-@router.post("/api/invites/accept/{token}")
+@router.post("/api/invites/accept/{token}", response_model=Union[InviteAccept, InviteAcceptMessage])
 def accept_invite(token: str, current_user=Depends(get_current_user)):
     if not current_user:
         raise HTTPException(status_code=401, detail="Unauthorized")
@@ -14,7 +16,6 @@ def accept_invite(token: str, current_user=Depends(get_current_user)):
     if not res:
         raise HTTPException(status_code=400, detail="Неверный или неактивный токен приглашения")
 
-    # OrmQuery может вернуть dict с статусом или сам объект UserWorkspace
     if isinstance(res, dict):
         status = res.get("status")
         if status == "already_member":
@@ -26,7 +27,25 @@ def accept_invite(token: str, current_user=Depends(get_current_user)):
             }
         if status == "ok":
             link = res.get("link")
-            return {"status": "ok", "workspace_id": link.workspace_id, "user_workspace_id": link.id}
+            return {
+                "status": "ok",
+                "workspace_id": getattr(link, "workspace_id", None),
+                "user_workspace_id": getattr(link, "id", None),
+            }
 
-    # Если вернулся объект UserWorkspace
-    return {"status": "ok", "workspace_id": res.workspace_id, "user_workspace_id": res.id}
+    try:
+        return InviteAccept.from_orm(res)
+    except Exception:
+        return res
+
+@router.post("/api/invites", response_model=InviteCreate)
+def create_invite_endpoint(current_user=Depends(get_current_user)):
+    if not current_user:
+        raise HTTPException(status_code=401, detail="Unauthorized")
+
+    invite = OrmQuery.create_invite(current_user.id)
+    if not invite:
+        raise HTTPException(status_code=400, detail="Workspace for user not found or invite not created")
+
+    # Важно: вернуть Pydantic модель через from_orm чтобы корректно сериализовать ORM объект
+    return InviteCreate.from_orm(invite)

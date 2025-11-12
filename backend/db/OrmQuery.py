@@ -451,3 +451,47 @@ class OrmQuery:
             session.commit()
             session.refresh(link)
             return {"status": "ok", "link": link}
+
+    @staticmethod
+    def create_invite(user_id: int) -> WorkspaceInvite | None:
+        """
+        Создаёт приглашение для воркспейса, связанного с user_id.
+        Требует реальный user_id (создателя) — он будет записан в created_by_id (NOT NULL).
+        Возвращает созданный WorkspaceInvite или None, если воркспейс не найден.
+        """
+        import secrets
+
+        with session_factory() as session:
+            # Получаем воркспейс пользователя через существующий метод
+            workspace = OrmQuery.get_workspace_by_user_id(user_id)
+            if workspace is None:
+                return None
+
+            # Проверяем, есть ли уже активное приглашение для этого воркспейса
+            existing = session.execute(
+                select(WorkspaceInvite).where(
+                    WorkspaceInvite.workspace_id == workspace.id,
+                    WorkspaceInvite.is_active == True
+                )
+            ).scalars().first()
+
+            if existing:
+                return existing
+
+            # Генерация токена
+            token = WorkspaceInvite.generate_token()
+
+            # Используем переданный user_id как created_by_id
+            created_by_id = int(user_id)
+
+            new_invite = WorkspaceInvite(
+                workspace_id=workspace.id,
+                token=token,
+                created_by_id=created_by_id,
+                is_active=True,
+                used_count=0,
+            )
+            session.add(new_invite)
+            session.commit()
+            session.refresh(new_invite)
+            return new_invite
