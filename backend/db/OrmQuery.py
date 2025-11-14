@@ -5,7 +5,7 @@ from core.security import hash_password
 from core.avatar_generator import generate_avatar
 
 from db.database import engine, Base, session_factory
-from db.dbstruct import User, Workspace, Project, Board, Column, Task, UserWorkspace, Comment, Label, ColorPalette, WorkspaceInvite
+from db.dbstruct import User, Workspace, Project, Board, Column, Task, UserWorkspace, Comment, Label, ColorPalette, WorkspaceInvite, UserProjectAccess
 from api.models.user import UserCreate
 from api.models.projects import ProjectCreate
 from api.models.boards import BoardCreate
@@ -495,3 +495,51 @@ class OrmQuery:
             session.commit()
             session.refresh(new_invite)
             return new_invite
+
+    @staticmethod
+    def create_user_project_access(project_id: int, user_id: int, can_edit: bool = False, can_view: bool = True):
+        """
+        Создать или обновить запись в user_project_accesses.
+        Возвращает объект UserProjectAccess или None (если проект/пользователь не найдены).
+        """
+        with session_factory() as session:
+            # Проверяем существование проекта и пользователя
+            project = session.query(Project).filter(Project.id == project_id).first()
+            user = session.query(User).filter(User.id == user_id).first()
+            if not project or not user:
+                return None
+
+            existing = session.query(UserProjectAccess).filter(
+                UserProjectAccess.project_id == project_id,
+                UserProjectAccess.user_id == user_id
+            ).first()
+
+            if existing:
+                existing.can_edit = can_edit
+                existing.can_view = can_view
+                session.add(existing)
+                session.commit()
+                session.refresh(existing)
+                return existing
+
+            new_access = UserProjectAccess(
+                user_id=user_id,
+                project_id=project_id,
+                can_edit=can_edit,
+                can_view=can_view
+            )
+            session.add(new_access)
+            session.commit()
+            session.refresh(new_access)
+            return new_access
+
+    @staticmethod
+    def get_users_project_access(project_id: int):
+        """
+        Получить все записи доступа к проекту по project_id.
+        """
+        with session_factory() as session:
+            accesses = session.query(UserProjectAccess).filter(
+                UserProjectAccess.project_id == project_id
+            ).all()
+            return accesses

@@ -3,7 +3,15 @@ from typing import List
 
 from core.security import get_current_user
 from db.OrmQuery import OrmQuery
-from api.models.projects import ProjectWithBoardsOut, ProjectCreate, ProjectOut, ProjectUpdateTitle
+from api.models.projects import (
+    ProjectWithBoardsOut,
+    ProjectCreate,
+    ProjectOut,
+    ProjectUpdateTitle,
+    ProjectUserAccessCreate,
+    ProjectGetUsersAccess,
+    ProjectUserAccessOut,
+)
 
 router = APIRouter()
 
@@ -56,3 +64,54 @@ def update_project_title(
 
     updated_project = OrmQuery.update_project_title(project_id, project_update.title)
     return updated_project
+
+@router.post("/api/projects/access/create", response_model=ProjectUserAccessOut)
+def create_project_user_access(
+    access: ProjectUserAccessCreate,
+    current_user=Depends(get_current_user)
+):
+    project = OrmQuery.get_project_by_id(access.project_id)
+    if not project:
+        raise HTTPException(status_code=404, detail="Проект не найден")
+
+    workspace = OrmQuery.get_workspace_by_user_id(current_user.id)
+    if not workspace or workspace.id != project.workspaces_id:
+        raise HTTPException(status_code=403, detail="Нет доступа к проекту")
+
+    new_access = OrmQuery.create_user_project_access(
+        project_id=access.project_id,
+        user_id=access.user_id,
+        can_edit=access.can_edit,
+        can_view=access.can_view
+    )
+    if not new_access:
+        raise HTTPException(status_code=400, detail="Не удалось создать доступ (проект или пользователь не найдены)")
+
+    return new_access
+
+@router.get("/api/projects/{project_id}/access", response_model=List[ProjectGetUsersAccess])
+def get_project_users_access(
+    project_id: int,
+    current_user=Depends(get_current_user)
+):
+    project = OrmQuery.get_project_by_id(project_id)
+    if not project:
+        raise HTTPException(status_code=404, detail="Проект не найден")
+
+    workspace = OrmQuery.get_workspace_by_user_id(current_user.id)
+    if not workspace or workspace.id != project.workspaces_id:
+        raise HTTPException(status_code=403, detail="Нет доступа к проекту")
+
+    access_list = OrmQuery.get_users_project_access(project_id) or []
+    # Преобразуем ORM-объекты в dict, чтобы соответствовать ProjectGetUsersAccess
+    result = [
+        {
+            "user_id": a.user_id,
+            "project_id": a.project_id,
+            "can_edit": getattr(a, "can_edit", False),
+            "can_view": getattr(a, "can_view", False),
+            "created_at": getattr(a, "created_at", None),
+        }
+        for a in access_list
+    ]
+    return result
