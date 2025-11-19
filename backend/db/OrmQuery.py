@@ -606,3 +606,32 @@ class OrmQuery:
             session.delete(project)
             session.commit()
             return True
+
+    @staticmethod
+    def delete_board(board_id: int) -> bool:
+        """
+        Удаляет доску по её ID вместе со всеми связанными сущностями:
+        - Колонками (columns)
+        - Задачами (tasks)
+        
+        Возвращает True, если доска была удалена, False, если доска не найдена.
+        """
+        with session_factory() as session:
+            board = session.query(Board).filter(Board.id == board_id).first()
+            if not board:
+                return False
+            
+            # Получаем все колонки доски
+            columns = session.query(Column).filter(Column.board_id == board_id).all()
+            
+            for column in columns:
+                # Удаляем все задачи колонки
+                session.query(Task).filter(Task.column_id == column.id).delete()
+            
+            # Удаляем все колонки доски
+            session.query(Column).filter(Column.board_id == board_id).delete()
+            
+            # Удаляем саму доску
+            session.delete(board)
+            session.commit()
+            return True
