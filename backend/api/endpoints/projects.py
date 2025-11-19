@@ -115,3 +115,31 @@ def get_project_users_access(
         for a in access_list
     ]
     return result
+
+@router.delete("/api/projects/{project_id}")
+def delete_project(
+    project_id: int,
+    current_user=Depends(get_current_user)
+):
+    """
+    Удаляет проект вместе со всеми связанными сущностями.
+    Только владелец workspace может удалить проект.
+    """
+    project = OrmQuery.get_project_by_id(project_id)
+    if not project:
+        raise HTTPException(status_code=404, detail="Проект не найден")
+
+    # Проверяем, что пользователь является владельцем workspace
+    user_role = OrmQuery.get_user_workspace_role(current_user.id, project.workspaces_id)
+    if user_role != "owner":
+        raise HTTPException(
+            status_code=403, 
+            detail="Только владелец рабочего пространства может удалять проекты"
+        )
+
+    # Удаляем проект со всеми связанными сущностями
+    success = OrmQuery.delete_project(project_id)
+    if not success:
+        raise HTTPException(status_code=500, detail="Не удалось удалить проект")
+
+    return {"status": "ok", "message": "Проект успешно удален"}

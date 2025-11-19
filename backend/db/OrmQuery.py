@@ -64,6 +64,7 @@ class OrmQuery:
                 avatar_url=avatar_url
             )
             session.add(new_user)
+            session.flush()  # получаем new_user.id
 
             # создаём дефолтный воркспейс и связываем с пользователем
             ws_name = user.username if user.username else "Workspace"
@@ -72,9 +73,17 @@ class OrmQuery:
                 description="Рабочее пространство созданное по умолчанию"
             )
             session.add(new_workspace)
+            session.flush()  # получаем new_workspace.id
 
-            # устанавливаем связь через relationship (secondary table handled в моделях)
-            new_user.workspaces.append(new_workspace)
+            # устанавливаем связь через промежуточную таблицу с ролью owner
+            user_workspace = UserWorkspace(
+                user_id=new_user.id,
+                workspace_id=new_workspace.id,
+                role="owner",
+                can_create_projects=True,
+                can_invite_users=True
+            )
+            session.add(user_workspace)
 
             session.commit()
             session.refresh(new_user)
@@ -543,3 +552,57 @@ class OrmQuery:
                 UserProjectAccess.project_id == project_id
             ).all()
             return accesses
+
+    @staticmethod
+    def get_user_workspace_role(user_id: int, workspace_id: int) -> str | None:
+        """
+        Получить роль пользователя в workspace.
+        Возвращает роль ('owner', 'admin', 'member', 'guest') или None, если связь не найдена.
+        """
+        with session_factory() as session:
+            user_workspace = session.query(UserWorkspace).filter(
+                UserWorkspace.user_id == user_id,
+                UserWorkspace.workspace_id == workspace_id
+            ).first()
+            return user_workspace.role if user_workspace else None
+
+    @staticmethod
+    def delete_project(project_id: int) -> bool:
+        """
+        Удаляет проект по его ID вместе со всеми связанными сущностями:
+        - Досками (boards)
+        - Колонками (columns)
+        - Задачами (tasks) 
+        - Правами доступа (user_project_accesses)
+        
+        Возвращает True, если проект был удален, False, если проект не найден.
+        """
+        with session_factory() as session:
+            project = session.query(Project).filter(Project.id == project_id).first()
+            if not project:
+                return False
+            
+            # Получаем все доски проекта
+            boards = session.query(Board).filter(Board.projects_id == project_id).all()
+            
+            for board in boards:
+                # Получаем все колонки доски
+                columns = session.query(Column).filter(Column.board_id == board.id).all()
+                
+                for column in columns:
+                    # Удаляем все задачи колонки
+                    session.query(Task).filter(Task.column_id == column.id).delete()
+                
+                # Удаляем все колонки доски
+                session.query(Column).filter(Column.board_id == board.id).delete()
+            
+            # Удаляем все доски проекта
+            session.query(Board).filter(Board.projects_id == project_id).delete()
+            
+            # Удаляем все права доступа к проекту
+            session.query(UserProjectAccess).filter(UserProjectAccess.project_id == project_id).delete()
+            
+            # Удаляем сам проект
+            session.delete(project)
+            session.commit()
+            return True
