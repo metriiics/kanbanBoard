@@ -45,6 +45,16 @@ class OrmQuery:
             return session.query(User).filter(User.email == email).first()
     
     @staticmethod
+    def get_user_by_username(username: str) -> User | None:
+
+        '''
+        Возвращает пользователя по его username.
+        '''
+
+        with session_factory() as session:
+            return session.query(User).filter(User.username == username).first()
+    
+    @staticmethod
     def create_user(user: UserCreate, avatar_url: Optional[str] = None) -> User:
 
         '''
@@ -506,6 +516,33 @@ class OrmQuery:
             return new_invite
 
     @staticmethod
+    def delete_invite(token: str, user_id: int) -> bool:
+        """
+        Удаляет (деактивирует) инвайт по токену.
+        Проверяет, что пользователь является владельцем workspace.
+        Возвращает True при успехе, False если токен не найден или нет прав.
+        """
+        with session_factory() as session:
+            # Находим инвайт
+            invite = session.query(WorkspaceInvite).filter(
+                WorkspaceInvite.token == token,
+                WorkspaceInvite.is_active == True
+            ).first()
+            
+            if not invite:
+                return False
+            
+            # Проверяем права пользователя на workspace
+            user_role = OrmQuery.get_user_workspace_role(user_id, invite.workspace_id)
+            if user_role != "owner":
+                return False
+            
+            # Деактивируем инвайт
+            invite.is_active = False
+            session.commit()
+            return True
+
+    @staticmethod
     def create_user_project_access(project_id: int, user_id: int, can_edit: bool = False, can_view: bool = True):
         """
         Создать или обновить запись в user_project_accesses.
@@ -635,3 +672,35 @@ class OrmQuery:
             session.delete(board)
             session.commit()
             return True
+
+    @staticmethod
+    def update_user(user_id: int, first_name: str | None = None, last_name: str | None = None, 
+                   username: str | None = None, avatar_file = None) -> User | None:
+        """
+        Обновляет данные пользователя.
+        Если передан avatar_file (UploadFile), сохраняет его и обновляет avatar_url.
+        Возвращает обновленного пользователя или None, если пользователь не найден.
+        """
+        from core.avatar_generator import save_avatar_file
+        
+        with session_factory() as session:
+            user = session.query(User).filter(User.id == user_id).first()
+            if not user:
+                return None
+            
+            if first_name is not None:
+                user.first_name = first_name
+            if last_name is not None:
+                user.last_name = last_name
+            if username is not None:
+                user.username = username
+            
+            # Обработка аватарки
+            if avatar_file is not None:
+                old_avatar_url = user.avatar_url
+                new_avatar_url = save_avatar_file(avatar_file, old_avatar_url)
+                user.avatar_url = new_avatar_url
+            
+            session.commit()
+            session.refresh(user)
+            return user

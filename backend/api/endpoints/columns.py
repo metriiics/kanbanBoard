@@ -3,7 +3,7 @@ from db.OrmQuery import OrmQuery
 from api.models.columns import ColumnTitleUpdate, ColumnCreate
 from core.security import get_current_user
 
-router = APIRouter()
+router = APIRouter(tags=["📊 Колонки"])
 
 @router.put("/api/columns/update_positions")
 def update_positions(payload: list[dict]):

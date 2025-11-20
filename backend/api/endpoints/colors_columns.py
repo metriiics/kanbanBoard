@@ -4,7 +4,7 @@ from typing import List, Dict, Any
 from db.OrmQuery import OrmQuery
 from core.security import get_current_user
 
-router = APIRouter()
+router = APIRouter(tags=["🎨 Цвета колонок"])
 
 @router.get("/api/colors")
 def get_available_colors(current_user=Depends(get_current_user)) -> List[Dict[str, Any]]:

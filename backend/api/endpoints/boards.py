@@ -4,7 +4,7 @@ from db.OrmQuery import OrmQuery
 from api.models.boards import BoardCreate, BoardOut, BoardUpdateTitle
 from core.security import get_current_user
 
-router = APIRouter()
+router = APIRouter(tags=["📋 Доски"])
 
 @router.post("/api/boards/create", response_model=BoardOut)
 def create_board_endpoint(board: BoardCreate, current_user=Depends(get_current_user)):

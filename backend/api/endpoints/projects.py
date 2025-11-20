@@ -13,7 +13,7 @@ from api.models.projects import (
     ProjectUserAccessOut,
 )
 
-router = APIRouter()
+router = APIRouter(tags=["📁 Проекты"])
 
 @router.get("/api/workspace/projects", response_model=List[ProjectWithBoardsOut])
 def get_workspace_projects(

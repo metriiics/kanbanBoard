@@ -9,7 +9,7 @@ from core.security import verify_password
 from api.models.user import UserCreate, UserRead
 from db.dbstruct import User
 
-router = APIRouter()
+router = APIRouter(tags=["🔐 Аутентификация"])
 
 @router.post("/api/auth/register", response_model=UserRead)
 def create_user_endpoint(user: UserCreate):
