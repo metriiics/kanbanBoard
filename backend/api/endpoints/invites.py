@@ -16,7 +16,7 @@ from api.utils.workspaces import (
 from core.config import settings
 from core.security import get_current_user
 from db.database import get_db
-from db.dbstruct import User, Workspace, WorkspaceInvite
+from db.dbstruct import User, Workspace, WorkspaceInvite, UserWorkspace
 
 router = APIRouter()
 
