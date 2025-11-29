@@ -1,144 +1,219 @@
-import { useState, useRef, useEffect } from 'react';
-import { createPortal } from 'react-dom';
+import { useEffect, useMemo, useState } from 'react';
+import { useWorkspace } from '../../hooks/h_workspace';
+import { useCurrentUser } from '../../hooks/h_useCurrentUser';
+import { createInviteLink, deleteInviteLink, getActiveInvite } from '../../api/a_invites';
+import { getWorkspaceMembers, removeWorkspaceMember } from '../../api/a_members';
 
 export default function MembersSettings() {
-  const [projects] = useState([
-    {
-      id: 1,
-      name: 'Проект Alpha',
-      boards: [
-        { id: 101, name: 'Задачи' },
-        { id: 102, name: 'UI/UX' },
-      ],
-    },
-    {
-      id: 2,
-      name: 'Маркетинг',
-      boards: [
-        { id: 201, name: 'Контент' },
-        { id: 202, name: 'Кампании' },
-      ],
-    },
-    {
-      id: 3,
-      name: 'Frontend Разработка',
-      boards: [
-        { id: 301, name: 'Компоненты' },
-        { id: 302, name: 'Баги' },
-      ],
-    },
-  ]);
-
-  const [members, setMembers] = useState([
-    {
-      id: 1,
-      name: 'Алексей Кочетков',
-      username: '@metriics',
-      projects: [
-        { id: 1, accessAll: false, boards: [101] },
-        { id: 2, accessAll: true, boards: [] },
-      ],
-    },
-    {
-      id: 2,
-      name: 'Снежана Корженко',
-      username: '@snezhana',
-      projects: [{ id: 3, accessAll: false, boards: [301] }],
-    },
-  ]);
-
+  const { workspace, loading: workspaceLoading } = useWorkspace();
+  const { user } = useCurrentUser();
+  const [members, setMembers] = useState([]);
+  const [membersLoading, setMembersLoading] = useState(true);
+  const [membersError, setMembersError] = useState('');
+  const [memberAction, setMemberAction] = useState({ state: 'idle', message: '', targetId: null });
   const [search, setSearch] = useState('');
-  const [openDropdown, setOpenDropdown] = useState(null);
-  const [dropdownPos, setDropdownPos] = useState({ top: 0, left: 0 });
-  const dropdownRef = useRef(null);
+  const [activeInvite, setActiveInvite] = useState(null);
+  const [inviteLoading, setInviteLoading] = useState(false);
+  const [inviteStatus, setInviteStatus] = useState({ state: 'idle', message: '' });
 
-  // === Логика переключения доступа ===
-  const toggleProjectAccess = (memberId, projectId) => {
-    setMembers(prev =>
-      prev.map(member => {
-        if (member.id !== memberId) return member;
-        const existing = member.projects.find(p => p.id === projectId);
-        if (existing) {
-          return {
-            ...member,
-            projects: member.projects.map(p =>
-              p.id === projectId ? { ...p, accessAll: !p.accessAll } : p
-            ),
-          };
-        } else {
-          return {
-            ...member,
-            projects: [...member.projects, { id: projectId, accessAll: true, boards: [] }],
-          };
-        }
-      })
-    );
-  };
-
-  const toggleBoardAccess = (memberId, projectId, boardId) => {
-    setMembers(prev =>
-      prev.map(member => {
-        if (member.id !== memberId) return member;
-        const project = member.projects.find(p => p.id === projectId);
-        if (!project) {
-          return {
-            ...member,
-            projects: [...member.projects, { id: projectId, accessAll: false, boards: [boardId] }],
-          };
-        }
-        const hasBoard = project.boards.includes(boardId);
-        return {
-          ...member,
-          projects: member.projects.map(p =>
-            p.id === projectId
-              ? {
-                  ...p,
-                  boards: hasBoard
-                    ? p.boards.filter(id => id !== boardId)
-                    : [...p.boards, boardId],
-                }
-              : p
-          ),
-        };
-      })
-    );
-  };
-
-  const removeMember = (id) => {
-    if (window.confirm('Исключить пользователя из рабочего пространства?')) {
-      setMembers(prev => prev.filter(m => m.id !== id));
-    }
-  };
-
-  const handleDropdownToggle = (memberId, e) => {
-    const rect = e.currentTarget.getBoundingClientRect();
-    if (openDropdown === memberId) {
-      setOpenDropdown(null);
-    } else {
-      setDropdownPos({
-        top: rect.bottom + window.scrollY + 4,
-        left: rect.left + window.scrollX,
-      });
-      setOpenDropdown(memberId);
-    }
-  };
-
-  // === Закрытие при клике вне меню ===
   useEffect(() => {
-    const handleClickOutside = (e) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(e.target)) {
-        setOpenDropdown(null);
-      }
-    };
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, []);
+    let isMounted = true;
 
-  const filteredMembers = members.filter(
-    (m) =>
-      m.name.toLowerCase().includes(search.toLowerCase()) ||
-      m.username.toLowerCase().includes(search.toLowerCase())
-  );
+    async function fetchMembers() {
+      if (!workspace?.id) return;
+      try {
+        setMembersLoading(true);
+        setMembersError('');
+        const data = await getWorkspaceMembers(workspace.id);
+        if (isMounted) {
+          setMembers(data);
+        }
+      } catch (err) {
+        if (isMounted) {
+          setMembersError(err?.response?.data?.detail || 'Не удалось загрузить участников');
+        }
+      } finally {
+        if (isMounted) {
+          setMembersLoading(false);
+        }
+      }
+    }
+
+    fetchMembers();
+    return () => {
+      isMounted = false;
+    };
+  }, [workspace?.id]);
+
+  useEffect(() => {
+    let isMounted = true;
+
+    async function fetchActiveInvite() {
+      if (!workspace?.id) return;
+      try {
+        const data = await getActiveInvite(workspace.id);
+        if (isMounted) {
+          setActiveInvite(data);
+        }
+      } catch (err) {
+        if (err?.response?.status !== 404 && isMounted) {
+          setInviteStatus({
+            state: 'error',
+            message: err?.response?.data?.detail || 'Не удалось получить ссылку',
+          });
+        }
+      }
+    }
+
+    fetchActiveInvite();
+    return () => {
+      isMounted = false;
+    };
+  }, [workspace?.id]);
+
+  const copyToClipboard = async (value) => {
+    if (!value) return false;
+    try {
+      if (navigator?.clipboard?.writeText) {
+        await navigator.clipboard.writeText(value);
+      } else {
+        const textarea = document.createElement('textarea');
+        textarea.value = value;
+        textarea.style.position = 'fixed';
+        textarea.style.top = '-9999px';
+        document.body.appendChild(textarea);
+        textarea.focus();
+        textarea.select();
+        document.execCommand('copy');
+        document.body.removeChild(textarea);
+      }
+      return true;
+    } catch {
+      return false;
+    }
+  };
+
+  const handleInvitePrimaryAction = async () => {
+    if (!workspace?.id) {
+      setInviteStatus({
+        state: 'error',
+        message: 'Рабочее пространство не найдено',
+      });
+      return;
+    }
+
+    if (!activeInvite) {
+      try {
+        setInviteLoading(true);
+        const data = await createInviteLink(workspace.id);
+        setActiveInvite(data);
+        await copyToClipboard(data.invite_url);
+        setInviteStatus({
+          state: 'success',
+          message: 'Ссылка создана и скопирована в буфер обмена',
+        });
+      } catch (err) {
+        setInviteStatus({
+          state: 'error',
+          message: err?.response?.data?.detail || 'Не удалось создать ссылку',
+        });
+      } finally {
+        setInviteLoading(false);
+      }
+      return;
+    }
+
+    const copied = await copyToClipboard(activeInvite.invite_url);
+    setInviteStatus({
+      state: copied ? 'success' : 'error',
+      message: copied ? 'Ссылка скопирована' : 'Не удалось скопировать ссылку',
+    });
+  };
+
+  const handleDisableInviteLink = async () => {
+    if (!activeInvite?.token) {
+      setInviteStatus({
+        state: 'error',
+        message: 'Ссылка ещё не создана',
+      });
+      return;
+    }
+    try {
+      setInviteLoading(true);
+      await deleteInviteLink(activeInvite.token);
+      setActiveInvite(null);
+      setInviteStatus({
+        state: 'success',
+        message: 'Ссылка отключена',
+      });
+    } catch (err) {
+      setInviteStatus({
+        state: 'error',
+        message: err?.response?.data?.detail || 'Не удалось отключить ссылку',
+      });
+    } finally {
+      setInviteLoading(false);
+    }
+  };
+
+  const filteredMembers = useMemo(() => {
+    if (!search) return members;
+    return members.filter((member) => {
+      const name = `${member.first_name || ''} ${member.last_name || ''}`.toLowerCase();
+      const username = (member.username || '').toLowerCase();
+      const email = (member.email || '').toLowerCase();
+      const query = search.toLowerCase();
+      return name.includes(query) || username.includes(query) || email.includes(query);
+    });
+  }, [members, search]);
+
+  const getDisplayName = (member) => {
+    const name = `${member.first_name || ''} ${member.last_name || ''}`.trim();
+    if (name) return name;
+    if (member.username) return member.username;
+    if (member.email) return member.email;
+    return 'Без имени';
+  };
+
+  const getInitials = (member) => {
+    const name = getDisplayName(member);
+    return name
+      .split(' ')
+      .filter(Boolean)
+      .map((part) => part[0])
+      .slice(0, 2)
+      .join('')
+      .toUpperCase();
+  };
+
+  const handleRemoveMember = async (member) => {
+    if (!workspace?.id) return;
+    if (!window.confirm(`Исключить пользователя ${getDisplayName(member)}?`)) {
+      return;
+    }
+    try {
+      setMemberAction({ state: 'loading', message: '', targetId: member.user_id });
+      await removeWorkspaceMember({ workspaceId: workspace.id, userId: member.user_id });
+      setMembers((prev) => prev.filter((item) => item.user_id !== member.user_id));
+      setMemberAction({
+        state: 'success',
+        message: `Пользователь ${getDisplayName(member)} исключён`,
+        targetId: null,
+      });
+    } catch (err) {
+      setMemberAction({
+        state: 'error',
+        message: err?.response?.data?.detail || 'Не удалось исключить пользователя',
+        targetId: null,
+      });
+    }
+  };
+
+  const canRemoveMember = (member) => {
+    if (!user) return false;
+    if (member.user_id === user.id) return false;
+    return true;
+  };
 
   return (
     <div className="members-settings">
@@ -147,18 +222,42 @@ export default function MembersSettings() {
       </h3>
 
       <p className="members-description">
-        Участники рабочего пространства могут просматривать проекты и доски, в зависимости от выданных разрешений.
+        Управляйте командой, отправляйте приглашения и контролируйте доступ.
       </p>
 
       <div className="invite-section">
         <h4 className="invite-title">Приглашайте пользователей</h4>
         <p className="invite-description">
-          Чтобы присоединиться к этому рабочему пространству, нужна только пригласительная ссылка.
+          {workspace?.name
+            ? `Поделитесь ссылкой, чтобы пригласить людей в «${workspace.name}».`
+            : 'Чтобы присоединиться к рабочему пространству, нужна только пригласительная ссылка.'}
         </p>
+        {activeInvite && (
+          <div className="invite-link-preview" title={activeInvite.invite_url}>
+            {activeInvite.invite_url}
+          </div>
+        )}
         <div className="invite-actions">
-          <button className="invite-button">Скопировать ссылку</button>
-          <button className="regenerate-button">Отключить ссылку</button>
+          <button
+            className="invite-button"
+            onClick={handleInvitePrimaryAction}
+            disabled={inviteLoading || workspaceLoading}
+          >
+            {activeInvite ? 'Скопировать ссылку' : 'Создать ссылку'}
+          </button>
+          <button
+            className="regenerate-button"
+            onClick={handleDisableInviteLink}
+            disabled={!activeInvite || inviteLoading}
+          >
+            Отключить ссылку
+          </button>
         </div>
+        {inviteStatus.message && (
+          <div className={`invite-status ${inviteStatus.state}`}>
+            {inviteStatus.message}
+          </div>
+        )}
       </div>
 
       <hr className="section-divider" />
@@ -181,104 +280,71 @@ export default function MembersSettings() {
           <span>Действия</span>
         </div>
 
-        {filteredMembers.map((member) => (
-          <div key={member.id} className="member-row">
-            <div className="member-info-row">
-              <div className="member-avatar">
-                {member.name
-                  .split(' ')
-                  .map((n) => n[0])
-                  .join('')
-                  .toUpperCase()}
+        {membersLoading && (
+          <div className="members-status">Загружаем участников...</div>
+        )}
+
+        {membersError && (
+          <div className="members-status error">{membersError}</div>
+        )}
+
+        {!membersLoading &&
+          !membersError &&
+          filteredMembers.map((member) => {
+            const removeDisabled =
+              !canRemoveMember(member) ||
+              (memberAction.state === 'loading' &&
+                memberAction.targetId === member.user_id);
+            return (
+              <div key={member.workspace_link_id} className="member-row">
+                <div className="member-info-row">
+                  <div className="member-avatar">{getInitials(member)}</div>
+                  <div className="member-text">
+                    <div className="member-name-row">
+                      <span className="member-name">{getDisplayName(member)}</span>
+                      <span className="role-chip">{member.role || 'member'}</span>
+                    </div>
+                    <div className="member-username">
+                      {member.email || member.username || '—'}
+                    </div>
+                  </div>
+                </div>
+
+                <div className="member-actions">
+                  <button
+                    className="remove-button"
+                    onClick={() => handleRemoveMember(member)}
+                    disabled={removeDisabled}
+                    title={
+                      member.user_id === user?.id
+                        ? 'Нельзя удалить себя'
+                        : undefined
+                    }
+                  >
+                    {memberAction.state === 'loading' &&
+                    memberAction.targetId === member.user_id
+                      ? 'Удаляем...'
+                      : 'Исключить'}
+                  </button>
+                </div>
               </div>
-              <div className="member-text">
-                <div className="member-name">{member.name}</div>
-                <div className="member-username">{member.username}</div>
-              </div>
-            </div>
+            );
+          })}
 
-            <div className="member-actions">
-              <button
-                className="dropdown-toggle"
-                onClick={(e) => handleDropdownToggle(member.id, e)}
-              >
-                Доступ ▾
-              </button>
-              <button
-                className="remove-button"
-                onClick={() => removeMember(member.id)}
-              >
-                Исключить
-              </button>
-            </div>
-
-            {openDropdown === member.id &&
-              createPortal(
-                <div
-                  ref={dropdownRef}
-                  className="dropdown-menu"
-                  style={{
-                    position: 'absolute',
-                    top: dropdownPos.top,
-                    left: dropdownPos.left,
-                    zIndex: 9999,
-                  }}
-                >
-                  {projects.map((project) => {
-                    const memberProject = member.projects.find(
-                      (p) => p.id === project.id
-                    );
-                    const accessAll = memberProject?.accessAll || false;
-                    const allowedBoards = memberProject?.boards || [];
-
-                    return (
-                      <div key={project.id} className="dropdown-project">
-                        <label className="dropdown-project-title">
-                          <input
-                            type="checkbox"
-                            checked={accessAll}
-                            onChange={() =>
-                              toggleProjectAccess(member.id, project.id)
-                            }
-                          />
-                          {project.name}
-                        </label>
-
-                        <div className="dropdown-boards">
-                          {project.boards.map((board) => (
-                            <label key={board.id} className="dropdown-item">
-                              <input
-                                type="checkbox"
-                                checked={
-                                  accessAll ||
-                                  allowedBoards.includes(board.id)
-                                }
-                                disabled={accessAll}
-                                onChange={() =>
-                                  toggleBoardAccess(
-                                    member.id,
-                                    project.id,
-                                    board.id
-                                  )
-                                }
-                              />
-                              {board.name}
-                            </label>
-                          ))}
-                        </div>
-                      </div>
-                    );
-                  })}
-                </div>,
-                document.body
-              )}
+        {!membersLoading && !membersError && filteredMembers.length === 0 && (
+          <div className="members-empty">
+            {members.length === 0
+              ? 'Пока нет участников. Отправьте ссылку-приглашение.'
+              : 'Пользователи не найдены.'}
           </div>
-        ))}
-
-        {filteredMembers.length === 0 && (
-          <div className="no-results">Пользователи не найдены</div>
         )}
       </div>
+
+      {memberAction.message && memberAction.state !== 'loading' && (
+        <div className={`members-alert ${memberAction.state}`}>
+          {memberAction.message}
+        </div>
+      )}
     </div>
   );
 }

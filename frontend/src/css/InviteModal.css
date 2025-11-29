@@ -76,6 +76,11 @@
   background: #4338ca;
 }
 
+.invite-link button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
 /* Кнопка удаления */
 .delete-link-btn {
   background: #ef4444 !important;
@@ -100,6 +105,11 @@
   opacity: 0.9;
 }
 
+.generate-link-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
 /* Действия */
 .modal-actions {
   display: flex;
@@ -117,6 +127,26 @@
 
 .modal-actions button:hover {
   background: #d1d5db;
+}
+
+.invite-status-message {
+  margin-top: 18px;
+  font-size: 14px;
+  border-radius: 8px;
+  padding: 10px 14px;
+  text-align: center;
+}
+
+.invite-status-message.success {
+  background: #ecfdf5;
+  color: #047857;
+  border: 1px solid #a7f3d0;
+}
+
+.invite-status-message.error {
+  background: #fef2f2;
+  color: #b91c1c;
+  border: 1px solid #fecaca;
 }
 
 @keyframes fadeIn {

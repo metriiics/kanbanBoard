@@ -11,6 +11,7 @@ class Settings(BaseSettings):
     ALGORITHM: str = "HS256"
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 30
     SALT: str
+    FRONTEND_URL: str = "http://localhost:3000"
 
     @property
     def DATABASE_URL(self) -> str:

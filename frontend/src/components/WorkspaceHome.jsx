@@ -3,23 +3,35 @@ import { Link } from "react-router-dom";
 import { getProjectsByWorkspace } from "../api/a_workspaces";
 import { useAuth } from "../contexts/AuthContext";
 import Sidebar from "./Sidebar"; 
+import { useWorkspace } from "../hooks/h_workspace";
 
 export default function WorkspaceHome() {
   const { user } = useAuth();
+  const { workspace, workspaceLoading } = useWorkspace();
   const [recentProjects, setRecentProjects] = useState([]);
+  const [projectsLoading, setProjectsLoading] = useState(true);
+  const [projectsError, setProjectsError] = useState("");
   const [tasks, setTasks] = useState([]);
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
 
   useEffect(() => {
     // Запрос к API для получения проектов
     const fetchProjects = async () => {
+      if (!workspace?.id) {
+        setRecentProjects([]);
+        setProjectsLoading(false);
+        return;
+      }
       try {
-        const workspaceId = 1; // временно, позже можно получить из user/workspace
-        const data = await getProjectsByWorkspace(workspaceId);
+        setProjectsLoading(true);
+        setProjectsError("");
+        const data = await getProjectsByWorkspace(workspace.id);
         setRecentProjects(data);
       } catch (error) {
         console.error("Ошибка при загрузке проектов:", error);
+        setProjectsError("Не удалось загрузить проекты");
       }
+      setProjectsLoading(false);
     };
 
     fetchProjects();
@@ -54,7 +66,7 @@ export default function WorkspaceHome() {
         project: "KanbanBoard",
       },
     ]);
-  }, []);
+  }, [workspace?.id]);
 
   return (
     <div className="kanban-board-with-sidebar">
@@ -80,14 +92,18 @@ export default function WorkspaceHome() {
           <section className="recent-projects">
             <h2>Недавние проекты</h2>
             <div className="projects-grid">
-              {recentProjects.length > 0 ? (
+              {projectsLoading || workspaceLoading ? (
+                <p>Загружаем проекты...</p>
+              ) : projectsError ? (
+                <p>{projectsError}</p>
+              ) : recentProjects.length > 0 ? (
                 recentProjects.map((project) => (
                   <Link
                     to={`/project/${project.id}/board`}
                     className="project-card"
                     key={project.id}
                   >
-                    <h3>{project.name}</h3>
+                    <h3>{project.name || project.title}</h3>
                     <p>{project.description || "Без описания"}</p>
                   </Link>
                 ))

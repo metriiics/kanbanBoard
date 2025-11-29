@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { createPortal } from 'react-dom';
 import {
   useProjects,
@@ -31,12 +31,33 @@ export default function Sidebar({ isCollapsed, onToggle }) {
 
   const createBoard = useCreateBoard();
   const createProject = useCreateProject();
-  const { workspace } = useWorkspace();
+  const {
+    workspace,
+    setActiveWorkspaceId,
+    workspaceList,
+    workspaceListLoading,
+    workspaceListError,
+  } = useWorkspace();
   const { projects, setProjects, loading, error } = useProjects();
   const { user } = useCurrentUser();
   const location = useLocation();
+  const navigate = useNavigate();
 
-  const workspaceName = user?.username || 'Загрузка...';
+  const [isWorkspaceMenuOpen, setIsWorkspaceMenuOpen] = useState(false);
+  const workspaceMenuRef = useRef(null);
+
+  const workspaceNameFallback = user?.username || 'Рабочее пространство';
+  const currentWorkspaceMeta = workspaceList?.find((item) => item.id === workspace?.id);
+  const workspaceName = workspace?.name || currentWorkspaceMeta?.name || workspaceNameFallback;
+  const workspaceSubtitle = workspaceListLoading
+    ? 'Загружаем пространства...'
+    : workspaceListError
+    ? 'Не удалось загрузить список'
+    : currentWorkspaceMeta?.is_personal
+    ? 'Личное пространство'
+    : currentWorkspaceMeta?.role
+    ? `Роль: ${currentWorkspaceMeta.role}`
+    : 'Рабочее пространство';
 
   const [projectTitle, setProjectTitle] = useState('');
   const [boardTitle, setBoardTitle] = useState('');
@@ -54,6 +75,36 @@ export default function Sidebar({ isCollapsed, onToggle }) {
     document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
+
+  useEffect(() => {
+    const handleWorkspaceMenuClick = (e) => {
+      if (
+        workspaceMenuRef.current &&
+        !workspaceMenuRef.current.contains(e.target)
+      ) {
+        setIsWorkspaceMenuOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleWorkspaceMenuClick);
+    return () => document.removeEventListener('mousedown', handleWorkspaceMenuClick);
+  }, []);
+
+  const handleWorkspaceToggle = () => {
+    setIsWorkspaceMenuOpen((prev) => !prev);
+  };
+
+  const handleWorkspaceSelect = (workspaceId) => {
+    if (!workspaceId || workspaceId === workspace?.id) {
+      setIsWorkspaceMenuOpen(false);
+      return;
+    }
+    setActiveWorkspaceId(workspaceId);
+    setSelectedProject(null);
+    setIsWorkspaceMenuOpen(false);
+    if (user?.username) {
+      navigate(`/${user.username}/`);
+    }
+  };
 
   const handleProjectClick = (project) => setSelectedProject(project);
 
@@ -257,8 +308,49 @@ export default function Sidebar({ isCollapsed, onToggle }) {
     <>
       <div className="sidebar">
         <div className="sidebar-header">
-          <div className="workspace-info">
-            <h3>{workspaceName}</h3>
+          <div className="workspace-info" ref={workspaceMenuRef}>
+            <button
+              type="button"
+              className="workspace-switcher"
+              onClick={handleWorkspaceToggle}
+            >
+              <div className="workspace-switcher-text">
+                <h3>{workspaceName}</h3>
+                <span className="workspace-subtitle">{workspaceSubtitle}</span>
+              </div>
+              <span className={`workspace-chevron ${isWorkspaceMenuOpen ? 'open' : ''}`}>▾</span>
+            </button>
+            {isWorkspaceMenuOpen && (
+              <div className="workspace-dropdown">
+                {workspaceListLoading && (
+                  <div className="workspace-dropdown-item muted">Загружаем...</div>
+                )}
+                {!workspaceListLoading && workspaceListError && (
+                  <div className="workspace-dropdown-item error">{workspaceListError}</div>
+                )}
+                {!workspaceListLoading && !workspaceListError && workspaceList?.length === 0 && (
+                  <div className="workspace-dropdown-item muted">Пространства не найдены</div>
+                )}
+                {!workspaceListLoading &&
+                  !workspaceListError &&
+                  workspaceList?.map((item) => (
+                    <button
+                      type="button"
+                      key={item.id}
+                      className={`workspace-dropdown-item ${item.id === workspace?.id ? 'active' : ''}`}
+                      onClick={() => handleWorkspaceSelect(item.id)}
+                    >
+                      <div className="workspace-dropdown-text">
+                        <span>{item.name || 'Без названия'}</span>
+                        <small>
+                          {item.is_personal ? 'Личное пространство' : `Роль: ${item.role}`}
+                        </small>
+                      </div>
+                      {item.id === workspace?.id && <span className="workspace-check">✓</span>}
+                    </button>
+                  ))}
+              </div>
+            )}
           </div>
           <button className="toggle-btn" onClick={onToggle}>
             ◀

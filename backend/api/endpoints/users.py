@@ -1,4 +1,4 @@
-from fastapi import APIRouter, HTTPException, Depends
+from fastapi import APIRouter, HTTPException, Depends, Query
 from sqlalchemy.orm import Session
 from db.database import session_factory, get_db
 from db.OrmQuery import OrmQuery
@@ -6,6 +6,7 @@ from api.models.user import UserRead
 from api.models.workspace import WorkspaceOut
 from db.dbstruct import User 
 from core.security import get_current_user
+from api.utils.workspaces import resolve_membership
 
 router = APIRouter()
     
@@ -39,8 +40,16 @@ def get_user_endpoint(user_id: int):
 
 
 @router.get("/api/workspace/me", response_model=WorkspaceOut)
-def get_user_workspace(current_user = Depends(get_current_user)):
-    workspace = OrmQuery.get_workspace_by_user_id(current_user.id)
+def get_user_workspace(
+    workspace_id: int | None = Query(
+        default=None,
+        description="ID рабочего пространства (опционально)",
+    ),
+    current_user = Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
+    membership = resolve_membership(db, current_user.id, workspace_id)
+    workspace = membership.workspace
     if not workspace:
         raise HTTPException(status_code=404, detail="Рабочее пространство не найдено")
     return workspace
