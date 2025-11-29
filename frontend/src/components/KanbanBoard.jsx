@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useCallback, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { DndProvider } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
@@ -9,16 +9,96 @@ import Sidebar from "./Sidebar";
 import useBoard from "../hooks/h_useBoard"; 
 import CalendarView from './CalendarView';
 import MyTaskView from './MyTaskView';
+import { normalizeTaskCard } from "../utils/taskMapper";
+import { useTasks } from "../hooks/h_useTasks";
 
 export default function KanbanBoard() {
   const { boardId } = useParams();
   const { columns, setColumns, projectData, loading, error, saveColumnPositions, saveColumnTitle, onAddTask } = useBoard(boardId);
+  const { updateTask } = useTasks();
 
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
   const [activeNav, setActiveNav] = useState('board'); // Активный пункт навигации
   const [selectedTask, setSelectedTask] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isModalRightAligned, setIsModalRightAligned] = useState(false);
+  const handleTaskUpdated = useCallback((updatedTask) => {
+    if (!updatedTask?.id) return;
+
+    // Нормализуем задачу для карточки на доске
+    const normalizedCard = normalizeTaskCard(updatedTask);
+
+    setColumns((prevColumns) => {
+      let taskFound = false;
+      let hasChanges = false;
+      
+      const nextColumns = prevColumns.map((column) => {
+        const taskIndex = column.tasks.findIndex((t) => t.id === updatedTask.id);
+        if (taskIndex === -1) {
+          return column; // Возвращаем тот же объект, если задача не найдена
+        }
+        taskFound = true;
+        const existingTask = column.tasks[taskIndex];
+        
+        // Проверяем, есть ли реальные изменения
+        const newTitle = normalizedCard.title || existingTask.title;
+        const newPriority = normalizedCard.priority ?? existingTask.priority;
+        const newDueDate = normalizedCard.dueDate || normalizedCard.due_date || existingTask.dueDate || existingTask.due_date;
+        const newLabels = normalizedCard.labels && normalizedCard.labels.length > 0 ? normalizedCard.labels : existingTask.labels;
+        const newAssignee = normalizedCard.assignee || existingTask.assignee;
+        
+        // Проверяем, изменилось ли что-то
+        const titleChanged = newTitle !== existingTask.title;
+        const priorityChanged = newPriority !== existingTask.priority;
+        const dueDateChanged = newDueDate !== (existingTask.dueDate || existingTask.due_date);
+        const labelsChanged = JSON.stringify(newLabels) !== JSON.stringify(existingTask.labels);
+        const assigneeChanged = JSON.stringify(newAssignee) !== JSON.stringify(existingTask.assignee);
+        
+        if (!titleChanged && !priorityChanged && !dueDateChanged && !labelsChanged && !assigneeChanged) {
+          return column; // Нет изменений - возвращаем тот же объект
+        }
+        
+        hasChanges = true;
+        const updatedTasks = [...column.tasks];
+        
+        // Обновляем только измененную задачу
+        updatedTasks[taskIndex] = { 
+          ...existingTask,
+          title: newTitle,
+          priority: newPriority,
+          dueDate: newDueDate,
+          due_date: newDueDate,
+          labels: newLabels,
+          assignee: newAssignee,
+          column_id: normalizedCard.column_id || existingTask.column_id,
+        };
+        
+        return { ...column, tasks: updatedTasks };
+      });
+
+      // Возвращаем предыдущее состояние, если не было изменений
+      return (taskFound && hasChanges) ? nextColumns : prevColumns;
+    });
+
+    setSelectedTask((prev) => {
+      if (!prev || prev.id !== updatedTask.id) return prev;
+      const normalized = normalizeTaskCard(updatedTask);
+      // Проверяем, есть ли изменения
+      if (
+        prev.title === normalized.title &&
+        prev.priority === normalized.priority &&
+        JSON.stringify(prev.labels) === JSON.stringify(normalized.labels) &&
+        JSON.stringify(prev.assignee) === JSON.stringify(normalized.assignee)
+      ) {
+        return prev; // Нет изменений
+      }
+      return {
+        ...prev,
+        ...normalized,
+        columnTitle: updatedTask.column?.title ?? updatedTask.columnTitle ?? prev.columnTitle,
+      };
+    });
+  }, [setColumns]);
 
   const [isAddingColumn, setIsAddingColumn] = useState(false);
   const [newColumnTitle, setNewColumnTitle] = useState("");
@@ -28,7 +108,8 @@ export default function KanbanBoard() {
   if (!projectData) return <div className="empty">Нет данных по доске</div>;
 
   // Функция для перемещения задачи между колонками
-  const moveTaskBetweenColumns = (taskId, fromColumnId, toColumnId) => {
+  const moveTaskBetweenColumns = async (taskId, fromColumnId, toColumnId) => {
+    // Оптимистичное обновление UI
     setColumns(prevColumns => {
       const newColumns = [...prevColumns];
       
@@ -43,10 +124,35 @@ export default function KanbanBoard() {
       
       // Перемещаем задачу
       const [task] = fromColumn.tasks.splice(taskIndex, 1);
-      toColumn.tasks.push(task);
+      // Обновляем column_id в задаче
+      const updatedTask = { ...task, column_id: toColumnId };
+      toColumn.tasks.push(updatedTask);
       
       return newColumns;
     });
+
+    // Сохраняем на сервере
+    try {
+      await updateTask(taskId, { column_id: toColumnId });
+    } catch (err) {
+      console.error("Ошибка при сохранении перемещения задачи:", err);
+      // Откатываем изменения при ошибке
+      setColumns(prevColumns => {
+        const newColumns = [...prevColumns];
+        const fromColumn = newColumns.find(col => col.id === fromColumnId);
+        const toColumn = newColumns.find(col => col.id === toColumnId);
+        
+        if (!fromColumn || !toColumn) return prevColumns;
+        
+        const taskIndex = toColumn.tasks.findIndex(task => task.id === taskId);
+        if (taskIndex === -1) return prevColumns;
+        
+        const [task] = toColumn.tasks.splice(taskIndex, 1);
+        fromColumn.tasks.push(task);
+        
+        return newColumns;
+      });
+    }
   };
 
   // Функция для изменения порядка задач в колонке
@@ -235,6 +341,7 @@ export default function KanbanBoard() {
           onClose={handleCloseModal}
           isRightAligned={isModalRightAligned}
           onToggleAlignment={handleToggleAlignment}
+          onTaskUpdated={handleTaskUpdated}
         />
       </div>
     </DndProvider>

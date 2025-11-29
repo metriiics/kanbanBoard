@@ -158,7 +158,10 @@ class OrmQuery:
                 session.query(Column)
                 .filter(Column.board_id == board_id)
                 .options(
-                    joinedload(Column.tasks),                         # подгружаем задачи колонки
+                    joinedload(Column.tasks)  # подгружаем задачи колонки
+                        .joinedload(Task.assignee),
+                    joinedload(Column.tasks)
+                        .joinedload(Task.labels),
                     joinedload(Column.board).joinedload(Board.project),
                     joinedload(Column.color) 
                 )
@@ -704,3 +707,45 @@ class OrmQuery:
             session.commit()
             session.refresh(user)
             return user
+
+    @staticmethod
+    def create_comment(task_id: int, user_id: int, content: str) -> Comment | None:
+        """
+        Создаёт комментарий к задаче.
+        Возвращает объект Comment или None, если задача не найдена.
+        """
+        with session_factory() as session:
+            task = session.query(Task).filter(Task.id == task_id).first()
+            if not task:
+                return None
+            
+            new_comment = Comment(
+                task_id=task_id,
+                user_id=user_id,
+                content=content
+            )
+            session.add(new_comment)
+            session.commit()
+            session.refresh(new_comment)
+            return new_comment
+
+    @staticmethod
+    def create_label(workspace_id: int, name: str, color: str | None = None) -> Label | None:
+        """
+        Создаёт новый тег в рабочем пространстве.
+        Возвращает объект Label или None, если пространство не найдено.
+        """
+        with session_factory() as session:
+            workspace = session.query(Workspace).filter(Workspace.id == workspace_id).first()
+            if not workspace:
+                return None
+            
+            new_label = Label(
+                workspace_id=workspace_id,
+                name=name,
+                color=color or "#d1d5db"
+            )
+            session.add(new_label)
+            session.commit()
+            session.refresh(new_label)
+            return new_label

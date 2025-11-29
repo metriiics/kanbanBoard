@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends, HTTPException
 
 from core.security import get_current_user
-from api.models.tasks import BoardTasksOut, TaskFilledFieldsOut, TaskCardOut, TaskDetailOut, TaskCreate, TaskUpdate
+from api.models.tasks import BoardTasksOut, TaskFilledFieldsOut, TaskCardOut, TaskDetailOut, TaskCreate, TaskUpdate, TaskCommentOut, CommentCreate
 from db.OrmQuery import OrmQuery
 
 from db.dbstruct import Task as TaskModel
@@ -78,9 +78,30 @@ def get_tasks_by_board(board_id: int, current_user = Depends(get_current_user)):
                     "id": t.id,
                     "title": getattr(t, "title", None),
                     "description": getattr(t, "description", None),
+                    "priority": getattr(t, "priority", None),
+                    "due_date": getattr(t, "due_date", None),
                     "board_id": getattr(t, "board_id", None) or board_id_val,
                     "column_id": getattr(t, "column_id", None) or getattr(t, "columns_id", None) or getattr(t, "columnsId", None),
-                    "created_at": getattr(t, "created_at", None)
+                    "created_at": getattr(t, "created_at", None),
+                    "labels": [
+                        {
+                            "id": l.id,
+                            "name": getattr(l, "name", None),
+                            "color": getattr(l, "color", None)
+                        }
+                        for l in getattr(t, "labels", []) or []
+                    ],
+                    "assignee": (
+                        {
+                            "id": assignee.id,
+                            "first_name": getattr(assignee, "first_name", None),
+                            "last_name": getattr(assignee, "last_name", None),
+                            "username": getattr(assignee, "username", None),
+                            "email": getattr(assignee, "email", None),
+                        }
+                        if (assignee := getattr(t, "assignee", None))
+                        else None
+                    )
                 }
                 for t in getattr(c, "tasks", []) or []
             ]
@@ -291,4 +312,46 @@ def update_task(task_id: int, payload: TaskUpdate, current_user = Depends(get_cu
         "labels": labels,
         "assignee": assignee,
         "comments": comments
+    }
+
+@router.post("/api/tasks/{task_id}/comments", response_model=TaskCommentOut)
+def create_comment(task_id: int, payload: CommentCreate, current_user = Depends(get_current_user)):
+    """
+    Создаёт новый комментарий к задаче.
+    """
+    comment = OrmQuery.create_comment(task_id=task_id, user_id=current_user.id, content=payload.content)
+    if not comment:
+        raise HTTPException(status_code=404, detail="Задача не найдена")
+    
+    # Загружаем комментарий с пользователем
+    task = OrmQuery.get_task_with_relations(task_id)
+    if not task:
+        raise HTTPException(status_code=404, detail="Задача не найдена")
+    
+    # Находим созданный комментарий
+    created_comment = None
+    for com in getattr(task, "comments", []) or []:
+        if com.id == comment.id:
+            created_comment = com
+            break
+    
+    if not created_comment:
+        raise HTTPException(status_code=500, detail="Ошибка при создании комментария")
+    
+    cu = getattr(created_comment, "user", None)
+    user_obj = None
+    if cu:
+        user_obj = {
+            "id": cu.id,
+            "first_name": getattr(cu, "first_name", None),
+            "last_name": getattr(cu, "last_name", None),
+            "username": getattr(cu, "username", None),
+            "email": getattr(cu, "email", None),
+        }
+    
+    return {
+        "id": created_comment.id,
+        "content": getattr(created_comment, "content", None),
+        "user": user_obj,
+        "created_at": getattr(created_comment, "created_at", None)
     }

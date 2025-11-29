@@ -93,3 +93,10 @@ class TaskUpdate(BaseModel):
     column_id: Optional[int] = None
     assigned_to: Optional[int] = None
     label_ids: Optional[List[int]] = None
+
+class CommentCreate(BaseModel):
+    content: str
+
+class LabelCreate(BaseModel):
+    name: str
+    color: Optional[str] = None

@@ -1,10 +1,11 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, memo } from 'react';
 import { useDrag, useDrop } from 'react-dnd';
 import Avatar from 'react-avatar';
 import { createPortal } from 'react-dom';
 import { getEmptyImage } from 'react-dnd-html5-backend';
+import { getAssigneeDisplayName } from '../utils/taskMapper';
 
-export default function KanbanTask({ task, index, columnId, columnTitle, onTaskClick, moveTaskInColumn }) {
+const KanbanTask = ({ task, index, columnId, columnTitle, onTaskClick, moveTaskInColumn }) => {
   const [showUserInfo, setShowUserInfo] = useState(false);
   const [tooltipPos, setTooltipPos] = useState({ x: 0, y: 0 });
 
@@ -35,7 +36,7 @@ export default function KanbanTask({ task, index, columnId, columnTitle, onTaskC
     accept: 'task',
     hover: (item) => {
       if (item.columnId === columnId && item.index !== index) {
-        moveTaskInColumn(item.index, columnId, index, columnId);
+        moveTaskInColumn(item.index, index, columnId);
         item.index = index;
       }
     },
@@ -52,11 +53,11 @@ export default function KanbanTask({ task, index, columnId, columnTitle, onTaskC
     }
   };
 
-  const assignee = task.assignee || {
-    name: 'Иван Иванов',
-    role: 'Менеджер проекта',
-    email: 'ivan.ivanov@company.ru',
-  };
+  const assignee = task.assignee;
+  const dueDateValue = task.dueDate || task.due_date || null;
+  const hasAssignee = Boolean(assignee);
+  const hasDueDate = Boolean(dueDateValue);
+  const assigneeName = getAssigneeDisplayName(assignee);
 
   const handleMouseEnter = (e) => {
     const rect = e.currentTarget.getBoundingClientRect();
@@ -96,36 +97,43 @@ export default function KanbanTask({ task, index, columnId, columnTitle, onTaskC
           </div>
         </div>
 
-        {task.description && <p className="task-description">{task.description}</p>}
+        {(hasDueDate || hasAssignee) && (
+          <div className="task-footer">
+            {hasDueDate && (
+              <span className="task-date">
+                {new Date(dueDateValue).toLocaleDateString('ru-RU')}
+              </span>
+            )}
 
-        {/* Нижний блок: дата и аватар */}
-        <div className="task-footer">
-          <span className="task-date">
-            {task.dueDate
-              ? new Date(task.dueDate).toLocaleDateString('ru-RU')
-              : '20.11.2025'}
-          </span>
-
-          <div
-            className="task-user"
-            onMouseEnter={handleMouseEnter}
-            onMouseLeave={handleMouseLeave}
-          >
-            <Avatar
-              name={assignee.name}
-              size="25"
-              round={true}
-              textSizeRatio={2}
-              color="#764ba2"
-            />
+            {hasAssignee && (
+              <div
+                className="task-user"
+                onMouseEnter={handleMouseEnter}
+                onMouseLeave={handleMouseLeave}
+              >
+                <Avatar
+                  name={assigneeName || ' '}
+                  size="25"
+                  round={true}
+                  textSizeRatio={2}
+                  color="#764ba2"
+                />
+              </div>
+            )}
           </div>
-        </div>
+        )}
 
         {/* Теги — ниже даты */}
         {task.labels && task.labels.length > 0 && (
           <div className="task-tags">
-            {task.labels.slice(0, 2).map((label, i) => (
-              <span key={i} className="task-tag">{label}</span>
+            {task.labels.slice(0, 2).map((label, idx) => (
+              <span
+                key={label.id ?? `${label.name}-${idx}`}
+                className="task-tag"
+                style={label.color ? { backgroundColor: label.color } : {}}
+              >
+                {label.name}
+              </span>
             ))}
             {task.labels.length > 2 && (
               <span className="task-tag task-tag-more">
@@ -136,7 +144,7 @@ export default function KanbanTask({ task, index, columnId, columnTitle, onTaskC
         )}
 
         {/* Tooltip через createPortal */}
-        {showUserInfo &&
+        {showUserInfo && hasAssignee &&
           createPortal(
             <div
               className="user-tooltip"
@@ -146,9 +154,9 @@ export default function KanbanTask({ task, index, columnId, columnTitle, onTaskC
                 left: tooltipPos.x,
               }}
             >
-              <p><strong>{assignee.name}</strong></p>
-              <p>{assignee.role}</p>
-              <p className="user-email">{assignee.email}</p>
+              <p><strong>{assigneeName}</strong></p>
+              {assignee.username && <p>@{assignee.username}</p>}
+              {assignee.email && <p className="user-email">{assignee.email}</p>}
             </div>,
             document.body
           )}
@@ -167,18 +175,38 @@ export default function KanbanTask({ task, index, columnId, columnTitle, onTaskC
             <div className="task-header">
               <h4 className="task-title">{task.title}</h4>
             </div>
-            {task.description && <p className="task-description">{task.description}</p>}
-            <div className="task-footer">
-              <span className="task-date">
-                {task.dueDate
-                  ? new Date(task.dueDate).toLocaleDateString('ru-RU')
-                  : '20.11.2025'}
-              </span>
-              <Avatar name={assignee.name} size="25" round={true} color="#764ba2" />
-            </div>
+            {(hasDueDate || hasAssignee) && (
+              <div className="task-footer">
+                {hasDueDate && (
+                  <span className="task-date">
+                    {new Date(dueDateValue).toLocaleDateString('ru-RU')}
+                  </span>
+                )}
+                {hasAssignee && (
+                  <Avatar name={assigneeName || ' '} size="25" round={true} color="#764ba2" />
+                )}
+              </div>
+            )}
           </div>,
           document.body
         )}
     </>
   );
-}
+};
+
+// Мемоизируем компонент для предотвращения лишних ререндеров
+export default memo(KanbanTask, (prevProps, nextProps) => {
+  // Сравниваем только необходимые поля
+  return (
+    prevProps.task.id === nextProps.task.id &&
+    prevProps.task.title === nextProps.task.title &&
+    prevProps.task.priority === nextProps.task.priority &&
+    prevProps.task.dueDate === nextProps.task.dueDate &&
+    prevProps.task.due_date === nextProps.task.due_date &&
+    JSON.stringify(prevProps.task.labels) === JSON.stringify(nextProps.task.labels) &&
+    JSON.stringify(prevProps.task.assignee) === JSON.stringify(nextProps.task.assignee) &&
+    prevProps.index === nextProps.index &&
+    prevProps.columnId === nextProps.columnId &&
+    prevProps.columnTitle === nextProps.columnTitle
+  );
+});

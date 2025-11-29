@@ -1,9 +1,9 @@
-import React, { useRef, useState, useEffect  } from 'react';
+import React, { useRef, useState, useEffect, memo } from 'react';
 import { useDrop, useDrag } from 'react-dnd';
 import { useColors } from '../hooks/h_useColors';
 import KanbanTask from "./KanbanTask";
 
-export default function KanbanColumn({ 
+const KanbanColumn = ({ 
   column, 
   onUpdateColumns, 
   index, 
@@ -13,7 +13,7 @@ export default function KanbanColumn({
   moveTaskBetweenColumns, 
   onAddTask,
   onDeleteColumn,
-  saveColumnTitle }) {
+  saveColumnTitle }) => {
     
   const [isAddingTask, setIsAddingTask] = useState(false);
   const [newTaskTitle, setNewTaskTitle] = useState('');
@@ -83,8 +83,12 @@ export default function KanbanColumn({
 
       // --- если перетаскивается задача ---
       if (monitor.getItemType() === 'task' && item.columnId !== column.id) {
-        moveTaskBetweenColumns(item.taskId, item.columnId, column.id);
-        item.columnId = column.id;
+        // Предотвращаем множественные вызовы
+        if (item.lastColumnId !== column.id) {
+          moveTaskBetweenColumns(item.taskId, item.columnId, column.id);
+          item.columnId = column.id;
+          item.lastColumnId = column.id;
+        }
       }
     },
     collect: (monitor) => ({
@@ -341,4 +345,16 @@ export default function KanbanColumn({
       )}
     </div>
   );
-}
+};
+
+// Мемоизируем компонент для предотвращения лишних ререндеров
+export default memo(KanbanColumn, (prevProps, nextProps) => {
+  // Сравниваем только необходимые поля
+  return (
+    prevProps.column.id === nextProps.column.id &&
+    prevProps.column.title === nextProps.column.title &&
+    prevProps.column.tasks.length === nextProps.column.tasks.length &&
+    prevProps.index === nextProps.index &&
+    JSON.stringify(prevProps.column.color) === JSON.stringify(nextProps.column.color)
+  );
+});

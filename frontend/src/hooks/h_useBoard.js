@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { useTasks } from './h_useTasks';
 import { getBoardColumns } from '../api/a_board';
 import { updateColumnsPositions, updateColumnTitle } from '../api/a_columns';
+import { normalizeTaskCard } from '../utils/taskMapper';
 
 export default function useBoard(boardId) {
   const [columns, setColumns] = useState([]);
@@ -17,7 +18,11 @@ export default function useBoard(boardId) {
     setError(null);
     try {
       const data = await getBoardColumns(boardId);
-      setColumns(data.columns || []);
+      const normalizedColumns = (data.columns || []).map((column) => ({
+        ...column,
+        tasks: (column.tasks || []).map((task) => normalizeTaskCard(task)),
+      }));
+      setColumns(normalizedColumns);
       setProjectData({
         name: data.project?.title || 'Без названия проекта',
         boardName: data.board_title || 'Без названия доски',
@@ -61,7 +66,7 @@ export default function useBoard(boardId) {
         setColumns((prev) =>
           prev.map((col) =>
             col.id === columnId
-              ? { ...col, tasks: [...col.tasks, newTask] }
+              ? { ...col, tasks: [...col.tasks, normalizeTaskCard(newTask)] }
               : col
           )
         );

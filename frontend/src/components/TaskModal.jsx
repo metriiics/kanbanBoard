@@ -1,148 +1,520 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, useMemo, useCallback } from 'react';
 import Calendar from 'react-calendar';
 import { useTasks } from "../hooks/h_useTasks";
+import { getTaskDetailsApi, createCommentApi } from "../api/a_tasks";
+import { getWorkspaceMembers } from "../api/a_members";
+import { getWorkspaceLabels, createWorkspaceLabel } from "../api/a_workspaces";
+import { useWorkspaceContext } from "../contexts/WorkspaceContext";
+import { normalizeTaskDetail, getAssigneeDisplayName } from "../utils/taskMapper";
 
-export default function TaskModal({ task, isOpen, onClose, isRightAligned, onToggleAlignment }) {
-  const [description, setDescription] = useState(task?.description || '');
-  const [isCommentExpanded, setIsCommentExpanded] = useState(false);
-  const [comment, setComment] = useState('');
-  const [dueDate, setDueDate] = useState(task?.dueDate || '');
-  const [tags, setTags] = useState(task?.labels || []);
-  const [newTag, setNewTag] = useState('');
-  const [isTagsDropdownOpen, setIsTagsDropdownOpen] = useState(false);
-  const dropdownRef = useRef(null);
+const formatMemberName = (member) => {
+  if (!member) return "";
+  const fullName = [member.first_name, member.last_name].filter(Boolean).join(" ").trim();
+  return fullName || member.username || member.email || "Без имени";
+};
 
-  const { updateTask } = useTasks();
-  const [isSaving, setIsSaving] = useState(false);
+const mapMemberToAssignee = (member) => ({
+  id: member.user_id,
+  firstName: member.first_name ?? "",
+  lastName: member.last_name ?? "",
+  username: member.username ?? "",
+  email: member.email ?? "",
+  displayName: formatMemberName(member),
+});
 
-  // Для полей исполнителя и приоритета
-  const [assignee, setAssignee] = useState(task?.assignee || '');
-  const [priority, setPriority] = useState(task?.priority || '');
-  const [availableAssignees] = useState(['Алексей', 'Марина', 'Игорь', 'София', 'Дмитрий']);
-  const [assigneeSearch, setAssigneeSearch] = useState('');
-  const filteredAssignees = availableAssignees.filter(user =>
-    user.toLowerCase().includes(assigneeSearch.toLowerCase())
-  );
+const formatCommentUser = (user) => {
+  if (!user) return "Неизвестный пользователь";
+  const fullName = [user.first_name, user.last_name].filter(Boolean).join(" ").trim();
+  return fullName || user.username || user.email || "Неизвестный пользователь";
+};
+
+const formatDateTime = (value) => {
+  if (!value) return "";
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return "";
+  return date.toLocaleString("ru-RU", { day: "2-digit", month: "short", hour: "2-digit", minute: "2-digit" });
+};
+
+const formatDateOnly = (value) => {
+  if (!value) return "";
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return "";
+  return date.toLocaleDateString("ru-RU", { day: "2-digit", month: "long", year: "numeric" });
+};
+
+const cleanupPayload = (payload) => {
+  const cleaned = {};
+  Object.entries(payload).forEach(([key, value]) => {
+    if (value !== undefined) {
+      cleaned[key] = value;
+    }
+  });
+  return cleaned;
+};
+
+export default function TaskModal({
+  task,
+  isOpen,
+  onClose,
+  isRightAligned,
+  onToggleAlignment,
+  onTaskUpdated,
+}) {
+  const taskId = task?.id;
+  const { workspace, activeWorkspaceId } = useWorkspaceContext();
+  const workspaceId = workspace?.id ?? activeWorkspaceId ?? null;
+
+  const [taskDetail, setTaskDetail] = useState(null);
+  const [detailLoading, setDetailLoading] = useState(false);
+  const [detailError, setDetailError] = useState("");
+
+  const [title, setTitle] = useState(task?.title || "");
+  const [description, setDescription] = useState(task?.description || "");
+  const [dueDate, setDueDate] = useState(task?.dueDate || task?.due_date || null);
+  const [priority, setPriority] = useState(task?.priority || "");
+  const [assignee, setAssignee] = useState(task?.assignee || null);
+  const [selectedLabels, setSelectedLabels] = useState(task?.labels || []);
+
   const [isAssigneeDropdownOpen, setIsAssigneeDropdownOpen] = useState(false);
   const [isPriorityDropdownOpen, setIsPriorityDropdownOpen] = useState(false);
   const [isDateDropdownOpen, setIsDateDropdownOpen] = useState(false);
+  const [isTagsDropdownOpen, setIsTagsDropdownOpen] = useState(false);
 
-  const [existingTags] = useState([
-    'срочно', 'важно', 'баг', 'фича', 'дизайн', 
-    'разработка', 'тестирование', 'документация'
-  ]);
+  const [assigneeSearch, setAssigneeSearch] = useState("");
+  const [labelsSearch, setLabelsSearch] = useState("");
+
+  const [members, setMembers] = useState([]);
+  const [membersLoading, setMembersLoading] = useState(false);
+  const [membersError, setMembersError] = useState("");
+
+  const [labelsOptions, setLabelsOptions] = useState([]);
+  const [labelsLoading, setLabelsLoading] = useState(false);
+  const [labelsError, setLabelsError] = useState("");
+
+  const [newComment, setNewComment] = useState("");
+  const [isCreatingComment, setIsCreatingComment] = useState(false);
+  const [isCreatingLabel, setIsCreatingLabel] = useState(false);
+
+  const { updateTask } = useTasks();
+  const [isSaving, setIsSaving] = useState(false);
+  const savingCounterRef = useRef(0);
+
+  const descriptionSaveTimer = useRef(null);
+  const tagsDropdownRef = useRef(null);
+  const assigneeDropdownRef = useRef(null);
+  const priorityDropdownRef = useRef(null);
+  const dateDropdownRef = useRef(null);
+
+  const hydrateFromDetail = useCallback((detail) => {
+    setTitle(detail.title ?? "");
+    setDescription(detail.description ?? "");
+    setDueDate(detail.dueDate ?? null);
+    setPriority(detail.priority ?? "");
+    setAssignee(detail.assignee ?? null);
+    setSelectedLabels(detail.labels ?? []);
+  }, []);
+
+  useEffect(() => {
+    if (!isOpen || !task || taskDetail) return;
+    setTitle(task.title ?? "");
+    setDescription(task.description ?? "");
+    setDueDate(task.dueDate ?? task.due_date ?? null);
+    setPriority(task.priority ?? "");
+    setAssignee(task.assignee ?? null);
+    setSelectedLabels(task.labels ?? []);
+  }, [isOpen, task, taskDetail]);
+
+  useEffect(() => {
+    if (!isOpen || !taskId) return;
+    let ignore = false;
+    setDetailLoading(true);
+    setDetailError("");
+
+    (async () => {
+      try {
+        const data = await getTaskDetailsApi(taskId);
+        if (ignore) return;
+        const normalized = normalizeTaskDetail(data);
+        setTaskDetail(normalized);
+        hydrateFromDetail(normalized);
+      } catch (err) {
+        if (!ignore) {
+          setDetailError(err?.response?.data?.detail || "Не удалось загрузить данные задачи");
+        }
+      } finally {
+        if (!ignore) {
+          setDetailLoading(false);
+        }
+      }
+    })();
+
+    return () => {
+      ignore = true;
+    };
+  }, [isOpen, taskId, hydrateFromDetail]);
+
+  useEffect(() => {
+    if (!isOpen || !workspaceId) return;
+    let ignore = false;
+    setMembersLoading(true);
+    setMembersError("");
+
+    (async () => {
+      try {
+        const data = await getWorkspaceMembers(workspaceId);
+        if (!ignore) {
+          setMembers(data || []);
+        }
+      } catch (err) {
+        if (!ignore) {
+          setMembersError(err?.response?.data?.detail || "Не удалось загрузить участников");
+          setMembers([]);
+        }
+      } finally {
+        if (!ignore) {
+          setMembersLoading(false);
+        }
+      }
+    })();
+
+    return () => {
+      ignore = true;
+    };
+  }, [isOpen, workspaceId]);
+
+  useEffect(() => {
+    if (!isOpen || !workspaceId) return;
+    let ignore = false;
+    setLabelsLoading(true);
+    setLabelsError("");
+
+    (async () => {
+      try {
+        const data = await getWorkspaceLabels(workspaceId);
+        if (!ignore) {
+          setLabelsOptions(data || []);
+        }
+      } catch (err) {
+        if (!ignore) {
+          setLabelsError(err?.response?.data?.detail || "Не удалось загрузить теги");
+          setLabelsOptions([]);
+        }
+      } finally {
+        if (!ignore) {
+          setLabelsLoading(false);
+        }
+      }
+    })();
+
+    return () => {
+      ignore = true;
+    };
+  }, [isOpen, workspaceId]);
 
   useEffect(() => {
     const handleClickOutside = (event) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+      if (isTagsDropdownOpen && tagsDropdownRef.current && !tagsDropdownRef.current.contains(event.target)) {
         setIsTagsDropdownOpen(false);
+      }
+      if (
+        isAssigneeDropdownOpen &&
+        assigneeDropdownRef.current &&
+        !assigneeDropdownRef.current.contains(event.target)
+      ) {
+        setIsAssigneeDropdownOpen(false);
+      }
+      if (
+        isPriorityDropdownOpen &&
+        priorityDropdownRef.current &&
+        !priorityDropdownRef.current.contains(event.target)
+      ) {
+        setIsPriorityDropdownOpen(false);
+      }
+      if (isDateDropdownOpen && dateDropdownRef.current && !dateDropdownRef.current.contains(event.target)) {
+        setIsDateDropdownOpen(false);
       }
     };
 
-    if (isTagsDropdownOpen) {
-      document.addEventListener('mousedown', handleClickOutside);
+    if (isOpen) {
+      document.addEventListener("mousedown", handleClickOutside);
     }
 
     return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
+      document.removeEventListener("mousedown", handleClickOutside);
     };
-  }, [isTagsDropdownOpen])
+  }, [
+    isOpen,
+    isTagsDropdownOpen,
+    isAssigneeDropdownOpen,
+    isPriorityDropdownOpen,
+    isDateDropdownOpen,
+  ]);
 
-  if (!isOpen || !task) return null;
+  useEffect(() => {
+    if (isOpen) return;
+    setIsAssigneeDropdownOpen(false);
+    setIsPriorityDropdownOpen(false);
+    setIsDateDropdownOpen(false);
+    setIsTagsDropdownOpen(false);
+    setAssigneeSearch("");
+    setLabelsSearch("");
+    if (descriptionSaveTimer.current) {
+      clearTimeout(descriptionSaveTimer.current);
+      descriptionSaveTimer.current = null;
+    }
+  }, [isOpen]);
 
-  // Функция для добавления тега
-  const handleAddTag = () => {
-    if (newTag.trim() && !tags.includes(newTag.trim())) {
-      setTags([...tags, newTag.trim()]);
-      setNewTag('');
+  useEffect(() => {
+    return () => {
+      if (descriptionSaveTimer.current) {
+        clearTimeout(descriptionSaveTimer.current);
+      }
+    };
+  }, []);
+
+  const saveTaskChanges = useCallback(
+    async (patch) => {
+      if (!taskId) return;
+      const cleaned = cleanupPayload(patch);
+      if (Object.keys(cleaned).length === 0) return;
+
+      savingCounterRef.current += 1;
+      setIsSaving(true);
+      try {
+        const updated = await updateTask(taskId, cleaned);
+        const normalized = normalizeTaskDetail(updated);
+        setTaskDetail(normalized);
+        hydrateFromDetail(normalized);
+        if (onTaskUpdated) {
+          onTaskUpdated(normalized);
+        }
+      } catch (err) {
+        console.error("Ошибка при сохранении задачи:", err);
+      } finally {
+        savingCounterRef.current -= 1;
+        if (savingCounterRef.current <= 0) {
+          setIsSaving(false);
+        }
+      }
+    },
+    [taskId, updateTask, hydrateFromDetail, onTaskUpdated]
+  );
+
+  const handleTitleChange = (value) => {
+    setTitle(value);
+    if (descriptionSaveTimer.current) {
+      clearTimeout(descriptionSaveTimer.current);
+    }
+    descriptionSaveTimer.current = setTimeout(() => {
+      saveTaskChanges({ title: value });
+    }, 700);
+  };
+
+  const handleDescriptionChange = (value) => {
+    setDescription(value);
+    if (descriptionSaveTimer.current) {
+      clearTimeout(descriptionSaveTimer.current);
+    }
+    descriptionSaveTimer.current = setTimeout(() => {
+      saveTaskChanges({ description: value });
+    }, 700);
+  };
+
+  const handleDueDateSelect = (value) => {
+    const isoString = value ? new Date(value).toISOString() : null;
+    setDueDate(isoString);
+    setIsDateDropdownOpen(false);
+    saveTaskChanges({ due_date: isoString });
+  };
+
+  const handleDueDateClear = (event) => {
+    event?.stopPropagation();
+    setDueDate(null);
+    saveTaskChanges({ due_date: null });
+  };
+
+  const handlePrioritySelect = (level) => {
+    setPriority(level);
+    setIsPriorityDropdownOpen(false);
+    saveTaskChanges({ priority: level });
+  };
+
+  const handlePriorityClear = (event) => {
+    event?.stopPropagation();
+    setPriority("");
+    saveTaskChanges({ priority: null });
+  };
+
+  const handleAssigneeSelect = (member) => {
+    const normalized = mapMemberToAssignee(member);
+    setAssignee(normalized);
+    setIsAssigneeDropdownOpen(false);
+    saveTaskChanges({ assigned_to: member.user_id });
+  };
+
+  const handleAssigneeClear = (event) => {
+    event?.stopPropagation();
+    setAssignee(null);
+    saveTaskChanges({ assigned_to: null });
+  };
+
+  const handleLabelToggle = (label) => {
+    const exists = selectedLabels.some((current) => current.id === label.id);
+    const updated = exists
+      ? selectedLabels.filter((item) => item.id !== label.id)
+      : [...selectedLabels, label];
+    setSelectedLabels(updated);
+    saveTaskChanges({ label_ids: updated.map((item) => item.id) });
+  };
+
+  const filteredMembers = useMemo(() => {
+    const query = assigneeSearch.trim().toLowerCase();
+    if (!query) return members;
+    return members.filter((member) => {
+      const haystack = `${formatMemberName(member)} ${member.email ?? ""} ${member.username ?? ""}`.toLowerCase();
+      return haystack.includes(query);
+    });
+  }, [assigneeSearch, members]);
+
+  const filteredLabels = useMemo(() => {
+    const query = labelsSearch.trim().toLowerCase();
+    if (!query) return labelsOptions;
+    return labelsOptions.filter((label) => (label.name ?? "").toLowerCase().includes(query));
+  }, [labelsSearch, labelsOptions]);
+
+  const canCreateNewLabel = useMemo(() => {
+    const query = labelsSearch.trim();
+    if (!query) return false;
+    return !labelsOptions.some((label) => (label.name ?? "").toLowerCase() === query.toLowerCase());
+  }, [labelsSearch, labelsOptions]);
+
+  const handleCreateLabel = async () => {
+    const labelName = labelsSearch.trim();
+    if (!labelName || !workspaceId) return;
+
+    setIsCreatingLabel(true);
+    try {
+      const newLabel = await createWorkspaceLabel(workspaceId, labelName, "#d1d5db");
+      setLabelsOptions((prev) => [...prev, newLabel]);
+      setLabelsSearch("");
+      handleLabelToggle(newLabel);
+    } catch (err) {
+      console.error("Ошибка при создании тега:", err);
+      setLabelsError(err?.response?.data?.detail || "Не удалось создать тег");
+    } finally {
+      setIsCreatingLabel(false);
     }
   };
 
-  // Функция для обработки Enter
-  const handleTagKeyPress = (e) => {
-    if (e.key === 'Enter') {
-      e.preventDefault();
-      handleAddTag();
+  const handleCreateComment = async () => {
+    const content = newComment.trim();
+    if (!content || !taskId) return;
+
+    setIsCreatingComment(true);
+    try {
+      await createCommentApi(taskId, content);
+      // Обновляем детали задачи, чтобы получить обновленный список комментариев
+      const updatedDetails = await getTaskDetailsApi(taskId);
+      const normalized = normalizeTaskDetail(updatedDetails);
+      setTaskDetail(normalized);
+      setNewComment("");
+    } catch (err) {
+      console.error("Ошибка при создании комментария:", err);
+    } finally {
+      setIsCreatingComment(false);
     }
   };
 
-  // Функция для удаления тега
-  const handleRemoveTag = (tagToRemove) => {
-    setTags(tags.filter(tag => tag !== tagToRemove));
-  };
+  if (!isOpen || !task) {
+    return null;
+  }
+
+  const createdAt = taskDetail?.createdAt || task?.createdAt || task?.created_at || null;
+  const comments = taskDetail?.comments ?? [];
+  const assigneeName = getAssigneeDisplayName(assignee);
 
   return (
     <>
-      {/* Затемнение фона */}
-      <div className={`modal-overlay ${isRightAligned ? 'right-aligned' : ''}`} onClick={onClose} />
-      
-      {/* Модальное окно как правый сайдбар */}
-      <div 
-        className={`task-modal ${isRightAligned ? 'right-sidebar' : 'centered'}`}
+      <div className={`modal-overlay ${isRightAligned ? "right-aligned" : ""}`} onClick={onClose} />
+
+      <div
+        className={`task-modal ${isRightAligned ? "right-sidebar" : "centered"}`}
         onClick={(e) => e.stopPropagation()}
       >
-        {/* Заголовок модалки */}
         <div className="modal-header">
           <div className="modal-title">
-            <h2>{task.title}</h2>
+            <input
+              type="text"
+              className="task-title-input"
+              value={title}
+              onChange={(e) => handleTitleChange(e.target.value)}
+              placeholder="Название задачи..."
+              style={{
+                fontSize: "20px",
+                fontWeight: "600",
+                border: "none",
+                outline: "none",
+                background: "transparent",
+                width: "100%",
+                padding: "4px 0",
+                color: "#172b4d",
+                marginBottom: "8px",
+              }}
+            />
 
             <div className="task-meta-header">
               <span className="created-date">
-                Создано: {new Date(task.createdAt).toLocaleDateString()}
+                Создано: {createdAt ? formatDateOnly(createdAt) : "—"}
               </span>
 
               <div className="meta-separator">•</div>
 
               <span className="meta-project">
-                Проект: <strong>{task.projectName || 'Без проекта'}</strong>
+                Проект: <strong>{task.projectName || "Без проекта"}</strong>
               </span>
 
               <div className="meta-separator">•</div>
 
               <span className="meta-board">
-                Доска: <strong>{task.boardName || 'Без доски'}</strong>
+                Колонка: <strong>{taskDetail?.column?.title || task.columnTitle || "Без колонки"}</strong>
               </span>
             </div>
           </div>
 
           <div className="modal-actions">
-            <button 
+            <div className={`saving-indicator ${isSaving ? "saving" : ""}`}>
+              {isSaving ? "Сохраняем..." : "Все изменения сохранены"}
+            </div>
+            <button
               className="align-btn"
               onClick={onToggleAlignment}
-              title={isRightAligned ? 'Вернуть в центр' : 'Сместить вправо'}
+              title={isRightAligned ? "Вернуть в центр" : "Сместить вправо"}
             >
-              {isRightAligned ? '⤢' : '⤡'}
+              {isRightAligned ? "⤢" : "⤡"}
             </button>
-            <button className="close-btn" onClick={onClose}>×</button>
+            <button className="close-btn" onClick={onClose}>
+              ×
+            </button>
           </div>
         </div>
 
-
-        {/* Контент модалки */}
         <div className="modal-content">
+          {detailError && <div className="error-banner">{detailError}</div>}
+          {detailLoading && !taskDetail && <div className="loading-placeholder">Загрузка данных...</div>}
 
-          {/* Детали задачи */}
           <div className="task-details">
-            {/* Исполнитель */}
             <div className="detail-item">
               <span className="detail-label">Исполнитель</span>
-              <div className="tags-dropdown-container" ref={dropdownRef}>
-                {/* Основная строка */}
+              <div className="tags-dropdown-container" ref={assigneeDropdownRef}>
                 <div
                   className="tags-main-row"
-                  onClick={() => setIsAssigneeDropdownOpen(!isAssigneeDropdownOpen)}
+                  onClick={() => setIsAssigneeDropdownOpen((prev) => !prev)}
                 >
                   <div className="tags-list">
                     {assignee ? (
                       <span className="tag-item assignee-tag">
-                        {assignee}
-                        <button
-                          className="tag-remove"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            setAssignee('');
-                          }}
-                        >
+                        {assigneeName}
+                        <button className="tag-remove" onClick={handleAssigneeClear}>
                           ×
                         </button>
                       </span>
@@ -152,10 +524,11 @@ export default function TaskModal({ task, isOpen, onClose, isRightAligned, onTog
                   </div>
                 </div>
 
-                {/* Выпадающее меню с поиском */}
                 {isAssigneeDropdownOpen && (
                   <div className="tags-dropdown">
-                    {/* Поле поиска */}
+                    <span className="field-hint">
+                      Начните вводить имя или email, чтобы найти участника пространства.
+                    </span>
                     <div className="assignee-search">
                       <input
                         type="text"
@@ -166,30 +539,31 @@ export default function TaskModal({ task, isOpen, onClose, isRightAligned, onTog
                         autoFocus
                       />
                     </div>
-
-                    {/* Список исполнителей */}
                     <div className="existing-tags">
                       <div className="existing-tags-list">
-                        {filteredAssignees.length > 0 ? (
-                          filteredAssignees.map((user, index) => (
-                            <label
-                              key={index}
-                              className="existing-tag-item"
-                              onClick={() => {
-                                setAssignee(user);
-                                setIsAssigneeDropdownOpen(false);
-                              }}
+                        {membersLoading ? (
+                          <div className="dropdown-status">Загрузка участников...</div>
+                        ) : membersError ? (
+                          <div className="dropdown-status error">{membersError}</div>
+                        ) : !workspaceId ? (
+                          <div className="dropdown-status">Нет активного пространства</div>
+                        ) : filteredMembers.length ? (
+                          filteredMembers.map((member) => (
+                            <div
+                              key={member.user_id}
+                              className="existing-tag-item user-suggestion"
+                              onClick={() => handleAssigneeSelect(member)}
                             >
-                              <input
-                                type="radio"
-                                checked={assignee === user}
-                                onChange={() => setAssignee(user)}
-                              />
-                              <span className="tag-label">{user}</span>
-                            </label>
+                              <span className="tag-label">
+                                {formatMemberName(member)}
+                                {member.email && (
+                                  <span className="member-email">{member.email}</span>
+                                )}
+                              </span>
+                            </div>
                           ))
                         ) : (
-                          <div className="no-results">Нет совпадений</div>
+                          <div className="dropdown-status">Участники не найдены</div>
                         )}
                       </div>
                     </div>
@@ -198,25 +572,15 @@ export default function TaskModal({ task, isOpen, onClose, isRightAligned, onTog
               </div>
             </div>
 
-            {/* Дата выполнения */}
             <div className="detail-item">
               <span className="detail-label">Дата</span>
-              <div className="tags-dropdown-container">
-                <div
-                  className="tags-main-row"
-                  onClick={() => setIsDateDropdownOpen(!isDateDropdownOpen)}
-                >
+              <div className="tags-dropdown-container" ref={dateDropdownRef}>
+                <div className="tags-main-row" onClick={() => setIsDateDropdownOpen((prev) => !prev)}>
                   <div className="tags-list">
                     {dueDate ? (
                       <span className="tag-item date-tag">
-                        {new Date(dueDate).toLocaleDateString()}
-                        <button
-                          className="tag-remove"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            setDueDate('');
-                          }}
-                        >
+                        {formatDateOnly(dueDate)}
+                        <button className="tag-remove" onClick={handleDueDateClear}>
                           ×
                         </button>
                       </span>
@@ -229,10 +593,7 @@ export default function TaskModal({ task, isOpen, onClose, isRightAligned, onTog
                 {isDateDropdownOpen && (
                   <div className="tags-dropdown calendar-dropdown">
                     <Calendar
-                      onChange={(date) => {
-                        setDueDate(date.toISOString());
-                        setIsDateDropdownOpen(false);
-                      }}
+                      onChange={handleDueDateSelect}
                       value={dueDate ? new Date(dueDate) : new Date()}
                       locale="ru-RU"
                     />
@@ -241,38 +602,30 @@ export default function TaskModal({ task, isOpen, onClose, isRightAligned, onTog
               </div>
             </div>
 
-            {/* Приоритет */}
             <div className="detail-item">
               <span className="detail-label">Приоритет</span>
-              <div className="tags-dropdown-container" ref={dropdownRef}>
-                {/* Основная строка */}
+              <div className="tags-dropdown-container" ref={priorityDropdownRef}>
                 <div
                   className="tags-main-row"
-                  onClick={() => setIsPriorityDropdownOpen(!isPriorityDropdownOpen)}
+                  onClick={() => setIsPriorityDropdownOpen((prev) => !prev)}
                 >
                   <div className="tags-list">
                     {priority ? (
                       <span
                         className={`tag-item priority-tag ${
-                          priority === 'high'
-                            ? 'priority-high'
-                            : priority === 'medium'
-                            ? 'priority-medium'
-                            : 'priority-low'
+                          priority === "high"
+                            ? "priority-high"
+                            : priority === "medium"
+                            ? "priority-medium"
+                            : "priority-low"
                         }`}
                       >
-                        {priority === 'high'
-                          ? 'Высокий'
-                          : priority === 'medium'
-                          ? 'Средний'
-                          : 'Низкий'}
-                        <button
-                          className="tag-remove"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            setPriority('');
-                          }}
-                        >
+                        {priority === "high"
+                          ? "Высокий"
+                          : priority === "medium"
+                          ? "Средний"
+                          : "Низкий"}
+                        <button className="tag-remove" onClick={handlePriorityClear}>
                           ×
                         </button>
                       </span>
@@ -282,26 +635,22 @@ export default function TaskModal({ task, isOpen, onClose, isRightAligned, onTog
                   </div>
                 </div>
 
-                {/* Выпадающее меню */}
                 {isPriorityDropdownOpen && (
                   <div className="tags-dropdown">
                     <div className="existing-tags">
                       <div className="existing-tags-list">
-                        {['high', 'medium', 'low'].map((level) => (
+                        {["high", "medium", "low"].map((level) => (
                           <div
                             key={level}
-                            className={`existing-tag-item ${priority === level ? 'selected' : ''}`}
-                            onClick={() => {
-                              setPriority(level);
-                              setIsPriorityDropdownOpen(false);
-                            }}
+                            className={`existing-tag-item ${priority === level ? "selected" : ""}`}
+                            onClick={() => handlePrioritySelect(level)}
                           >
                             <span className="tag-label">
-                              {level === 'high'
-                                ? 'Высокий'
-                                : level === 'medium'
-                                ? 'Средний'
-                                : 'Низкий'}
+                              {level === "high"
+                                ? "Высокий"
+                                : level === "medium"
+                                ? "Средний"
+                                : "Низкий"}
                             </span>
                           </div>
                         ))}
@@ -311,29 +660,27 @@ export default function TaskModal({ task, isOpen, onClose, isRightAligned, onTog
                 )}
               </div>
             </div>
-
           </div>
 
-          {/* Теги */}
           <div className="task-section">
             <div className="detail-item">
               <span className="detail-label">Теги</span>
-              <div className="tags-dropdown-container" ref={dropdownRef}>
-                {/* Основная строка с тегами */}
-                <div 
-                  className="tags-main-row"
-                  onClick={() => setIsTagsDropdownOpen(!isTagsDropdownOpen)}
-                >
+              <div className="tags-dropdown-container" ref={tagsDropdownRef}>
+                <div className="tags-main-row" onClick={() => setIsTagsDropdownOpen((prev) => !prev)}>
                   <div className="tags-list">
-                    {tags.length > 0 ? (
-                      tags.map((tag, index) => (
-                        <span key={index} className="tag-item">
-                          {tag}
-                          <button 
+                    {selectedLabels.length ? (
+                      selectedLabels.map((label) => (
+                        <span
+                          key={label.id}
+                          className="tag-item"
+                          style={label.color ? { backgroundColor: label.color, color: "#fff" } : undefined}
+                        >
+                          {label.name}
+                          <button
                             className="tag-remove"
                             onClick={(e) => {
                               e.stopPropagation();
-                              handleRemoveTag(tag);
+                              handleLabelToggle(label);
                             }}
                           >
                             ×
@@ -346,49 +693,69 @@ export default function TaskModal({ task, isOpen, onClose, isRightAligned, onTog
                   </div>
                 </div>
 
-                {/* Выпадающее меню */}
                 {isTagsDropdownOpen && (
                   <div className="tags-dropdown">
-                    {/* Добавление нового тега */}
-                    <div className="add-new-tag">
-                      <div className="new-tag-input">
-                        <input
-                          type="text"
-                          className="tag-input"
-                          value={newTag}
-                          onChange={(e) => setNewTag(e.target.value)}
-                          onKeyPress={handleTagKeyPress}
-                          placeholder="Введите название тега..."
-                        />
-                        <button 
-                          className="btn btn-small"
-                          onClick={handleAddTag}
-                          disabled={!newTag.trim()}
-                        >
-                          Добавить
-                        </button>
-                      </div>
+                    <span className="field-hint">
+                      Теги берутся из текущего рабочего пространства.
+                    </span>
+                    <div className="new-tag-input">
+                      <input
+                        type="text"
+                        className="tag-input"
+                        placeholder="Поиск по тегам..."
+                        value={labelsSearch}
+                        onChange={(e) => setLabelsSearch(e.target.value)}
+                        autoFocus
+                      />
                     </div>
-
-                    {/* Список существующих тегов */}
                     <div className="existing-tags">
                       <div className="existing-tags-list">
-                        {existingTags.map((tag, index) => (
-                          <label key={index} className="existing-tag-item">
-                            <input
-                              type="checkbox"
-                              checked={tags.includes(tag)}
-                              onChange={(e) => {
-                                if (e.target.checked) {
-                                  setTags([...tags, tag]);
-                                } else {
-                                  setTags(tags.filter(t => t !== tag));
-                                }
-                              }}
-                            />
-                            <span className="tag-label">{tag}</span>
-                          </label>
-                        ))}
+                        {labelsLoading ? (
+                          <div className="dropdown-status">Загрузка тегов...</div>
+                        ) : labelsError ? (
+                          <div className="dropdown-status error">{labelsError}</div>
+                        ) : !workspaceId ? (
+                          <div className="dropdown-status">Нет активного пространства</div>
+                        ) : filteredLabels.length ? (
+                          <>
+                            {filteredLabels.map((label) => {
+                              const isChecked = selectedLabels.some((item) => item.id === label.id);
+                              return (
+                                <label
+                                  key={label.id}
+                                  className={`existing-tag-item ${isChecked ? "selected" : ""}`}
+                                  onClick={() => handleLabelToggle(label)}
+                                >
+                                  <span className="tag-color-dot" style={{ backgroundColor: label.color || "#d1d5db" }} />
+                                  <span className="tag-label">{label.name}</span>
+                                </label>
+                              );
+                            })}
+                            {canCreateNewLabel && (
+                              <div
+                                className="existing-tag-item create-tag-item"
+                                onClick={handleCreateLabel}
+                                style={{ cursor: isCreatingLabel ? "wait" : "pointer" }}
+                              >
+                                <span className="tag-label">
+                                  {isCreatingLabel ? "Создание..." : `+ Создать тег "${labelsSearch}"`}
+                                </span>
+                              </div>
+                            )}
+                          </>
+                        ) : canCreateNewLabel ? (
+                          <div
+                            className="existing-tag-item create-tag-item"
+                            onClick={handleCreateLabel}
+                            style={{ cursor: isCreatingLabel ? "wait" : "pointer" }}
+                          >
+                            <span className="tag-label">
+                              {isCreatingLabel ? "Создание..." : `+ Создать тег "${labelsSearch}"`}
+                            </span>
+                          </div>
+                        ) : (
+                          <div className="dropdown-status">Теги не найдены</div>
+                        )}
                       </div>
                     </div>
                   </div>
@@ -402,20 +769,18 @@ export default function TaskModal({ task, isOpen, onClose, isRightAligned, onTog
             <textarea
               className="description-input"
               value={description}
-              onChange={(e) => setDescription(e.target.value)}
+              onChange={(e) => handleDescriptionChange(e.target.value)}
               placeholder="Добавьте описание задачи..."
               rows="4"
               ref={(textarea) => {
                 if (textarea) {
-                  // Автоматическое изменение высоты при загрузке
-                  textarea.style.height = 'auto';
-                  textarea.style.height = textarea.scrollHeight + 'px';
+                  textarea.style.height = "auto";
+                  textarea.style.height = `${textarea.scrollHeight}px`;
                 }
               }}
               onInput={(e) => {
-                // Автоматическое изменение высоты при вводе
-                e.target.style.height = 'auto';
-                e.target.style.height = e.target.scrollHeight + 'px';
+                e.target.style.height = "auto";
+                e.target.style.height = `${e.target.scrollHeight}px`;
               }}
             />
           </div>
@@ -423,42 +788,44 @@ export default function TaskModal({ task, isOpen, onClose, isRightAligned, onTog
           <div className="task-section comments-section-bottom">
             <h3>Комментарии</h3>
             <div className="comments-container">
-              <div className="comment-display">
-                {comment ? (
-                  <div className="comment-text">
-                    {comment}
-                  </div>
-                ) : (
-                  <div className="comment-placeholder">
-                    Комментариев пока нет
-                  </div>
-                )}
-              </div>
-              
               <div className="comment-input-section">
                 <textarea
                   className="comment-input"
-                  value={comment}
-                  onChange={(e) => setComment(e.target.value)}
+                  value={newComment}
+                  onChange={(e) => setNewComment(e.target.value)}
                   placeholder="Напишите комментарий..."
-                  rows={1}
-                  style={{
-                    height: 'auto',
-                    minHeight: '40px',
-                    maxHeight: '120px'
-                  }}
-                  onInput={(e) => {
-                    // Автоматическое изменение высоты
-                    e.target.style.height = 'auto';
-                    e.target.style.height = e.target.scrollHeight + 'px';
+                  rows="3"
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter" && (e.ctrlKey || e.metaKey)) {
+                      e.preventDefault();
+                      handleCreateComment();
+                    }
                   }}
                 />
-                <button 
-                  className="btn btn-primary"
-                  disabled={!comment.trim()}
+                <button
+                  className="comment-submit-btn"
+                  onClick={handleCreateComment}
+                  disabled={!newComment.trim() || isCreatingComment}
                 >
-                  Добавить комментарий
+                  {isCreatingComment ? "Отправка..." : "Отправить"}
                 </button>
+              </div>
+              <div className="comment-display">
+                {comments.length ? (
+                  <ul className="comment-list">
+                    {comments.map((comment) => (
+                      <li key={comment.id} className="comment-item">
+                        <div className="comment-header">
+                          <span className="comment-author">{formatCommentUser(comment.user)}</span>
+                          <span className="comment-date">{formatDateTime(comment.created_at)}</span>
+                        </div>
+                        <div className="comment-text">{comment.content || "—"}</div>
+                      </li>
+                    ))}
+                  </ul>
+                ) : (
+                  <div className="comment-placeholder">Комментариев пока нет</div>
+                )}
               </div>
             </div>
           </div>

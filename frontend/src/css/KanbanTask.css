@@ -7,8 +7,10 @@
   box-shadow: 0 1px 4px rgba(0,0,0,0.05);
   margin-bottom: 12px;
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: box-shadow 0.2s ease, transform 0.2s ease;
   border: 1px solid #f0f0f0;
+  will-change: transform;
+  contain: layout style paint;
 }
 
 .task-header {

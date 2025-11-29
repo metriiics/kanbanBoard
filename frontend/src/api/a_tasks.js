@@ -5,7 +5,17 @@ export const createTaskApi = async (payload) => {
   return response.data;
 };
 
+export const getTaskDetailsApi = async (taskId) => {
+  const response = await api.get(`/api/tasks/${taskId}/details`);
+  return response.data;
+};
+
 export const updateTaskApi = async (taskId, payload) => {
   const response = await api.put(`/api/tasks/${taskId}`, payload);
+  return response.data;
+};
+
+export const createCommentApi = async (taskId, content) => {
+  const response = await api.post(`/api/tasks/${taskId}/comments`, { content });
   return response.data;
 };

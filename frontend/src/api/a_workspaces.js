@@ -20,3 +20,18 @@ export async function getUserWorkspaces() {
   const response = await api.get("/api/workspaces/my");
   return response.data;
 }
+
+export const getWorkspaceLabels = async (workspaceId) => {
+  const response = await api.get("/api/workspace/labels", {
+    params: workspaceId ? { workspace_id: workspaceId } : {},
+  });
+  return response.data;
+};
+
+export const createWorkspaceLabel = async (workspaceId, name, color) => {
+  const response = await api.post("/api/workspace/labels", 
+    { name, color },
+    { params: workspaceId ? { workspace_id: workspaceId } : {} }
+  );
+  return response.data;
+};
