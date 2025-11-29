@@ -1,20 +1,14 @@
-<<<<<<< HEAD
-from fastapi import APIRouter, HTTPException, Depends, Query
-=======
-from fastapi import APIRouter, HTTPException, Depends, UploadFile, File, Form
->>>>>>> 98c7536ea8e95b34886d1db81d422b290cdc346f
+from fastapi import APIRouter, HTTPException, Depends, Query, UploadFile, File, Form
 from sqlalchemy.orm import Session
+from typing import Optional
+
 from db.database import session_factory, get_db
 from db.OrmQuery import OrmQuery
 from api.models.user import UserRead
 from api.models.workspace import WorkspaceOut
 from db.dbstruct import User 
 from core.security import get_current_user
-<<<<<<< HEAD
 from api.utils.workspaces import resolve_membership
-=======
-from typing import Optional
->>>>>>> 98c7536ea8e95b34886d1db81d422b290cdc346f
 
 router = APIRouter(tags=["👤 Пользователи"])
     

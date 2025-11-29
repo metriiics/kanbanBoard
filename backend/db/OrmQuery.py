@@ -85,9 +85,6 @@ class OrmQuery:
             session.add(new_workspace)
             session.flush()  # получаем new_workspace.id
 
-<<<<<<< HEAD
-            session.flush()
-
             # создаём связь с ролями владельца, чтобы пользователь мог управлять workspace
             owner_link = UserWorkspace(
                 user_id=new_user.id,
@@ -97,17 +94,6 @@ class OrmQuery:
                 can_create_projects=True
             )
             session.add(owner_link)
-=======
-            # устанавливаем связь через промежуточную таблицу с ролью owner
-            user_workspace = UserWorkspace(
-                user_id=new_user.id,
-                workspace_id=new_workspace.id,
-                role="owner",
-                can_create_projects=True,
-                can_invite_users=True
-            )
-            session.add(user_workspace)
->>>>>>> 98c7536ea8e95b34886d1db81d422b290cdc346f
 
             session.commit()
             session.refresh(new_user)

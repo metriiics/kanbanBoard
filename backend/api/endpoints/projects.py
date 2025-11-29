@@ -4,11 +4,6 @@ from sqlalchemy.orm import Session
 
 from core.security import get_current_user
 from db.OrmQuery import OrmQuery
-<<<<<<< HEAD
-from api.models.projects import ProjectWithBoardsOut, ProjectCreate, ProjectOut, ProjectUpdateTitle
-from api.utils.workspaces import resolve_membership
-from db.database import get_db
-=======
 from api.models.projects import (
     ProjectWithBoardsOut,
     ProjectCreate,
@@ -18,7 +13,8 @@ from api.models.projects import (
     ProjectGetUsersAccess,
     ProjectUserAccessOut,
 )
->>>>>>> 98c7536ea8e95b34886d1db81d422b290cdc346f
+from api.utils.workspaces import resolve_membership
+from db.database import get_db
 
 router = APIRouter(tags=["📁 Проекты"])
 
