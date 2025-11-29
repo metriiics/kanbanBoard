@@ -7,7 +7,7 @@ from db.OrmQuery import OrmQuery
 from db.dbstruct import Task as TaskModel
 
 
-router = APIRouter()
+router = APIRouter(tags=["✅ Задачи"])
 
 @router.post("/api/tasks", response_model=TaskCardOut)
 def create_task_endpoint(payload: TaskCreate, current_user = Depends(get_current_user)):
