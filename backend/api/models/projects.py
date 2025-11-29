@@ -18,3 +18,25 @@ class ProjectCreate(BaseModel):
 
 class ProjectUpdateTitle(BaseModel):
     title: str = Field(..., description="Новое название проекта")
+
+class ProjectUserAccessCreate(BaseModel):
+    user_id: int
+    project_id: int
+    can_edit: bool
+    can_view: bool
+    created_at: datetime
+
+class ProjectUserAccessOut(BaseModel):
+    id: int
+    user_id: int
+    project_id: int
+    can_edit: bool
+    can_view: bool
+    created_at: datetime
+
+class ProjectGetUsersAccess(BaseModel):
+    user_id: int
+    project_id: int
+    can_edit: bool
+    can_view: bool
+    created_at: datetime

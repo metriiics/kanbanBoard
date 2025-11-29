@@ -5,7 +5,7 @@ from core.security import hash_password
 from core.avatar_generator import generate_avatar
 
 from db.database import engine, Base, session_factory
-from db.dbstruct import User, Workspace, Project, Board, Column, Task, UserWorkspace, Comment, Label, ColorPalette
+from db.dbstruct import User, Workspace, Project, Board, Column, Task, UserWorkspace, Comment, Label, ColorPalette, WorkspaceInvite, UserProjectAccess
 from api.models.user import UserCreate
 from api.models.projects import ProjectCreate
 from api.models.boards import BoardCreate
@@ -45,6 +45,16 @@ class OrmQuery:
             return session.query(User).filter(User.email == email).first()
     
     @staticmethod
+    def get_user_by_username(username: str) -> User | None:
+
+        '''
+        Возвращает пользователя по его username.
+        '''
+
+        with session_factory() as session:
+            return session.query(User).filter(User.username == username).first()
+    
+    @staticmethod
     def create_user(user: UserCreate, avatar_url: Optional[str] = None) -> User:
 
         '''
@@ -64,6 +74,7 @@ class OrmQuery:
                 avatar_url=avatar_url
             )
             session.add(new_user)
+            session.flush()  # получаем new_user.id
 
             # создаём дефолтный воркспейс и связываем с пользователем
             ws_name = user.username if user.username else "Workspace"
@@ -72,9 +83,17 @@ class OrmQuery:
                 description="Рабочее пространство созданное по умолчанию"
             )
             session.add(new_workspace)
+            session.flush()  # получаем new_workspace.id
 
-            # устанавливаем связь через relationship (secondary table handled в моделях)
-            new_user.workspaces.append(new_workspace)
+            # устанавливаем связь через промежуточную таблицу с ролью owner
+            user_workspace = UserWorkspace(
+                user_id=new_user.id,
+                workspace_id=new_workspace.id,
+                role="owner",
+                can_create_projects=True,
+                can_invite_users=True
+            )
+            session.add(user_workspace)
 
             session.commit()
             session.refresh(new_user)
@@ -385,3 +404,303 @@ class OrmQuery:
             session.commit()
             session.refresh(column)
             return column
+        
+    @staticmethod
+    def create_column(board_id: int, title: str, position: int, color_id: int = 1):
+        """
+        Создает новую колонку в доске.
+        Всегда устанавливает color_id == 1.
+        """
+        with session_factory() as session:
+            if session.get(Board, board_id) is None:
+                return None
+
+            new_column = Column(
+                title=title,
+                board_id=board_id,
+                position=position,
+                color_id=1,  # жёстко — всегда 1
+            )
+            session.add(new_column)
+            session.commit()
+            session.refresh(new_column)
+            return new_column
+        
+    @staticmethod
+    def accept_invite(token: str, user_id: int):
+        """
+        Принимает приглашение по токену и связывает пользователя с воркспейсом.
+        Возвращает:
+         - {"status":"ok", "link": UserWorkspace} при успешном добавлении
+         - {"status":"already_member", "workspace_id": ..., "user_workspace_id": ...} если пользователь уже в воркспейсе
+         - None если токен недействителен/неактивен
+        """
+        # Проверяем токен приглашения
+        with session_factory() as session:
+            invite = session.query(WorkspaceInvite).filter(
+                WorkspaceInvite.token == token,
+                WorkspaceInvite.is_active == True
+            ).first()
+            if not invite:
+                return None
+            # Проверяем, что пользователь не является уже участником воркспейса
+            existing = session.query(UserWorkspace).filter(
+                UserWorkspace.user_id == user_id,
+                UserWorkspace.workspace_id == invite.workspace_id
+            ).first()
+            if existing:
+                return {
+                    "status": "already_member",
+                    "workspace_id": existing.workspace_id,
+                    "user_workspace_id": existing.id
+                }
+            # Создаем связь пользователя с воркспейсом
+            link = UserWorkspace(
+                user_id=user_id,
+                workspace_id=invite.workspace_id,
+                role="member"
+            )
+            session.add(link)
+            # Обновляем счетчик использований приглашения
+            try:
+                invite.used_count = (invite.used_count or 0) + 1
+            except AttributeError:
+                pass
+
+            session.commit()
+            session.refresh(link)
+            return {"status": "ok", "link": link}
+
+    @staticmethod
+    def create_invite(user_id: int) -> WorkspaceInvite | None:
+        """
+        Создаёт приглашение для воркспейса, связанного с user_id.
+        Требует реальный user_id (создателя) — он будет записан в created_by_id (NOT NULL).
+        Возвращает созданный WorkspaceInvite или None, если воркспейс не найден.
+        """
+        import secrets
+
+        with session_factory() as session:
+            # Получаем воркспейс пользователя через существующий метод
+            workspace = OrmQuery.get_workspace_by_user_id(user_id)
+            if workspace is None:
+                return None
+
+            # Проверяем, есть ли уже активное приглашение для этого воркспейса
+            existing = session.execute(
+                select(WorkspaceInvite).where(
+                    WorkspaceInvite.workspace_id == workspace.id,
+                    WorkspaceInvite.is_active == True
+                )
+            ).scalars().first()
+
+            if existing:
+                return existing
+
+            # Генерация токена
+            token = WorkspaceInvite.generate_token()
+
+            # Используем переданный user_id как created_by_id
+            created_by_id = int(user_id)
+
+            new_invite = WorkspaceInvite(
+                workspace_id=workspace.id,
+                token=token,
+                created_by_id=created_by_id,
+                is_active=True,
+                used_count=0,
+            )
+            session.add(new_invite)
+            session.commit()
+            session.refresh(new_invite)
+            return new_invite
+
+    @staticmethod
+    def delete_invite(token: str, user_id: int) -> bool:
+        """
+        Удаляет (деактивирует) инвайт по токену.
+        Проверяет, что пользователь является владельцем workspace.
+        Возвращает True при успехе, False если токен не найден или нет прав.
+        """
+        with session_factory() as session:
+            # Находим инвайт
+            invite = session.query(WorkspaceInvite).filter(
+                WorkspaceInvite.token == token,
+                WorkspaceInvite.is_active == True
+            ).first()
+            
+            if not invite:
+                return False
+            
+            # Проверяем права пользователя на workspace
+            user_role = OrmQuery.get_user_workspace_role(user_id, invite.workspace_id)
+            if user_role != "owner":
+                return False
+            
+            # Деактивируем инвайт
+            invite.is_active = False
+            session.commit()
+            return True
+
+    @staticmethod
+    def create_user_project_access(project_id: int, user_id: int, can_edit: bool = False, can_view: bool = True):
+        """
+        Создать или обновить запись в user_project_accesses.
+        Возвращает объект UserProjectAccess или None (если проект/пользователь не найдены).
+        """
+        with session_factory() as session:
+            # Проверяем существование проекта и пользователя
+            project = session.query(Project).filter(Project.id == project_id).first()
+            user = session.query(User).filter(User.id == user_id).first()
+            if not project or not user:
+                return None
+
+            existing = session.query(UserProjectAccess).filter(
+                UserProjectAccess.project_id == project_id,
+                UserProjectAccess.user_id == user_id
+            ).first()
+
+            if existing:
+                existing.can_edit = can_edit
+                existing.can_view = can_view
+                session.add(existing)
+                session.commit()
+                session.refresh(existing)
+                return existing
+
+            new_access = UserProjectAccess(
+                user_id=user_id,
+                project_id=project_id,
+                can_edit=can_edit,
+                can_view=can_view
+            )
+            session.add(new_access)
+            session.commit()
+            session.refresh(new_access)
+            return new_access
+
+    @staticmethod
+    def get_users_project_access(project_id: int):
+        """
+        Получить все записи доступа к проекту по project_id.
+        """
+        with session_factory() as session:
+            accesses = session.query(UserProjectAccess).filter(
+                UserProjectAccess.project_id == project_id
+            ).all()
+            return accesses
+
+    @staticmethod
+    def get_user_workspace_role(user_id: int, workspace_id: int) -> str | None:
+        """
+        Получить роль пользователя в workspace.
+        Возвращает роль ('owner', 'admin', 'member', 'guest') или None, если связь не найдена.
+        """
+        with session_factory() as session:
+            user_workspace = session.query(UserWorkspace).filter(
+                UserWorkspace.user_id == user_id,
+                UserWorkspace.workspace_id == workspace_id
+            ).first()
+            return user_workspace.role if user_workspace else None
+
+    @staticmethod
+    def delete_project(project_id: int) -> bool:
+        """
+        Удаляет проект по его ID вместе со всеми связанными сущностями:
+        - Досками (boards)
+        - Колонками (columns)
+        - Задачами (tasks) 
+        - Правами доступа (user_project_accesses)
+        
+        Возвращает True, если проект был удален, False, если проект не найден.
+        """
+        with session_factory() as session:
+            project = session.query(Project).filter(Project.id == project_id).first()
+            if not project:
+                return False
+            
+            # Получаем все доски проекта
+            boards = session.query(Board).filter(Board.projects_id == project_id).all()
+            
+            for board in boards:
+                # Получаем все колонки доски
+                columns = session.query(Column).filter(Column.board_id == board.id).all()
+                
+                for column in columns:
+                    # Удаляем все задачи колонки
+                    session.query(Task).filter(Task.column_id == column.id).delete()
+                
+                # Удаляем все колонки доски
+                session.query(Column).filter(Column.board_id == board.id).delete()
+            
+            # Удаляем все доски проекта
+            session.query(Board).filter(Board.projects_id == project_id).delete()
+            
+            # Удаляем все права доступа к проекту
+            session.query(UserProjectAccess).filter(UserProjectAccess.project_id == project_id).delete()
+            
+            # Удаляем сам проект
+            session.delete(project)
+            session.commit()
+            return True
+
+    @staticmethod
+    def delete_board(board_id: int) -> bool:
+        """
+        Удаляет доску по её ID вместе со всеми связанными сущностями:
+        - Колонками (columns)
+        - Задачами (tasks)
+        
+        Возвращает True, если доска была удалена, False, если доска не найдена.
+        """
+        with session_factory() as session:
+            board = session.query(Board).filter(Board.id == board_id).first()
+            if not board:
+                return False
+            
+            # Получаем все колонки доски
+            columns = session.query(Column).filter(Column.board_id == board_id).all()
+            
+            for column in columns:
+                # Удаляем все задачи колонки
+                session.query(Task).filter(Task.column_id == column.id).delete()
+            
+            # Удаляем все колонки доски
+            session.query(Column).filter(Column.board_id == board_id).delete()
+            
+            # Удаляем саму доску
+            session.delete(board)
+            session.commit()
+            return True
+
+    @staticmethod
+    def update_user(user_id: int, first_name: str | None = None, last_name: str | None = None, 
+                   username: str | None = None, avatar_file = None) -> User | None:
+        """
+        Обновляет данные пользователя.
+        Если передан avatar_file (UploadFile), сохраняет его и обновляет avatar_url.
+        Возвращает обновленного пользователя или None, если пользователь не найден.
+        """
+        from core.avatar_generator import save_avatar_file
+        
+        with session_factory() as session:
+            user = session.query(User).filter(User.id == user_id).first()
+            if not user:
+                return None
+            
+            if first_name is not None:
+                user.first_name = first_name
+            if last_name is not None:
+                user.last_name = last_name
+            if username is not None:
+                user.username = username
+            
+            # Обработка аватарки
+            if avatar_file is not None:
+                old_avatar_url = user.avatar_url
+                new_avatar_url = save_avatar_file(avatar_file, old_avatar_url)
+                user.avatar_url = new_avatar_url
+            
+            session.commit()
+            session.refresh(user)
+            return user

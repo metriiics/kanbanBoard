@@ -16,3 +16,11 @@ class UserRead(UserBase): # Схема для чтения информации 
 class UserLogin(BaseModel): # Схема для входа пользователя
     email: EmailStr
     password: str
+
+class UserUpdate(BaseModel): # Схема для обновления профиля пользователя (без файлов)
+    first_name: str | None = None
+    last_name: str | None = None
+    username: str | None = None
+    
+    class Config:
+        from_attributes = True
