@@ -19,3 +19,9 @@ export const createCommentApi = async (taskId, content) => {
   const response = await api.post(`/api/tasks/${taskId}/comments`, { content });
   return response.data;
 };
+
+export const getUserTasksApi = async (workspaceId = null) => {
+  const params = workspaceId ? { workspace_id: workspaceId } : {};
+  const response = await api.get("/api/users/me/tasks", { params });
+  return response.data;
+};

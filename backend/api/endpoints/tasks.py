@@ -1,10 +1,11 @@
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Query
 
 from core.security import get_current_user
-from api.models.tasks import BoardTasksOut, TaskFilledFieldsOut, TaskCardOut, TaskDetailOut, TaskCreate, TaskUpdate, TaskCommentOut, CommentCreate
+from api.models.tasks import BoardTasksOut, TaskFilledFieldsOut, TaskCardOut, TaskDetailOut, TaskCreate, TaskUpdate, TaskCommentOut, CommentCreate, UserTaskOut
 from db.OrmQuery import OrmQuery
 
 from db.dbstruct import Task as TaskModel
+from typing import List
 
 
 router = APIRouter(tags=["✅ Задачи"])
@@ -356,3 +357,44 @@ def create_comment(task_id: int, payload: CommentCreate, current_user = Depends(
         "user": user_obj,
         "created_at": getattr(created_comment, "created_at", None)
     }
+
+@router.get("/api/users/me/tasks", response_model=List[UserTaskOut])
+def get_user_tasks(
+    workspace_id: int | None = Query(default=None, description="ID рабочего пространства (опционально)"),
+    current_user = Depends(get_current_user)
+):
+    """
+    Возвращает задачи, назначенные текущему пользователю.
+    Если указан workspace_id, возвращает только задачи из проектов этого workspace.
+    """
+    tasks = OrmQuery.get_user_tasks(current_user.id, workspace_id)
+    
+    result = []
+    for task in tasks:
+        column = getattr(task, "column", None)
+        status = getattr(column, "title", None) if column else None
+        
+        project_title = None
+        workspace_name = None
+        
+        if column:
+            board = getattr(column, "board", None)
+            if board:
+                project = getattr(board, "project", None)
+                if project:
+                    project_title = getattr(project, "title", None)
+                    workspace = getattr(project, "workspace", None)
+                    if workspace:
+                        workspace_name = getattr(workspace, "name", None)
+        
+        result.append({
+            "id": task.id,
+            "title": getattr(task, "title", None),
+            "status": status,
+            "created_at": getattr(task, "created_at", None),
+            "due_date": getattr(task, "due_date", None),
+            "project_title": project_title,
+            "workspace_name": workspace_name
+        })
+    
+    return result

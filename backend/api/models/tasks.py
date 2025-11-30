@@ -105,3 +105,13 @@ class CommentCreate(BaseModel):
 class LabelCreate(BaseModel):
     name: str
     color: Optional[str] = None
+
+class UserTaskOut(BaseModel):
+    """Модель для отображения задач пользователя в таблице"""
+    id: int
+    title: Optional[str] = None
+    status: Optional[str] = None  # Название колонки
+    created_at: Optional[datetime] = None
+    due_date: Optional[datetime] = None
+    project_title: Optional[str] = None
+    workspace_name: Optional[str] = None

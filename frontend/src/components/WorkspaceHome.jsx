@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { getProjectsByWorkspace } from "../api/a_workspaces";
+import { getUserTasksApi } from "../api/a_tasks";
 import { useAuth } from "../contexts/AuthContext";
 import Sidebar from "./Sidebar"; 
 import { useWorkspace } from "../hooks/h_workspace";
@@ -12,6 +13,8 @@ export default function WorkspaceHome() {
   const [projectsLoading, setProjectsLoading] = useState(true);
   const [projectsError, setProjectsError] = useState("");
   const [tasks, setTasks] = useState([]);
+  const [tasksLoading, setTasksLoading] = useState(true);
+  const [tasksError, setTasksError] = useState("");
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
 
   useEffect(() => {
@@ -36,36 +39,26 @@ export default function WorkspaceHome() {
 
     fetchProjects();
 
-    // Временные данные для таблицы задач
-    setTasks([
-      {
-        id: 1,
-        title: "Настроить API",
-        author: "Dmitro Sckrinik",
-        status: "В процессе",
-        created: "2025-10-18",
-        deadline: "2025-10-25",
-        project: "CRM-платформа",
-      },
-      {
-        id: 2,
-        title: "Сделать адаптивный дизайн",
-        author: "Alexsey Go Pro",
-        status: "На проверке",
-        created: "2025-10-15",
-        deadline: "2025-10-23",
-        project: "UI-редизайн",
-      },
-      {
-        id: 3,
-        title: "Подключить WebSocket",
-        author: "Angel",
-        status: "Готово",
-        created: "2025-10-10",
-        deadline: "2025-10-20",
-        project: "KanbanBoard",
-      },
-    ]);
+    // Запрос к API для получения задач пользователя
+    const fetchTasks = async () => {
+      if (!workspace?.id) {
+        setTasks([]);
+        setTasksLoading(false);
+        return;
+      }
+      try {
+        setTasksLoading(true);
+        setTasksError("");
+        const data = await getUserTasksApi(workspace.id);
+        setTasks(data);
+      } catch (error) {
+        console.error("Ошибка при загрузке задач:", error);
+        setTasksError("Не удалось загрузить задачи");
+      }
+      setTasksLoading(false);
+    };
+
+    fetchTasks();
   }, [workspace?.id]);
 
   return (
@@ -116,38 +109,60 @@ export default function WorkspaceHome() {
           {/* Мои задачи */}
           <section className="my-tasks">
             <h2>Мои задачи</h2>
-            <table className="tasks-table">
-              <thead>
-                <tr>
-                  <th>Задача</th>
-                  <th>Автор</th>
-                  <th>Статус</th>
-                  <th>Создано</th>
-                  <th>Дедлайн</th>
-                  <th>Проект</th>
-                </tr>
-              </thead>
-              <tbody>
-                {tasks.map((task) => (
-                  <tr key={task.id}>
-                    <td>{task.title}</td>
-                    <td>{task.author}</td>
-                    <td>
-                      <span
-                        className={`status-badge ${task.status
-                          .toLowerCase()
-                          .replace(/\s/g, "-")}`}
-                      >
-                        {task.status}
-                      </span>
-                    </td>
-                    <td>{task.created}</td>
-                    <td>{task.deadline}</td>
-                    <td>{task.project}</td>
+            {tasksLoading ? (
+              <p>Загружаем задачи...</p>
+            ) : tasksError ? (
+              <p>{tasksError}</p>
+            ) : (
+              <table className="tasks-table">
+                <thead>
+                  <tr>
+                    <th>Задача</th>
+                    <th>Статус</th>
+                    <th>Создано</th>
+                    <th>Дедлайн</th>
+                    <th>Проект</th>
+                    <th>Пространство</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
+                </thead>
+                <tbody>
+                  {tasks.length > 0 ? (
+                    tasks.map((task) => {
+                      const formatDate = (dateStr) => {
+                        if (!dateStr) return "-";
+                        const date = new Date(dateStr);
+                        return date.toLocaleDateString("ru-RU");
+                      };
+                      
+                      return (
+                        <tr key={task.id}>
+                          <td>{task.title || "Без названия"}</td>
+                          <td>
+                            <span
+                              className={`status-badge ${(task.status || "")
+                                .toLowerCase()
+                                .replace(/\s/g, "-")}`}
+                            >
+                              {task.status || "-"}
+                            </span>
+                          </td>
+                          <td>{formatDate(task.created_at)}</td>
+                          <td>{formatDate(task.due_date)}</td>
+                          <td>{task.project_title || "-"}</td>
+                          <td>{task.workspace_name || "-"}</td>
+                        </tr>
+                      );
+                    })
+                  ) : (
+                    <tr>
+                      <td colSpan="6" style={{ textAlign: "center" }}>
+                        Нет назначенных задач 😕
+                      </td>
+                    </tr>
+                  )}
+                </tbody>
+              </table>
+            )}
           </section>
         </div>
       </div>

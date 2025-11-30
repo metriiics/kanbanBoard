@@ -790,6 +790,34 @@ class OrmQuery:
             return new_comment
 
     @staticmethod
+    def get_user_tasks(user_id: int, workspace_id: Optional[int] = None):
+        """
+        Возвращает задачи, назначенные пользователю (assigned_to = user_id).
+        Если передан workspace_id, возвращает только задачи из проектов этого workspace.
+        Загружает связанные данные: column, board, project, workspace.
+        """
+        with session_factory() as session:
+            # Базовый запрос с подгрузкой всех связей
+            query = (
+                session.query(Task)
+                .options(
+                    joinedload(Task.column).joinedload(Column.board).joinedload(Board.project).joinedload(Project.workspace)
+                )
+                .filter(Task.assigned_to == user_id)
+            )
+            
+            # Если указан workspace_id, фильтруем по нему через join
+            if workspace_id is not None:
+                query = (
+                    query.join(Column, Task.column_id == Column.id)
+                    .join(Board, Column.board_id == Board.id)
+                    .join(Project, Board.projects_id == Project.id)
+                    .filter(Project.workspaces_id == workspace_id)
+                )
+            
+            return query.order_by(Task.created_at.desc()).all()
+
+    @staticmethod
     def create_label(workspace_id: int, name: str, color: str | None = None) -> Label | None:
         """
         Создаёт новый тег в рабочем пространстве.

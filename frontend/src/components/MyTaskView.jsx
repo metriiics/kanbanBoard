@@ -1,75 +1,85 @@
 import React, { useEffect, useState } from "react";
+import { getUserTasksApi } from "../api/a_tasks";
 
 export default function MyTaskView() {
   const [tasks, setTasks] = useState([]);
+  const [tasksLoading, setTasksLoading] = useState(true);
+  const [tasksError, setTasksError] = useState("");
 
   useEffect(() => {
-    setTasks([
-      {
-        id: 1,
-        title: "Настроить API",
-        author: "Dmitro Sckrinik",
-        status: "В процессе",
-        created: "2025-10-18",
-        deadline: "2025-10-25",
-        project: "CRM-платформа",
-      },
-      {
-        id: 2,
-        title: "Сделать адаптивный дизайн",
-        author: "Alexsey Go Pro",
-        status: "На проверке",
-        created: "2025-10-15",
-        deadline: "2025-10-23",
-        project: "UI-редизайн",
-      },
-      {
-        id: 3,
-        title: "Подключить WebSocket",
-        author: "Angel",
-        status: "Готово",
-        created: "2025-10-10",
-        deadline: "2025-10-20",
-        project: "KanbanBoard",
-      },
-    ]);
+    // Запрос к API для получения всех задач пользователя
+    const fetchTasks = async () => {
+      try {
+        setTasksLoading(true);
+        setTasksError("");
+        // Без workspace_id - получаем все задачи пользователя
+        const data = await getUserTasksApi(null);
+        setTasks(data);
+      } catch (error) {
+        console.error("Ошибка при загрузке задач:", error);
+        setTasksError("Не удалось загрузить задачи");
+      }
+      setTasksLoading(false);
+    };
+
+    fetchTasks();
   }, []);
+
+  const formatDate = (dateStr) => {
+    if (!dateStr) return "-";
+    const date = new Date(dateStr);
+    return date.toLocaleDateString("ru-RU");
+  };
 
   return (
     <div className="kanban-MyTask-board">
       <section className="my-tasks-board">
-        <table className="tasks-table-board">
-          <thead>
-            <tr>
-              <th>Задача</th>
-              <th>Автор</th>
-              <th>Статус</th>
-              <th>Создано</th>
-              <th>Дедлайн</th>
-              <th>Проект</th>
-            </tr>
-          </thead>
-          <tbody>
-            {tasks.map((task) => (
-              <tr key={task.id}>
-                <td>{task.title}</td>
-                <td>{task.author}</td>
-                <td>
-                  <span
-                    className={`status-badge-board ${task.status
-                      .toLowerCase()
-                      .replace(/\s/g, "-")}`}
-                  >
-                    {task.status}
-                  </span>
-                </td>
-                <td>{task.created}</td>
-                <td>{task.deadline}</td>
-                <td>{task.project}</td>
+        {tasksLoading ? (
+          <p>Загружаем задачи...</p>
+        ) : tasksError ? (
+          <p>{tasksError}</p>
+        ) : (
+          <table className="tasks-table-board">
+            <thead>
+              <tr>
+                <th>Задача</th>
+                <th>Статус</th>
+                <th>Создано</th>
+                <th>Дедлайн</th>
+                <th>Проект</th>
+                <th>Пространство</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              {tasks.length > 0 ? (
+                tasks.map((task) => (
+                  <tr key={task.id}>
+                    <td>{task.title || "Без названия"}</td>
+                    <td>
+                      <span
+                        className={`status-badge-board ${(task.status || "")
+                          .toLowerCase()
+                          .replace(/\s/g, "-")}`}
+                      >
+                        {task.status || "-"}
+                      </span>
+                    </td>
+                    <td>{formatDate(task.created_at)}</td>
+                    <td>{formatDate(task.due_date)}</td>
+                    <td>{task.project_title || "-"}</td>
+                    <td>{task.workspace_name || "-"}</td>
+                  </tr>
+                ))
+              ) : (
+                <tr>
+                  <td colSpan="6" style={{ textAlign: "center" }}>
+                    Нет назначенных задач 😕
+                  </td>
+                </tr>
+              )}
+            </tbody>
+          </table>
+        )}
       </section>
     </div>
   );
