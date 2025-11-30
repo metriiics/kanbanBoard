@@ -140,6 +140,28 @@
   color: #b91c1c;
 }
 
+/* Мини-загрузчик для дропдауна */
+.mini-loader {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.mini-spinner {
+  width: 14px;
+  height: 14px;
+  border: 2px solid rgba(102, 126, 234, 0.2);
+  border-top-color: #667eea;
+  border-radius: 50%;
+  animation: mini-spin 0.8s linear infinite;
+}
+
+@keyframes mini-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
 .workspace-dropdown-text {
   display: flex;
   flex-direction: column;

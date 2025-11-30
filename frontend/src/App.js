@@ -28,6 +28,8 @@ import "./css/CalendarView.css";
 import "./css/MyTaskView.css";
 import "./css/InviteModal.css";
 import "./css/InvitationPage.css";
+import "./css/PageLoader.css";
+import "./css/ErrorPage.css";
 import "./css/SectionSettings/ProfileSettings.css";
 import "./css/SectionSettings/MembersSettings.css";
 

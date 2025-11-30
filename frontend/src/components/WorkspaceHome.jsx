@@ -5,10 +5,11 @@ import { getUserTasksApi } from "../api/a_tasks";
 import { useAuth } from "../contexts/AuthContext";
 import Sidebar from "./Sidebar"; 
 import { useWorkspace } from "../hooks/h_workspace";
+import WorkspaceLoaderWrapper from "./WorkspaceLoaderWrapper";
 
 export default function WorkspaceHome() {
   const { user } = useAuth();
-  const { workspace, workspaceLoading } = useWorkspace();
+  const { workspace } = useWorkspace();
   const [recentProjects, setRecentProjects] = useState([]);
   const [projectsLoading, setProjectsLoading] = useState(true);
   const [projectsError, setProjectsError] = useState("");
@@ -61,59 +62,64 @@ export default function WorkspaceHome() {
     fetchTasks();
   }, [workspace?.id]);
 
+  // Определяем, нужно ли показывать общую загрузку
+  const isLoading = projectsLoading || tasksLoading;
+  
+  // Ошибки проектов и задач не критичны - они обрабатываются локально в компоненте
+  // Критические ошибки (workspace, projects, user) обрабатываются в WorkspaceLoaderWrapper
+
   return (
-    <div className="kanban-board-with-sidebar">
-      {/* Боковая панель */}
-      <Sidebar
-        isCollapsed={isSidebarCollapsed}
-        onToggle={() => setIsSidebarCollapsed(!isSidebarCollapsed)}
-      />
+    <WorkspaceLoaderWrapper 
+      additionalLoadingStates={[isLoading]}
+    >
+      <div className="kanban-board-with-sidebar">
+        {/* Боковая панель */}
+        <Sidebar
+          isCollapsed={isSidebarCollapsed}
+          onToggle={() => setIsSidebarCollapsed(!isSidebarCollapsed)}
+        />
 
-      {/* Основной контент */}
-      <div
-        className={`board-content ${
-          isSidebarCollapsed ? "sidebar-collapsed" : ""
-        }`}
-      >
-        <div className="workspace-home">
-          <header className="workspace-header">
-            <h1>Добро пожаловать, {user?.first_name || user?.username} 👋</h1>
-            <p>Вот ваши недавние проекты и активные задачи.</p>
-          </header>
+        {/* Основной контент */}
+        <div
+          className={`board-content ${
+            isSidebarCollapsed ? "sidebar-collapsed" : ""
+          }`}
+        >
+          <div className="workspace-home">
+            <header className="workspace-header">
+              <h1>Добро пожаловать, {user?.first_name || user?.username} 👋</h1>
+              <p>Вот ваши недавние проекты и активные задачи.</p>
+            </header>
 
-          {/* Недавние проекты */}
-          <section className="recent-projects">
-            <h2>Недавние проекты</h2>
-            <div className="projects-grid">
-              {projectsLoading || workspaceLoading ? (
-                <p>Загружаем проекты...</p>
-              ) : projectsError ? (
-                <p>{projectsError}</p>
-              ) : recentProjects.length > 0 ? (
-                recentProjects.map((project) => (
-                  <Link
-                    to={`/project/${project.id}/board`}
-                    className="project-card"
-                    key={project.id}
-                  >
-                    <h3>{project.name || project.title}</h3>
-                    <p>{project.description || "Без описания"}</p>
-                  </Link>
-                ))
+            {/* Недавние проекты */}
+            <section className="recent-projects">
+              <h2>Недавние проекты</h2>
+              <div className="projects-grid">
+                {projectsError ? (
+                  <p>{projectsError}</p>
+                ) : recentProjects.length > 0 ? (
+                  recentProjects.map((project) => (
+                    <Link
+                      to={`/project/${project.id}/board`}
+                      className="project-card"
+                      key={project.id}
+                    >
+                      <h3>{project.name || project.title}</h3>
+                      <p>{project.description || "Без описания"}</p>
+                    </Link>
+                  ))
+                ) : (
+                  <p>Нет недавних проектов 😕</p>
+                )}
+              </div>
+            </section>
+
+            {/* Мои задачи */}
+            <section className="my-tasks">
+              <h2>Мои задачи</h2>
+              {tasksError ? (
+                <p>{tasksError}</p>
               ) : (
-                <p>Нет недавних проектов 😕</p>
-              )}
-            </div>
-          </section>
-
-          {/* Мои задачи */}
-          <section className="my-tasks">
-            <h2>Мои задачи</h2>
-            {tasksLoading ? (
-              <p>Загружаем задачи...</p>
-            ) : tasksError ? (
-              <p>{tasksError}</p>
-            ) : (
               <table className="tasks-table">
                 <thead>
                   <tr>
@@ -167,5 +173,6 @@ export default function WorkspaceHome() {
         </div>
       </div>
     </div>
+    </WorkspaceLoaderWrapper>
   );
 }

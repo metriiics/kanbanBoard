@@ -11,6 +11,7 @@ import {
 } from '../hooks/h_workspace';
 import { useCurrentUser } from '../hooks/h_useCurrentUser';
 import InviteModal from "../components/InviteModal";
+import PageLoader from "./PageLoader";
 
 export default function Sidebar({ isCollapsed, onToggle }) {
   const [expandedProjects, setExpandedProjects] = useState({});
@@ -279,13 +280,7 @@ export default function Sidebar({ isCollapsed, onToggle }) {
       document.body
     );
 
-  if (loading) return <div className="sidebar">Загрузка...</div>;
-  if (error)
-    return (
-      <div className="sidebar">
-        Ошибка загрузки проектов: {error.message || JSON.stringify(error)}
-      </div>
-    );
+  // Ошибки обрабатываются в WorkspaceLoaderWrapper
 
   if (isCollapsed) {
     return (
@@ -323,7 +318,14 @@ export default function Sidebar({ isCollapsed, onToggle }) {
             {isWorkspaceMenuOpen && (
               <div className="workspace-dropdown">
                 {workspaceListLoading && (
-                  <div className="workspace-dropdown-item muted">Загружаем...</div>
+                  <div className="workspace-dropdown-item muted">
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px', justifyContent: 'center', padding: '8px 0' }}>
+                      <div className="mini-loader">
+                        <div className="mini-spinner"></div>
+                      </div>
+                      <span>Загружаем...</span>
+                    </div>
+                  </div>
                 )}
                 {!workspaceListLoading && workspaceListError && (
                   <div className="workspace-dropdown-item error">{workspaceListError}</div>
