@@ -416,7 +416,7 @@ export default function Sidebar({ isCollapsed, onToggle }) {
                   {selectedProject.boards?.map((board) => (
                     <div key={board.id} className="board-item">
                       <Link
-                        to={`/${user.username}/project/${selectedProject.id}/board/${board.id}`}
+                        to={user?.username ? `/${user.username}/project/${selectedProject.id}/board/${board.id}` : '#'}
                         className={`board-link-wrapper ${isBoardActive(board.id) ? 'active' : ''}`}
                       >
                         <span className="board-icon">📋</span>
@@ -445,9 +445,11 @@ export default function Sidebar({ isCollapsed, onToggle }) {
 
         {/* === ОБЩЕЕ === */}
         <div className="general-section-bottom">
-          <Link to={`/${user.username}/settings`} className="general-item">
-            Настройки
-          </Link>
+          {user?.username && (
+            <Link to={`/${user.username}/settings`} className="general-item">
+              Настройки
+            </Link>
+          )}
           <div
             className="general-item"
             onClick={() => setShowInviteModal(true)}

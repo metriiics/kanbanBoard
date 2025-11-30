@@ -1,7 +1,9 @@
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, HTTPException
+from sqlalchemy.exc import SQLAlchemyError
 from db.OrmQuery import OrmQuery
 from api.models.columns import ColumnTitleUpdate, ColumnCreate
 from core.security import get_current_user
+from core.logger import logger
 
 router = APIRouter(tags=["📊 Колонки"])
 
@@ -25,15 +27,77 @@ def update_column_title(column_id: int, data: ColumnTitleUpdate):
 
 @router.post("/api/columns")
 def create_column(data: ColumnCreate, current_user=Depends(get_current_user)):
-
+    """
+    Создание новой колонки в доске.
+    Проверяет доступ пользователя к доске через workspace.
+    """
     if not current_user:
-        return {"error": "Unauthorized"}, 401
-    """
-    Создание новой колонки
-    """
-    new_column = OrmQuery.create_column(
-        title=data.title,
-        position=data.position,
-        board_id=data.board_id
-    )
-    return {"id": new_column.id, "title": new_column.title, "position": new_column.position, "board_id": new_column.board_id}
+        raise HTTPException(status_code=401, detail="Не авторизован")
+    
+    # Проверяем существование доски
+    board = OrmQuery.get_board_by_id(data.board_id)
+    if not board:
+        raise HTTPException(status_code=404, detail="Доска не найдена")
+    
+    # Получаем проект доски
+    project = OrmQuery.get_project_by_id(board.projects_id)
+    if not project:
+        raise HTTPException(status_code=404, detail="Проект не найден")
+    
+    # Проверяем доступ пользователя к workspace проекта
+    user_role = OrmQuery.get_user_workspace_role(current_user.id, project.workspaces_id)
+    if user_role is None:
+        raise HTTPException(
+            status_code=403, 
+            detail="Нет доступа к рабочему пространству"
+        )
+    
+    # Валидация данных
+    if not data.title or not data.title.strip():
+        raise HTTPException(status_code=400, detail="Название колонки не может быть пустым")
+    
+    if data.position < 0:
+        raise HTTPException(status_code=400, detail="Позиция колонки должна быть неотрицательной")
+    
+    # Создаем колонку с проверкой доступа
+    try:
+        logger.info(f"Попытка создания колонки: board_id={data.board_id}, title={data.title}, position={data.position}, user_id={current_user.id}")
+        
+        new_column = OrmQuery.create_column(
+            board_id=data.board_id,
+            title=data.title.strip(),
+            position=data.position,
+            user_id=current_user.id
+        )
+        
+        if not new_column:
+            logger.error(f"Метод create_column вернул None для board_id={data.board_id}")
+            raise HTTPException(
+                status_code=500, 
+                detail="Не удалось создать колонку"
+            )
+        
+        logger.info(f"Колонка успешно создана: id={new_column.id}, title={new_column.title}")
+        
+        return {
+            "id": new_column.id, 
+            "title": new_column.title, 
+            "position": new_column.position, 
+            "board_id": new_column.board_id,
+            "color_id": new_column.color_id
+        }
+    except SQLAlchemyError as e:
+        logger.error(f"Ошибка базы данных при создании колонки: {str(e)}")
+        raise HTTPException(
+            status_code=500,
+            detail=f"Ошибка базы данных: {str(e)}"
+        )
+    except HTTPException:
+        # Пробрасываем HTTP исключения как есть
+        raise
+    except Exception as e:
+        logger.error(f"Неожиданная ошибка при создании колонки: {str(e)}")
+        raise HTTPException(
+            status_code=500,
+            detail=f"Внутренняя ошибка сервера: {str(e)}"
+        )

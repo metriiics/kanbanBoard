@@ -11,10 +11,11 @@ import CalendarView from './CalendarView';
 import MyTaskView from './MyTaskView';
 import { normalizeTaskCard } from "../utils/taskMapper";
 import { useTasks } from "../hooks/h_useTasks";
+import { createColumn } from "../api/a_columns";
 
 export default function KanbanBoard() {
   const { boardId } = useParams();
-  const { columns, setColumns, projectData, loading, error, saveColumnPositions, saveColumnTitle, onAddTask } = useBoard(boardId);
+  const { columns, setColumns, projectData, loading, error, saveColumnPositions, saveColumnTitle, onAddTask, refetch } = useBoard(boardId);
   const { updateTask } = useTasks();
 
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
@@ -189,20 +190,29 @@ export default function KanbanBoard() {
     });
   };
 
-  const handleAddColumn = (e) => {
+  const handleAddColumn = async (e) => {
     e.preventDefault();
-    if (!newColumnTitle.trim()) return;
+    if (!newColumnTitle.trim() || !boardId) return;
 
-    const newColumn = {
-      id: Date.now(), // временный id
-      title: newColumnTitle,
-      tasks: [],
-      position: columns.length,
-    };
+    try {
+      // Создаем колонку на сервере
+      const columnData = {
+        title: newColumnTitle.trim(),
+        position: columns.length,
+        board_id: parseInt(boardId),
+      };
 
-    setColumns((prev) => [...prev, newColumn]);
-    setNewColumnTitle("");
-    setIsAddingColumn(false);
+      await createColumn(columnData);
+
+      // Перезагружаем данные с сервера, чтобы получить полную структуру колонки (с цветом и т.д.)
+      await refetch();
+
+      setNewColumnTitle("");
+      setIsAddingColumn(false);
+    } catch (error) {
+      console.error("Ошибка при создании колонки:", error);
+      alert("Не удалось создать колонку. Попробуйте позже.");
+    }
   };
 
   // Функция для открытия задачи

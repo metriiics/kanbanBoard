@@ -9,3 +9,10 @@ export const updateColumnTitle = async (columnId, title) => {
   const response = await api.put(`/api/columns/${columnId}/title`, { title });
   return response.data;
 };
+
+export const createColumn = async (data) => {
+  const response = await api.post('/api/columns', data, {
+    withCredentials: true,
+  });
+  return response.data;
+};

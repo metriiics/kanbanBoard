@@ -1,6 +1,5 @@
 import React, { useState, useEffect, memo } from 'react';
 import { useDrag, useDrop } from 'react-dnd';
-import Avatar from 'react-avatar';
 import { createPortal } from 'react-dom';
 import { getEmptyImage } from 'react-dnd-html5-backend';
 import { getAssigneeDisplayName } from '../utils/taskMapper';
@@ -58,6 +57,15 @@ const KanbanTask = ({ task, index, columnId, columnTitle, onTaskClick, moveTaskI
   const hasAssignee = Boolean(assignee);
   const hasDueDate = Boolean(dueDateValue);
   const assigneeName = getAssigneeDisplayName(assignee);
+  const [avatarError, setAvatarError] = useState(false);
+
+  // Получаем URL аватара - используем напрямую из базы данных
+  const avatarUrl = assignee?.avatar_url || null;
+
+  // Сбрасываем ошибку при изменении задачи
+  useEffect(() => {
+    setAvatarError(false);
+  }, [task.id, avatarUrl]);
 
   const handleMouseEnter = (e) => {
     const rect = e.currentTarget.getBoundingClientRect();
@@ -111,13 +119,38 @@ const KanbanTask = ({ task, index, columnId, columnTitle, onTaskClick, moveTaskI
                 onMouseEnter={handleMouseEnter}
                 onMouseLeave={handleMouseLeave}
               >
-                <Avatar
-                  name={assigneeName || ' '}
-                  size="25"
-                  round={true}
-                  textSizeRatio={2}
-                  color="#764ba2"
-                />
+                {avatarUrl && !avatarError ? (
+                  <img
+                    src={avatarUrl}
+                    alt={assigneeName}
+                    className="task-user-avatar"
+                    style={{
+                      width: '25px',
+                      height: '25px',
+                      borderRadius: '50%',
+                      objectFit: 'cover',
+                    }}
+                    onError={() => setAvatarError(true)}
+                  />
+                ) : (
+                  <div
+                    className="task-user-avatar-fallback"
+                    style={{
+                      width: '25px',
+                      height: '25px',
+                      borderRadius: '50%',
+                      backgroundColor: '#764ba2',
+                      color: 'white',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      fontSize: '10px',
+                      fontWeight: 'bold',
+                    }}
+                  >
+                    {assigneeName ? assigneeName.charAt(0).toUpperCase() : '?'}
+                  </div>
+                )}
               </div>
             )}
           </div>
@@ -183,7 +216,35 @@ const KanbanTask = ({ task, index, columnId, columnTitle, onTaskClick, moveTaskI
                   </span>
                 )}
                 {hasAssignee && (
-                  <Avatar name={assigneeName || ' '} size="25" round={true} color="#764ba2" />
+                  avatarUrl ? (
+                    <img
+                      src={avatarUrl}
+                      alt={assigneeName}
+                      style={{
+                        width: '25px',
+                        height: '25px',
+                        borderRadius: '50%',
+                        objectFit: 'cover',
+                      }}
+                    />
+                  ) : (
+                    <div
+                      style={{
+                        width: '25px',
+                        height: '25px',
+                        borderRadius: '50%',
+                        backgroundColor: '#764ba2',
+                        color: 'white',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        fontSize: '10px',
+                        fontWeight: 'bold',
+                      }}
+                    >
+                      {assigneeName ? assigneeName.charAt(0).toUpperCase() : '?'}
+                    </div>
+                  )
                 )}
               </div>
             )}

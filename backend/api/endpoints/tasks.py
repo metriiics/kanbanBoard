@@ -98,6 +98,7 @@ def get_tasks_by_board(board_id: int, current_user = Depends(get_current_user)):
                             "last_name": getattr(assignee, "last_name", None),
                             "username": getattr(assignee, "username", None),
                             "email": getattr(assignee, "email", None),
+                            "avatar_url": getattr(assignee, "avatar_url", None),
                         }
                         if (assignee := getattr(t, "assignee", None))
                         else None

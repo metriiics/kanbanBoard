@@ -1,8 +1,10 @@
 from sqlalchemy import select, and_
 from fastapi import Depends
+from sqlalchemy.exc import SQLAlchemyError
 
 from core.security import hash_password
 from core.avatar_generator import generate_avatar
+from core.logger import logger
 
 from db.database import engine, Base, session_factory
 from db.dbstruct import User, Workspace, Project, Board, Column, Task, UserWorkspace, Comment, Label, ColorPalette, WorkspaceInvite, UserProjectAccess
@@ -409,25 +411,83 @@ class OrmQuery:
             return column
         
     @staticmethod
-    def create_column(board_id: int, title: str, position: int, color_id: int = 1):
+    def create_column(board_id: int, title: str, position: int, color_id: int = 1, user_id: Optional[int] = None):
         """
         Создает новую колонку в доске.
         Всегда устанавливает color_id == 1.
+        
+        Args:
+            board_id: ID доски
+            title: Название колонки
+            position: Позиция колонки
+            color_id: ID цвета (по умолчанию 1)
+            user_id: ID пользователя для проверки доступа (опционально)
+        
+        Returns:
+            Column объект или None, если доска не найдена или нет доступа
         """
         with session_factory() as session:
-            if session.get(Board, board_id) is None:
-                return None
-
-            new_column = Column(
-                title=title,
-                board_id=board_id,
-                position=position,
-                color_id=1,  # жёстко — всегда 1
+            # Получаем доску с проектом
+            board = (
+                session.query(Board)
+                .options(joinedload(Board.project))
+                .filter(Board.id == board_id)
+                .first()
             )
-            session.add(new_column)
-            session.commit()
-            session.refresh(new_column)
-            return new_column
+            
+            if not board:
+                return None
+            
+            # Если передан user_id, проверяем доступ к доске через workspace
+            if user_id is not None:
+                project = board.project
+                if not project:
+                    return None
+                
+                # Проверяем, что пользователь имеет доступ к workspace проекта
+                user_workspace = session.query(UserWorkspace).filter(
+                    UserWorkspace.user_id == user_id,
+                    UserWorkspace.workspace_id == project.workspaces_id
+                ).first()
+                
+                if not user_workspace:
+                    return None
+
+            # Проверяем существование color_id
+            color = session.get(ColorPalette, color_id)
+            if not color:
+                # Если цвет не найден, используем дефолтный цвет_id = 1
+                default_color = session.get(ColorPalette, 1)
+                if not default_color:
+                    return None
+                color_id = 1
+
+            try:
+                new_column = Column(
+                    title=title,
+                    board_id=board_id,
+                    position=position,
+                    color_id=color_id,
+                )
+                session.add(new_column)
+                session.flush()  # Получаем ID без коммита
+                
+                # Проверяем, что объект был добавлен
+                logger.info(f"Создание колонки: title={title}, board_id={board_id}, position={position}, color_id={color_id}")
+                
+                session.commit()
+                session.refresh(new_column)
+                
+                logger.info(f"Колонка успешно создана с ID={new_column.id}")
+                return new_column
+            except SQLAlchemyError as e:
+                session.rollback()
+                logger.error(f"Ошибка при создании колонки: {str(e)}")
+                raise
+            except Exception as e:
+                session.rollback()
+                logger.error(f"Неожиданная ошибка при создании колонки: {str(e)}")
+                raise
         
     @staticmethod
     def accept_invite(token: str, user_id: int):

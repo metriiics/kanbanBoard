@@ -7,13 +7,30 @@ class ColorOut(BaseModel):
     name: str
     hex_code: str
 
+class LabelOut(BaseModel):
+    id: int
+    name: Optional[str] = None
+    color: Optional[str] = None
+
+class AssigneeOut(BaseModel):
+    id: int
+    first_name: Optional[str] = None
+    last_name: Optional[str] = None
+    username: Optional[str] = None
+    email: Optional[str] = None
+    avatar_url: Optional[str] = None
+
 class TaskOut(BaseModel):
     id: int
     title: Optional[str] = None
     description: Optional[str] = None
+    priority: Optional[str] = None
+    due_date: Optional[datetime] = None
     board_id: Optional[int] = None
     column_id: Optional[int] = None
     created_at: Optional[datetime] = None
+    labels: List[LabelOut] = Field(default_factory=list)
+    assignee: Optional[AssigneeOut] = None
 
 class ColumnWithTasksOut(BaseModel):
     id: int
@@ -37,18 +54,6 @@ class BoardTasksOut(BaseModel):
 class TaskFilledFieldsOut(BaseModel):
     task_id: int
     filled_fields: Dict[str, Any] = Field(default_factory=dict, description="Заполненные поля задачи: имя поля -> значение")
-
-class LabelOut(BaseModel):
-    id: int
-    name: Optional[str] = None
-    color: Optional[str] = None
-
-class AssigneeOut(BaseModel):
-    id: int
-    first_name: Optional[str] = None
-    last_name: Optional[str] = None
-    username: Optional[str] = None
-    email: Optional[str] = None
 
 class TaskCardOut(BaseModel):
     id: int
