@@ -1,7 +1,8 @@
 from fastapi import APIRouter, Depends, HTTPException, Query
+from datetime import datetime
 
 from core.security import get_current_user
-from api.models.tasks import BoardTasksOut, TaskFilledFieldsOut, TaskCardOut, TaskDetailOut, TaskCreate, TaskUpdate, TaskCommentOut, CommentCreate, UserTaskOut
+from api.models.tasks import BoardTasksOut, TaskFilledFieldsOut, TaskCardOut, TaskDetailOut, TaskCreate, TaskUpdate, TaskCommentOut, CommentCreate, UserTaskOut, CalendarTaskOut
 from db.OrmQuery import OrmQuery
 
 from db.dbstruct import Task as TaskModel
@@ -395,6 +396,65 @@ def get_user_tasks(
             "due_date": getattr(task, "due_date", None),
             "project_title": project_title,
             "workspace_name": workspace_name
+        })
+    
+    return result
+
+@router.get("/api/boards/{board_id}/calendar/tasks", response_model=List[CalendarTaskOut])
+def get_calendar_tasks(
+    board_id: int,
+    start_date: datetime | None = Query(default=None, description="Начальная дата для фильтрации"),
+    end_date: datetime | None = Query(default=None, description="Конечная дата для фильтрации"),
+    column_id: int | None = Query(default=None, description="ID колонки (статус) для фильтрации"),
+    assigned_to: int | None = Query(default=None, description="ID исполнителя для фильтрации"),
+    label_id: int | None = Query(default=None, description="ID тега для фильтрации"),
+    current_user = Depends(get_current_user)
+):
+    """
+    Возвращает задачи для календаря с фильтрами.
+    """
+    tasks = OrmQuery.get_calendar_tasks(
+        board_id=board_id,
+        start_date=start_date,
+        end_date=end_date,
+        column_id=column_id,
+        assigned_to=assigned_to,
+        label_id=label_id
+    )
+    
+    result = []
+    for task in tasks:
+        column = getattr(task, "column", None)
+        column_title = getattr(column, "title", None) if column else None
+        
+        labels = [
+            {"id": l.id, "name": getattr(l, "name", None), "color": getattr(l, "color", None)}
+            for l in getattr(task, "labels", []) or []
+        ]
+        
+        assignee = None
+        a = getattr(task, "assignee", None)
+        if a:
+            assignee = {
+                "id": a.id,
+                "first_name": getattr(a, "first_name", None),
+                "last_name": getattr(a, "last_name", None),
+                "username": getattr(a, "username", None),
+                "email": getattr(a, "email", None),
+                "avatar_url": getattr(a, "avatar_url", None),
+            }
+        
+        result.append({
+            "id": task.id,
+            "title": getattr(task, "title", None),
+            "description": getattr(task, "description", None),
+            "priority": getattr(task, "priority", None),
+            "due_date": getattr(task, "due_date", None),
+            "column_id": getattr(task, "column_id", None),
+            "column_title": column_title,
+            "created_at": getattr(task, "created_at", None),
+            "labels": labels,
+            "assignee": assignee
         })
     
     return result

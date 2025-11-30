@@ -115,3 +115,16 @@ class UserTaskOut(BaseModel):
     due_date: Optional[datetime] = None
     project_title: Optional[str] = None
     workspace_name: Optional[str] = None
+
+class CalendarTaskOut(BaseModel):
+    """Модель для задач в календаре"""
+    id: int
+    title: Optional[str] = None
+    description: Optional[str] = None
+    priority: Optional[str] = None
+    due_date: Optional[datetime] = None
+    column_id: Optional[int] = None
+    column_title: Optional[str] = None
+    created_at: Optional[datetime] = None
+    labels: List[LabelOut] = Field(default_factory=list)
+    assignee: Optional[AssigneeOut] = None

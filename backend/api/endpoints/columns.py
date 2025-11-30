@@ -4,6 +4,7 @@ from db.OrmQuery import OrmQuery
 from api.models.columns import ColumnTitleUpdate, ColumnCreate
 from core.security import get_current_user
 from core.logger import logger
+from typing import List
 
 router = APIRouter(tags=["📊 Колонки"])
 
@@ -101,3 +102,30 @@ def create_column(data: ColumnCreate, current_user=Depends(get_current_user)):
             status_code=500,
             detail=f"Внутренняя ошибка сервера: {str(e)}"
         )
+
+@router.get("/api/boards/{board_id}/columns/list")
+def get_board_columns(board_id: int, current_user=Depends(get_current_user)):
+    """
+    Возвращает список всех колонок доски (без задач) для использования в фильтрах и создании задач.
+    """
+    columns = OrmQuery.get_columns_by_board_id(board_id)
+    
+    result = []
+    for col in columns:
+        color_info = None
+        if hasattr(col, 'color') and col.color:
+            color_info = {
+                "id": col.color.id,
+                "name": col.color.name,
+                "hex_code": col.color.hex_code
+            }
+        
+        result.append({
+            "id": col.id,
+            "title": getattr(col, "title", None),
+            "board_id": getattr(col, "board_id", None),
+            "position": getattr(col, "position", None),
+            "color": color_info
+        })
+    
+    return result

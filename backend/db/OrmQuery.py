@@ -7,12 +7,13 @@ from core.avatar_generator import generate_avatar
 from core.logger import logger
 
 from db.database import engine, Base, session_factory
-from db.dbstruct import User, Workspace, Project, Board, Column, Task, UserWorkspace, Comment, Label, ColorPalette, WorkspaceInvite, UserProjectAccess
+from db.dbstruct import User, Workspace, Project, Board, Column, Task, UserWorkspace, Comment, Label, ColorPalette, WorkspaceInvite, UserProjectAccess, TaskLabel
 from api.models.user import UserCreate
 from api.models.projects import ProjectCreate
 from api.models.boards import BoardCreate
 
 from typing import Optional
+from datetime import datetime
 
 from sqlalchemy.orm import joinedload
 
@@ -837,3 +838,75 @@ class OrmQuery:
             session.commit()
             session.refresh(new_label)
             return new_label
+
+    @staticmethod
+    def get_calendar_tasks(
+        board_id: int,
+        start_date: Optional[datetime] = None,
+        end_date: Optional[datetime] = None,
+        column_id: Optional[int] = None,
+        assigned_to: Optional[int] = None,
+        label_id: Optional[int] = None
+    ):
+        """
+        Возвращает задачи для календаря с фильтрами.
+        
+        Args:
+            board_id: ID доски
+            start_date: Начальная дата для фильтрации по due_date
+            end_date: Конечная дата для фильтрации по due_date
+            column_id: ID колонки (статус) для фильтрации
+            assigned_to: ID пользователя (исполнитель) для фильтрации
+            label_id: ID тега для фильтрации
+        
+        Returns:
+            Список задач с подгруженными связями
+        """
+        with session_factory() as session:
+            query = (
+                session.query(Task)
+                .join(Column, Task.column_id == Column.id)
+                .filter(Column.board_id == board_id)
+                .options(
+                    joinedload(Task.assignee),
+                    joinedload(Task.labels),
+                    joinedload(Task.column)
+                )
+            )
+            
+            # Фильтр по дате (due_date) - показываем только задачи с датами
+            query = query.filter(Task.due_date.isnot(None))
+            if start_date:
+                query = query.filter(Task.due_date >= start_date)
+            if end_date:
+                query = query.filter(Task.due_date <= end_date)
+            
+            # Фильтр по статусу (column_id)
+            if column_id:
+                query = query.filter(Task.column_id == column_id)
+            
+            # Фильтр по исполнителю
+            if assigned_to:
+                query = query.filter(Task.assigned_to == assigned_to)
+            
+            # Фильтр по тегу
+            if label_id:
+                query = query.join(TaskLabel, Task.id == TaskLabel.task_id).filter(
+                    TaskLabel.label_id == label_id
+                )
+            
+            return query.order_by(Task.due_date.asc(), Task.created_at.asc()).all()
+
+    @staticmethod
+    def get_columns_by_board_id(board_id: int):
+        """
+        Возвращает все колонки доски без задач.
+        """
+        with session_factory() as session:
+            return (
+                session.query(Column)
+                .filter(Column.board_id == board_id)
+                .options(joinedload(Column.color))
+                .order_by(Column.position.asc())
+                .all()
+            )
