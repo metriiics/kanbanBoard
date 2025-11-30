@@ -6,6 +6,7 @@ import KanbanColumn from "./KanbanColumn";
 import TaskModal from "./TaskModal";
 import KanbanTask from "./KanbanTask";
 import Sidebar from "./Sidebar";
+import AIAgentPanel from "./AIAgentPanel";
 import useBoard from "../hooks/h_useBoard"; 
 import CalendarView from './CalendarView';
 import MyTaskView from './MyTaskView';
@@ -23,6 +24,7 @@ export default function KanbanBoard() {
   const [selectedTask, setSelectedTask] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isModalRightAligned, setIsModalRightAligned] = useState(false);
+  const [isAIPanelOpen, setIsAIPanelOpen] = useState(false);
   const handleTaskUpdated = useCallback((updatedTask) => {
     if (!updatedTask?.id) return;
 
@@ -323,7 +325,23 @@ export default function KanbanBoard() {
                 <h1 className="project-name">{projectData.name}</h1>
                 <h2 className="board-name">{projectData.boardName}</h2>
               </div>
+              <button
+                className="ai-agent-btn"
+                onClick={() => setIsAIPanelOpen(true)}
+                aria-label="Открыть AI ассистента"
+                title="AI Ассистент"
+              >
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <path d="M12 2L2 7l10 5 10-5-10-5z"></path>
+                  <path d="M2 17l10 5 10-5"></path>
+                  <path d="M2 12l10 5 10-5"></path>
+                </svg>
+                <span>AI Ассистент</span>
+              </button>
             </div>
+
+            {/* Декоративная полоса */}
+            <div className="board-divider"></div>
 
             {/* Навигационная панель */}
             <nav className="board-navbar">
@@ -352,6 +370,11 @@ export default function KanbanBoard() {
           isRightAligned={isModalRightAligned}
           onToggleAlignment={handleToggleAlignment}
           onTaskUpdated={handleTaskUpdated}
+        />
+
+        <AIAgentPanel
+          isOpen={isAIPanelOpen}
+          onClose={() => setIsAIPanelOpen(false)}
         />
       </div>
     </DndProvider>
