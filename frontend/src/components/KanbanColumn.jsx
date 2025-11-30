@@ -1,4 +1,5 @@
 import React, { useRef, useState, useEffect, memo } from 'react';
+import { createPortal } from 'react-dom';
 import { useDrop, useDrag } from 'react-dnd';
 import { useColors } from '../hooks/h_useColors';
 import KanbanTask from "./KanbanTask";
@@ -295,8 +296,8 @@ const KanbanColumn = ({
         )}
       </div>
       
-      {/* === МОДАЛКА: выбор цвета === */}
-      {showColorModal && (
+      {/* === МОДАЛКА: выбор цвета (через Portal) === */}
+      {showColorModal && createPortal(
         <div className="modal-overlay" onClick={() => setShowColorModal(false)}>
           <div className="modal-window" onClick={(e) => e.stopPropagation()}>
             <h3>Выберите цвет</h3>
@@ -321,11 +322,12 @@ const KanbanColumn = ({
               </button>
             </div>
           </div>
-        </div>
+        </div>,
+        document.body
       )}
 
-      {/* === МОДАЛКА: подтверждение удаления === */}
-      {showDeleteModal && (
+      {/* === МОДАЛКА: подтверждение удаления (через Portal) === */}
+      {showDeleteModal && createPortal(
         <div className="modal-overlay" onClick={() => setShowDeleteModal(false)}>
           <div className="modal-window" onClick={(e) => e.stopPropagation()}>
             <h3>Удаление колонки</h3>
@@ -341,7 +343,8 @@ const KanbanColumn = ({
               </button>
             </div>
           </div>
-        </div>
+        </div>,
+        document.body
       )}
     </div>
   );

@@ -25,12 +25,18 @@
   gap: 8px;
 }
 
-.task-title {
-  font-size: 15px;
-  color: #172b4d;
-  font-weight: 600;
-  margin: 0;
-  line-height: 1.3;
+/* Специфичный селектор для названия задачи в карточке Kanban */
+.kanban-task .task-title,
+.kanban-task h4.task-title,
+.kanban-task .task-header .task-title-row h4.task-title,
+.kanban-task .task-header h4.task-title,
+.drag-preview .task-title,
+.drag-preview h4.task-title {
+  font-size: 15px !important;
+  color: #172b4d !important;
+  font-weight: 600 !important;
+  margin: 0 !important;
+  line-height: 1.4 !important;
 }
 
 .priority-indicator {
