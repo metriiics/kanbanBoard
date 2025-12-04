@@ -428,7 +428,9 @@ export default function Sidebar({ isCollapsed, onToggle }) {
             {/* === ПРОЕКТЫ === */}
             <div className="section">
               <div className="section-header">
-                <h4 className="section-title">ПРОЕКТЫ</h4>
+                <div className="projects-header">
+                  <h4 className="section-title">ПРОЕКТЫ</h4>
+                </div>
                 <button
                   className="create-btn"
                   onClick={handleCreateProject}
