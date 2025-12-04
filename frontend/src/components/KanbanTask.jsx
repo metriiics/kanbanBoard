@@ -22,6 +22,25 @@ const KanbanTask = ({ task, index, columnId, columnTitle, onTaskClick, moveTaskI
     }
   };
 
+  // Функция для определения, нужен ли белый текст на фоне цвета
+  const getTextColorForBackground = (hexColor) => {
+    if (!hexColor) return '#172b4d'; // дефолтный темный цвет
+    
+    // Убираем # если есть
+    const hex = hexColor.replace('#', '');
+    
+    // Конвертируем в RGB
+    const r = parseInt(hex.substr(0, 2), 16);
+    const g = parseInt(hex.substr(2, 2), 16);
+    const b = parseInt(hex.substr(4, 2), 16);
+    
+    // Вычисляем яркость (luminance)
+    const luminance = (0.299 * r + 0.587 * g + 0.114 * b) / 255;
+    
+    // Если яркость меньше 0.5, используем белый текст, иначе темный
+    return luminance < 0.5 ? '#ffffff' : '#172b4d';
+  };
+
   // 🟣 Правильно деструктурируем preview из useDrag
   const [{ isDragging }, drag, preview] = useDrag({
     type: 'task',
@@ -65,6 +84,17 @@ const KanbanTask = ({ task, index, columnId, columnTitle, onTaskClick, moveTaskI
   const hasAssignee = Boolean(assignee);
   const hasDueDate = Boolean(dueDateValue);
   const assigneeName = getAssigneeDisplayName(assignee);
+
+  // Проверка, просрочена ли дата
+  const isDateOverdue = () => {
+    if (!dueDateValue) return false;
+    const dueDate = new Date(dueDateValue);
+    const today = new Date();
+    // Сбрасываем время для сравнения только дат
+    today.setHours(0, 0, 0, 0);
+    dueDate.setHours(0, 0, 0, 0);
+    return dueDate < today;
+  };
 
   // Получаем URL аватара - используем напрямую из базы данных
   const avatarUrl = assignee?.avatar_url || null;
@@ -122,7 +152,9 @@ const KanbanTask = ({ task, index, columnId, columnTitle, onTaskClick, moveTaskI
         {(hasDueDate || hasAssignee) && (
           <div className="task-footer">
             {hasDueDate && (
-              <span className="task-date">
+              <span 
+                className={`task-date ${isDateOverdue() ? 'task-date-overdue' : ''}`}
+              >
                 {new Date(dueDateValue).toLocaleDateString('ru-RU')}
               </span>
             )}
@@ -177,7 +209,10 @@ const KanbanTask = ({ task, index, columnId, columnTitle, onTaskClick, moveTaskI
               <span
                 key={label.id ?? `${label.name}-${idx}`}
                 className="task-tag"
-                style={label.color ? { backgroundColor: label.color } : {}}
+                style={label.color ? { 
+                  backgroundColor: label.color,
+                  color: getTextColorForBackground(label.color)
+                } : {}}
               >
                 {label.name}
               </span>

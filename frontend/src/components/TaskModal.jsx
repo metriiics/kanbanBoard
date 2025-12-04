@@ -1,5 +1,4 @@
 import React, { useState, useRef, useEffect, useMemo, useCallback } from 'react';
-import Calendar from 'react-calendar';
 import { useTasks } from "../hooks/h_useTasks";
 import { getTaskDetailsApi, createCommentApi } from "../api/a_tasks";
 import { getWorkspaceMembers } from "../api/a_members";
@@ -40,6 +39,25 @@ const formatDateOnly = (value) => {
   const date = new Date(value);
   if (Number.isNaN(date.getTime())) return "";
   return date.toLocaleDateString("ru-RU", { day: "2-digit", month: "long", year: "numeric" });
+};
+
+// Функция для определения, нужен ли белый текст на фоне цвета
+const getTextColorForBackground = (hexColor) => {
+  if (!hexColor) return '#172b4d'; // дефолтный темный цвет
+  
+  // Убираем # если есть
+  const hex = hexColor.replace('#', '');
+  
+  // Конвертируем в RGB
+  const r = parseInt(hex.substr(0, 2), 16);
+  const g = parseInt(hex.substr(2, 2), 16);
+  const b = parseInt(hex.substr(4, 2), 16);
+  
+  // Вычисляем яркость (luminance)
+  const luminance = (0.299 * r + 0.587 * g + 0.114 * b) / 255;
+  
+  // Если яркость меньше 0.5, используем белый текст, иначе темный
+  return luminance < 0.5 ? '#ffffff' : '#172b4d';
 };
 
 const cleanupPayload = (payload) => {
@@ -94,6 +112,12 @@ export default function TaskModal({
   const [newComment, setNewComment] = useState("");
   const [isCreatingComment, setIsCreatingComment] = useState(false);
   const [isCreatingLabel, setIsCreatingLabel] = useState(false);
+
+  // Минималистичный календарь - состояние должно быть объявлено до условного return
+  const [calendarDate, setCalendarDate] = useState(() => {
+    if (task?.dueDate || task?.due_date) return new Date(task.dueDate || task.due_date);
+    return new Date();
+  });
 
   const { updateTask } = useTasks();
   const [isSaving, setIsSaving] = useState(false);
@@ -272,6 +296,13 @@ export default function TaskModal({
     };
   }, []);
 
+  // Синхронизируем календарь с выбранной датой
+  useEffect(() => {
+    if (dueDate) {
+      setCalendarDate(new Date(dueDate));
+    }
+  }, [dueDate]);
+
   const saveTaskChanges = useCallback(
     async (patch) => {
       if (!taskId) return;
@@ -320,8 +351,8 @@ export default function TaskModal({
     }, 700);
   };
 
-  const handleDueDateSelect = (value) => {
-    const isoString = value ? new Date(value).toISOString() : null;
+  const handleDueDateSelect = (date) => {
+    const isoString = date ? new Date(date).toISOString() : null;
     setDueDate(isoString);
     setIsDateDropdownOpen(false);
     saveTaskChanges({ due_date: isoString });
@@ -394,7 +425,8 @@ export default function TaskModal({
 
     setIsCreatingLabel(true);
     try {
-      const newLabel = await createWorkspaceLabel(workspaceId, labelName, "#d1d5db");
+      // Не передаем цвет - бэкенд сгенерирует случайный цвет автоматически
+      const newLabel = await createWorkspaceLabel(workspaceId, labelName, null);
       setLabelsOptions((prev) => [...prev, newLabel]);
       setLabelsSearch("");
       handleLabelToggle(newLabel);
@@ -435,6 +467,95 @@ export default function TaskModal({
   const author = taskDetail?.author || null;
   const authorName = getAssigneeDisplayName(author);
   const projectName = taskDetail?.column?.project?.title || task?.projectName || "Без проекта";
+
+  // Минималистичный календарь
+  const monthNames = [
+    'Январь', 'Февраль', 'Март', 'Апрель', 'Май', 'Июнь',
+    'Июль', 'Август', 'Сентябрь', 'Октябрь', 'Ноябрь', 'Декабрь'
+  ];
+
+  const weekDays = ['Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб', 'Вс'];
+
+  const getDaysInMonth = (date) => {
+    const year = date.getFullYear();
+    const month = date.getMonth();
+    const firstDay = new Date(year, month, 1);
+    const lastDay = new Date(year, month + 1, 0);
+    const daysInMonth = lastDay.getDate();
+    const startingDayOfWeek = firstDay.getDay();
+    
+    const days = [];
+    
+    // Дни предыдущего месяца (начинаем с понедельника, поэтому сдвигаем на 1)
+    const prevMonth = new Date(year, month - 1, 0);
+    const prevMonthDays = prevMonth.getDate();
+    const adjustedStartDay = startingDayOfWeek === 0 ? 6 : startingDayOfWeek - 1; // Понедельник = 0
+    
+    for (let i = adjustedStartDay - 1; i >= 0; i--) {
+      days.push({
+        date: new Date(year, month - 1, prevMonthDays - i),
+        isCurrentMonth: false,
+      });
+    }
+    
+    // Дни текущего месяца
+    for (let i = 1; i <= daysInMonth; i++) {
+      days.push({
+        date: new Date(year, month, i),
+        isCurrentMonth: true,
+      });
+    }
+    
+    // Дни следующего месяца
+    const remainingDays = 42 - days.length; // 6 недель * 7 дней
+    for (let i = 1; i <= remainingDays; i++) {
+      days.push({
+        date: new Date(year, month + 1, i),
+        isCurrentMonth: false,
+      });
+    }
+    
+    return days;
+  };
+
+  const isToday = (date) => {
+    const today = new Date();
+    return (
+      date.getDate() === today.getDate() &&
+      date.getMonth() === today.getMonth() &&
+      date.getFullYear() === today.getFullYear()
+    );
+  };
+
+  const isSelected = (date) => {
+    if (!dueDate) return false;
+    const selected = new Date(dueDate);
+    return (
+      date.getDate() === selected.getDate() &&
+      date.getMonth() === selected.getMonth() &&
+      date.getFullYear() === selected.getFullYear()
+    );
+  };
+
+  const isOverdue = (date) => {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const checkDate = new Date(date);
+    checkDate.setHours(0, 0, 0, 0);
+    return checkDate < today && !isSelected(date) && date.getMonth() === calendarDate.getMonth();
+  };
+
+  const handlePrevMonth = () => {
+    setCalendarDate(new Date(calendarDate.getFullYear(), calendarDate.getMonth() - 1, 1));
+  };
+
+  const handleNextMonth = () => {
+    setCalendarDate(new Date(calendarDate.getFullYear(), calendarDate.getMonth() + 1, 1));
+  };
+
+  const handleDateClick = (date) => {
+    handleDueDateSelect(date);
+  };
 
   return (
     <>
@@ -604,11 +725,55 @@ export default function TaskModal({
 
                 {isDateDropdownOpen && (
                   <div className="tags-dropdown calendar-dropdown">
-                    <Calendar
-                      onChange={handleDueDateSelect}
-                      value={dueDate ? new Date(dueDate) : new Date()}
-                      locale="ru-RU"
-                    />
+                    <div className="custom-calendar">
+                      <div className="calendar-header">
+                        <button 
+                          type="button" 
+                          className="calendar-nav-btn"
+                          onClick={handlePrevMonth}
+                        >
+                          ‹
+                        </button>
+                        <div className="calendar-month-year">
+                          {monthNames[calendarDate.getMonth()]} {calendarDate.getFullYear()}
+                        </div>
+                        <button 
+                          type="button" 
+                          className="calendar-nav-btn"
+                          onClick={handleNextMonth}
+                        >
+                          ›
+                        </button>
+                      </div>
+                      <div className="calendar-weekdays">
+                        {weekDays.map((day) => (
+                          <div key={day} className="calendar-weekday">{day}</div>
+                        ))}
+                      </div>
+                      <div className="calendar-days">
+                        {getDaysInMonth(calendarDate).map((dayObj, idx) => {
+                          const day = dayObj.date;
+                          const dayClasses = [
+                            'calendar-day',
+                            !dayObj.isCurrentMonth && 'calendar-day-other-month',
+                            isToday(day) && 'calendar-day-today',
+                            isSelected(day) && 'calendar-day-selected',
+                            isOverdue(day) && 'calendar-day-overdue',
+                          ].filter(Boolean).join(' ');
+                          
+                          return (
+                            <button
+                              key={idx}
+                              type="button"
+                              className={dayClasses}
+                              onClick={() => handleDateClick(day)}
+                            >
+                              {day.getDate()}
+                            </button>
+                          );
+                        })}
+                      </div>
+                    </div>
                   </div>
                 )}
               </div>
@@ -685,7 +850,10 @@ export default function TaskModal({
                         <span
                           key={label.id}
                           className="tag-item"
-                          style={label.color ? { backgroundColor: label.color, color: "#fff" } : undefined}
+                          style={label.color ? { 
+                            backgroundColor: label.color, 
+                            color: getTextColorForBackground(label.color) 
+                          } : undefined}
                         >
                           {label.name}
                           <button

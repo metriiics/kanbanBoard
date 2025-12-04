@@ -1,6 +1,7 @@
 from sqlalchemy import select, and_
 from fastapi import Depends
 from sqlalchemy.exc import SQLAlchemyError
+import random
 
 from core.security import hash_password
 from core.avatar_generator import generate_avatar
@@ -823,9 +824,25 @@ class OrmQuery:
             return query.order_by(Task.created_at.desc()).all()
 
     @staticmethod
+    def generate_random_color() -> str:
+        """
+        Генерирует случайный цвет для тега в формате HEX.
+        Использует палитру приятных цветов для лучшей читаемости.
+        """
+        tag_colors = [
+            "#4A90E2", "#50E3C2", "#9013FE", "#F5A623",
+            "#D0021B", "#B8E986", "#417505", "#F8E71C",
+            "#7B68EE", "#FF6B6B", "#4ECDC4", "#45B7D1",
+            "#FFA07A", "#98D8C8", "#F7DC6F", "#BB8FCE",
+            "#85C1E2", "#F1948A", "#82E0AA", "#F9E79F"
+        ]
+        return random.choice(tag_colors)
+
+    @staticmethod
     def create_label(workspace_id: int, name: str, color: str | None = None) -> Label | None:
         """
         Создаёт новый тег в рабочем пространстве.
+        Если цвет не передан, генерируется случайный цвет.
         Возвращает объект Label или None, если пространство не найдено.
         """
         with session_factory() as session:
@@ -833,10 +850,13 @@ class OrmQuery:
             if not workspace:
                 return None
             
+            # Генерируем случайный цвет, если не передан
+            label_color = color if color else OrmQuery.generate_random_color()
+            
             new_label = Label(
                 workspace_id=workspace_id,
                 name=name,
-                color=color or "#d1d5db"
+                color=label_color
             )
             session.add(new_label)
             session.commit()
