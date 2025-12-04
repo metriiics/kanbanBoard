@@ -1,5 +1,5 @@
 .workspace-home {
-  padding: 2rem;
+  padding: 1rem 2rem;
   background: #f8f9fb;
   min-height: 100vh;
   color: #1e1e1e;
@@ -13,35 +13,140 @@
 
 .workspace-header p {
   color: #666;
+  margin-bottom: 0.5rem;
+}
+
+.recent-projects {
+  margin-top: 3rem;
   margin-bottom: 2rem;
 }
 
 .recent-projects h2,
 .my-tasks h2 {
   font-size: 1.5rem;
-  margin-bottom: 0.5rem;
+  margin-bottom: 1rem;
   font-weight: 500;
+  color: #1e1e1e;
 }
 
 .projects-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
-  gap: 1rem;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 1.5rem;
 }
 
 .project-card {
   background: white;
-  border-radius: 1rem;
-  padding: 1.2rem;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
-  transition: all 0.2s ease-in-out;
-  text-decoration: none;
+  border-radius: 12px;
+  padding: 0;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
   color: inherit;
+  position: relative;
+  overflow: hidden;
+  border: 1px solid rgba(0, 0, 0, 0.06);
+  display: flex;
+  flex-direction: column;
+  min-height: 140px;
 }
 
-.project-card:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.1);
+/* Градиентная полоса слева */
+.project-card-accent {
+  width: 4px;
+  height: 100%;
+  background: linear-gradient(135deg, #b8a9e0 0%, #d4b5e8 100%);
+  position: absolute;
+  left: 0;
+  top: 0;
+  z-index: 1;
+}
+
+/* Декоративный круг в правом верхнем углу */
+.project-card::after {
+  content: '';
+  position: absolute;
+  top: -60px;
+  right: -60px;
+  width: 140px;
+  height: 140px;
+  background: linear-gradient(135deg, #b8a9e0 0%, #d4b5e8 100%);
+  border-radius: 50%;
+  opacity: 0.06;
+}
+
+/* Декоративный круг в левом нижнем углу */
+.project-card::before {
+  content: '';
+  position: absolute;
+  bottom: -40px;
+  left: -40px;
+  width: 100px;
+  height: 100px;
+  background: linear-gradient(135deg, #b8a9e0 0%, #d4b5e8 100%);
+  border-radius: 50%;
+  opacity: 0.05;
+}
+
+/* Дополнительная декоративная фигура - маленький круг */
+.project-card-content::after {
+  content: '';
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  width: 40px;
+  height: 40px;
+  background: linear-gradient(135deg, #b8a9e0 0%, #d4b5e8 100%);
+  border-radius: 50%;
+  opacity: 0.08;
+  z-index: 0;
+}
+
+/* Дополнительная декоративная фигура - квадрат */
+.project-card-content::before {
+  content: '';
+  position: absolute;
+  bottom: 15px;
+  right: 60px;
+  width: 30px;
+  height: 30px;
+  background: linear-gradient(135deg, #b8a9e0 0%, #d4b5e8 100%);
+  border-radius: 6px;
+  opacity: 0.07;
+  transform: rotate(45deg);
+  z-index: 0;
+}
+
+.project-card-content {
+  padding: 1.5rem;
+  position: relative;
+  z-index: 2;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.project-card h3 {
+  font-size: 1.2rem;
+  font-weight: 600;
+  margin: 0 0 0.5rem 0;
+  color: #172b4d;
+  line-height: 1.4;
+  letter-spacing: -0.01em;
+  position: relative;
+  z-index: 1;
+}
+
+.project-card-description {
+  font-size: 0.9rem;
+  color: #555;
+  margin: 0;
+  line-height: 1.6;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  position: relative;
+  z-index: 1;
 }
 
 /* Обертка для таблицы с прокруткой */

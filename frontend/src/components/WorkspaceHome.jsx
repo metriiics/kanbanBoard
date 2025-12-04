@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
 import { getProjectsByWorkspace } from "../api/a_workspaces";
 import { getUserTasksApi } from "../api/a_tasks";
 import { useAuth } from "../contexts/AuthContext";
@@ -30,7 +29,13 @@ export default function WorkspaceHome() {
         setProjectsLoading(true);
         setProjectsError("");
         const data = await getProjectsByWorkspace(workspace.id);
-        setRecentProjects(data);
+        // Сортируем проекты по дате создания (новые первыми)
+        const sortedProjects = [...data].sort((a, b) => {
+          const dateA = a.created_at ? new Date(a.created_at) : new Date(0);
+          const dateB = b.created_at ? new Date(b.created_at) : new Date(0);
+          return dateB - dateA; // Убывание: новые первыми
+        });
+        setRecentProjects(sortedProjects);
       } catch (error) {
         console.error("Ошибка при загрузке проектов:", error);
         setProjectsError("Не удалось загрузить проекты");
@@ -98,15 +103,19 @@ export default function WorkspaceHome() {
                 {projectsError ? (
                   <p>{projectsError}</p>
                 ) : recentProjects.length > 0 ? (
-                  recentProjects.map((project) => (
-                    <Link
-                      to={`/project/${project.id}/board`}
+                  recentProjects.slice(0, 5).map((project) => (
+                    <div
                       className="project-card"
                       key={project.id}
                     >
-                      <h3>{project.name || project.title}</h3>
-                      <p>{project.description || "Без описания"}</p>
-                    </Link>
+                      <div className="project-card-accent"></div>
+                      <div className="project-card-content">
+                        <h3>{project.name || project.title}</h3>
+                        {project.description && (
+                          <p className="project-card-description">{project.description}</p>
+                        )}
+                      </div>
+                    </div>
                   ))
                 ) : (
                   <p>Нет недавних проектов 😕</p>
