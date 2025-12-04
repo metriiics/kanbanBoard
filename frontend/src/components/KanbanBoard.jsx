@@ -14,6 +14,7 @@ import { normalizeTaskCard } from "../utils/taskMapper";
 import { useTasks } from "../hooks/h_useTasks";
 import { createColumn } from "../api/a_columns";
 import { useUserRole } from "../hooks/h_userRole";
+import PageLoader from "./PageLoader";
 
 // Создаем backend один раз вне компонента, чтобы избежать ошибки "Cannot have two HTML5 backends"
 const html5Backend = HTML5Backend;
@@ -122,7 +123,7 @@ export default function KanbanBoard() {
   const [isAddingColumn, setIsAddingColumn] = useState(false);
   const [newColumnTitle, setNewColumnTitle] = useState("");
 
-  if (loading) return <div className="loading">Загрузка доски...</div>;
+  if (loading) return <PageLoader message="Загружаем доску..." variant="full" />;
   if (error) return <div className="error">Ошибка: {error.message}</div>;
   if (!projectData) return <div className="empty">Нет данных по доске</div>;
 

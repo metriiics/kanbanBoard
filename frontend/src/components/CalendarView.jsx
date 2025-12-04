@@ -9,6 +9,7 @@ import { getWorkspaceLabels } from "../api/a_workspaces";
 import { useWorkspace } from "../hooks/h_workspace";
 import { useUserRole } from "../hooks/h_userRole";
 import TaskModal from "./TaskModal";
+import PageLoader from "./PageLoader";
 
 export default function CalendarView() {
   const { boardId } = useParams();
@@ -342,7 +343,7 @@ export default function CalendarView() {
 
       {/* === СЕТКА === */}
       {loading ? (
-        <div style={{ padding: "20px", textAlign: "center" }}>Загрузка...</div>
+        <PageLoader message="Загружаем календарь..." variant="inline" />
       ) : (
         <div
           className={`calendar-grid ${viewMode === "week" ? "week-view" : ""}`}

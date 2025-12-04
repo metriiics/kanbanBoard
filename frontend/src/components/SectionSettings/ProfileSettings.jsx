@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { useCurrentUser } from '../../hooks/h_useCurrentUser';
 import { updateUser } from '../../api/a_users';
 import { useAuth } from '../../contexts/AuthContext';
+import PageLoader from '../PageLoader';
 
 export default function ProfileSettings() {
   const { checkAuth } = useAuth();
@@ -83,7 +84,7 @@ export default function ProfileSettings() {
     }
   };
 
-  if (loading) return <div className="profile-settings"><p>Загрузка...</p></div>;
+  if (loading) return <div className="profile-settings"><PageLoader message="Загружаем профиль..." variant="inline" /></div>;
   if (error) return <div className="profile-settings"><p>Ошибка 😔</p></div>;
   if (!user) return <div className="profile-settings"><p>Пользователь не найден</p></div>;
 

@@ -315,7 +315,7 @@ const KanbanColumn = ({
           <div className="modal-window" onClick={(e) => e.stopPropagation()}>
             <h3>Выберите цвет</h3>
             {colorsLoading ? (
-              <div>Загрузка цветов...</div>
+              <div style={{ padding: "1rem", textAlign: "center", color: "#6b7280", fontSize: "0.9rem" }}>Загрузка цветов...</div>
             ) : (
               <div className="color-picker-modal">
                 {colors.map((color) => (

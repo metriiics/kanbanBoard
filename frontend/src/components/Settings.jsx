@@ -9,6 +9,7 @@ import NotificationsSettings from './SectionSettings/NotificationsSettings';
 import BillingSettings from './SectionSettings/BillingSettings';
 import BoardsSettings from './SectionSettings/BoardsSettings';
 import SettingsWorkspace from './SectionSettings/SettingsWorkspace';
+import PageLoader from './PageLoader';
 
 export default function Settings() {
   const { user, isAuthenticated, logout, loading } = useAuth();
@@ -55,13 +56,7 @@ export default function Settings() {
   };
 
   if (loading) {
-    return (
-      <div className="settings-page">
-        <div className="settings-wrapper">
-          <p>Загрузка...</p>
-        </div>
-      </div>
-    );
+    return <PageLoader message="Загружаем настройки..." variant="full" />;
   }
 
   if (!user) {
