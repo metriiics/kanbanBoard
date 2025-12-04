@@ -1,14 +1,21 @@
 import React, { useEffect, useState } from "react";
-import { getProjectsByWorkspace } from "../api/a_workspaces";
+import { useParams, useNavigate } from "react-router-dom";
+import { getProjectsByWorkspace, getWorkspaceByUsername } from "../api/a_workspaces";
 import { getUserTasksApi } from "../api/a_tasks";
 import { useAuth } from "../contexts/AuthContext";
 import Sidebar from "./Sidebar"; 
 import { useWorkspace } from "../hooks/h_workspace";
+import { useWorkspaceContext } from "../contexts/WorkspaceContext";
 import WorkspaceLoaderWrapper from "./WorkspaceLoaderWrapper";
+import ErrorPage from "./ErrorPage";
 
 export default function WorkspaceHome() {
+  const { username: urlUsername } = useParams();
   const { user } = useAuth();
-  const { workspace } = useWorkspace();
+  const { workspace: contextWorkspace, workspaceLoading: contextWorkspaceLoading, setActiveWorkspaceId } = useWorkspaceContext();
+  const [workspace, setWorkspace] = useState(null);
+  const [workspaceLoading, setWorkspaceLoading] = useState(true);
+  const [workspaceError, setWorkspaceError] = useState("");
   const [recentProjects, setRecentProjects] = useState([]);
   const [projectsLoading, setProjectsLoading] = useState(true);
   const [projectsError, setProjectsError] = useState("");
@@ -16,11 +23,58 @@ export default function WorkspaceHome() {
   const [tasksLoading, setTasksLoading] = useState(true);
   const [tasksError, setTasksError] = useState("");
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
+  const navigate = useNavigate();
 
+  // Загрузка workspace по username из URL
+  useEffect(() => {
+    if (!urlUsername) return;
+
+    const loadWorkspaceByUsername = async () => {
+      setWorkspaceLoading(true);
+      setWorkspaceError("");
+
+      try {
+        // Если username совпадает с текущим пользователем, используем текущий workspace из контекста
+        if (user?.username === urlUsername) {
+          // Используем состояние загрузки из контекста
+          // WorkspaceLoaderWrapper обработает загрузку через контекст
+          setWorkspaceLoading(false);
+          return;
+        }
+
+        // Иначе загружаем workspace по username
+        const workspaceData = await getWorkspaceByUsername(urlUsername);
+        setWorkspace(workspaceData);
+        setActiveWorkspaceId(workspaceData.id);
+      } catch (err) {
+        const status = err?.response?.status;
+        if (status === 404) {
+          setWorkspaceError("Пользователь не найден или рабочее пространство отсутствует");
+        } else if (status === 403) {
+          setWorkspaceError("Рабочее пространство недоступно");
+        } else {
+          setWorkspaceError(err?.response?.data?.detail || "Не удалось загрузить рабочее пространство");
+        }
+        setWorkspace(null);
+      } finally {
+        setWorkspaceLoading(false);
+      }
+    };
+
+    loadWorkspaceByUsername();
+  }, [urlUsername, user?.username, setActiveWorkspaceId]);
+
+  // Определяем, какой workspace использовать
+  // Если username совпадает с текущим пользователем, используем workspace из контекста
+  const activeWorkspace = user?.username === urlUsername ? contextWorkspace : workspace;
+  
+  // Определяем состояние загрузки workspace
+  const isWorkspaceLoading = user?.username === urlUsername ? contextWorkspaceLoading : workspaceLoading;
+  
   useEffect(() => {
     // Запрос к API для получения проектов
     const fetchProjects = async () => {
-      if (!workspace?.id) {
+      if (!activeWorkspace?.id) {
         setRecentProjects([]);
         setProjectsLoading(false);
         return;
@@ -28,7 +82,7 @@ export default function WorkspaceHome() {
       try {
         setProjectsLoading(true);
         setProjectsError("");
-        const data = await getProjectsByWorkspace(workspace.id);
+        const data = await getProjectsByWorkspace(activeWorkspace.id);
         // Сортируем проекты по дате создания (новые первыми)
         const sortedProjects = [...data].sort((a, b) => {
           const dateA = a.created_at ? new Date(a.created_at) : new Date(0);
@@ -47,7 +101,7 @@ export default function WorkspaceHome() {
 
     // Запрос к API для получения задач пользователя
     const fetchTasks = async () => {
-      if (!workspace?.id) {
+      if (!activeWorkspace?.id) {
         setTasks([]);
         setTasksLoading(false);
         return;
@@ -55,7 +109,7 @@ export default function WorkspaceHome() {
       try {
         setTasksLoading(true);
         setTasksError("");
-        const data = await getUserTasksApi(workspace.id);
+        const data = await getUserTasksApi(activeWorkspace.id);
         setTasks(data);
       } catch (error) {
         console.error("Ошибка при загрузке задач:", error);
@@ -65,10 +119,29 @@ export default function WorkspaceHome() {
     };
 
     fetchTasks();
-  }, [workspace?.id]);
-
+  }, [activeWorkspace?.id]);
+  
   // Определяем, нужно ли показывать общую загрузку
-  const isLoading = projectsLoading || tasksLoading;
+  const isLoading = isWorkspaceLoading || projectsLoading || tasksLoading;
+  
+  // Если workspace не найден или недоступен (и это не текущий пользователь), показываем страницу ошибки
+  if (user?.username !== urlUsername && !isWorkspaceLoading && workspaceError && !workspace) {
+    return (
+      <ErrorPage
+        title="Рабочее пространство недоступно"
+        message={workspaceError}
+        onRetry={() => {
+          // Если это не текущий пользователь, перенаправляем на его workspace
+          if (user?.username) {
+            navigate(`/${user.username}`);
+          } else {
+            navigate("/");
+          }
+        }}
+        retryLabel={user?.username ? `Перейти в моё пространство` : "На главную"}
+      />
+    );
+  }
   
   // Ошибки проектов и задач не критичны - они обрабатываются локально в компоненте
   // Критические ошибки (workspace, projects, user) обрабатываются в WorkspaceLoaderWrapper
@@ -76,6 +149,7 @@ export default function WorkspaceHome() {
   return (
     <WorkspaceLoaderWrapper 
       additionalLoadingStates={[isLoading]}
+      additionalErrors={workspaceError ? [workspaceError] : []}
     >
       <div className="kanban-board-with-sidebar">
         {/* Боковая панель */}
@@ -92,8 +166,18 @@ export default function WorkspaceHome() {
         >
           <div className="workspace-home">
             <header className="workspace-header">
-              <h1>Добро пожаловать, {user?.first_name || user?.username} 👋</h1>
-              <p>Вот ваши недавние проекты и активные задачи.</p>
+              <h1>
+                {activeWorkspace && urlUsername === user?.username 
+                  ? `Добро пожаловать, ${user?.first_name || user?.username} 👋`
+                  : `Рабочее пространство${activeWorkspace?.name ? `: ${activeWorkspace.name}` : ''}`
+                }
+              </h1>
+              <p>
+                {urlUsername === user?.username 
+                  ? "Вот ваши недавние проекты и активные задачи."
+                  : "Недавние проекты и активные задачи этого пространства."
+                }
+              </p>
             </header>
 
             {/* Недавние проекты */}

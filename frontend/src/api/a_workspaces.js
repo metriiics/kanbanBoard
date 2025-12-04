@@ -35,3 +35,9 @@ export const createWorkspaceLabel = async (workspaceId, name, color) => {
   );
   return response.data;
 };
+
+// Получить workspace по username пользователя
+export async function getWorkspaceByUsername(username) {
+  const response = await api.get(`/api/workspace/by-username/${username}`);
+  return response.data;
+}

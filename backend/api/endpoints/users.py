@@ -50,10 +50,25 @@ def get_user_workspace(
     current_user = Depends(get_current_user),
     db: Session = Depends(get_db),
 ):
+    from db.dbstruct import UserWorkspace
+    from sqlalchemy.orm import joinedload
+    
     membership = resolve_membership(db, current_user.id, workspace_id)
     workspace = membership.workspace
     if not workspace:
         raise HTTPException(status_code=404, detail="Рабочее пространство не найдено")
+    
+    # Находим владельца workspace (пользователя с ролью owner)
+    owner_link = (
+        db.query(UserWorkspace)
+        .options(joinedload(UserWorkspace.user))
+        .filter(
+            UserWorkspace.workspace_id == workspace.id,
+            UserWorkspace.role.ilike("owner")
+        )
+        .first()
+    )
+    owner_username = owner_link.user.username if owner_link and owner_link.user else None
     
     # Возвращаем workspace с информацией о роли пользователя
     return WorkspaceWithRoleOut(
@@ -65,6 +80,7 @@ def get_user_workspace(
         can_invite_users=membership.can_invite_users,
         can_create_projects=membership.can_create_projects,
         is_personal=False,  # Можно добавить логику определения личного пространства
+        owner_username=owner_username,
     )
 
 @router.put("/api/users/me")

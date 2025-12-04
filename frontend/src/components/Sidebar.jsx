@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { Link, useLocation, useNavigate, useParams } from 'react-router-dom';
 import { createPortal } from 'react-dom';
 import {
   useProjects,
@@ -46,6 +46,10 @@ export default function Sidebar({ isCollapsed, onToggle }) {
   const { canManageProjects, canManageBoards, isOwner } = useUserRole();
   const location = useLocation();
   const navigate = useNavigate();
+  const { username: urlUsername } = useParams();
+  
+  // Определяем username для ссылок: используем urlUsername или owner_username из workspace
+  const workspaceUsername = urlUsername || workspace?.owner_username || user?.username;
 
   const [isWorkspaceMenuOpen, setIsWorkspaceMenuOpen] = useState(false);
   const workspaceMenuRef = useRef(null);
@@ -105,7 +109,12 @@ export default function Sidebar({ isCollapsed, onToggle }) {
     setActiveWorkspaceId(workspaceId);
     setSelectedProject(null);
     setIsWorkspaceMenuOpen(false);
-    if (user?.username) {
+    // Находим workspace в списке и получаем username владельца
+    const selectedWorkspace = workspaceList.find(ws => ws.id === workspaceId);
+    if (selectedWorkspace?.owner_username) {
+      navigate(`/${selectedWorkspace.owner_username}/`);
+    } else if (user?.username) {
+      // Fallback на текущего пользователя, если не найден owner
       navigate(`/${user.username}/`);
     }
   };
@@ -505,7 +514,7 @@ export default function Sidebar({ isCollapsed, onToggle }) {
                   {projectForBoards.boards?.map((board) => (
                     <div key={board.id} className="board-item">
                       <Link
-                        to={user?.username ? `/${user.username}/project/${projectForBoards.id}/board/${board.id}` : '#'}
+                        to={workspaceUsername ? `/${workspaceUsername}/project/${projectForBoards.id}/board/${board.id}` : '#'}
                         className={`board-link-wrapper ${isBoardActive(board.id) ? 'active' : ''}`}
                       >
                         <span className="board-icon"></span>

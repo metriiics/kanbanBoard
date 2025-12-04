@@ -4,6 +4,7 @@ export default function ErrorPage({
   title = 'Ошибка загрузки данных',
   message = 'Не удалось загрузить необходимые данные. Пожалуйста, попробуйте обновить страницу.',
   onRetry = null,
+  retryLabel = 'Обновить страницу',
   errorDetails = null
 }) {
   const handleRetry = () => {
@@ -37,7 +38,7 @@ export default function ErrorPage({
 
         <div className="error-actions">
           <button className="error-retry-btn" onClick={handleRetry}>
-            <span>Обновить страницу</span>
+            <span>{retryLabel}</span>
           </button>
         </div>
       </div>

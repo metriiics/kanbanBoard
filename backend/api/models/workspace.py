@@ -17,4 +17,5 @@ class WorkspaceWithRoleOut(WorkspaceOut):
     can_invite_users: bool = Field(default=False)
     can_create_projects: bool = Field(default=False)
     is_personal: bool = Field(default=False, description="Является ли это личное пространство пользователя")
+    owner_username: Optional[str] = Field(None, description="Username владельца workspace")
 
