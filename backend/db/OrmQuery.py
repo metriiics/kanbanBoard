@@ -1,4 +1,4 @@
-from sqlalchemy import select, and_
+from sqlalchemy import select, and_, or_
 from fastapi import Depends
 from sqlalchemy.exc import SQLAlchemyError
 import random
@@ -929,23 +929,25 @@ class OrmQuery:
     @staticmethod
     def get_user_tasks(user_id: int, workspace_id: Optional[int] = None):
         """
-        Возвращает задачи, назначенные пользователю (assigned_to = user_id).
+        Возвращает задачи, назначенные пользователю.
+        Учитывает как старое поле assigned_to, так и новую таблицу TaskAssignee.
         Если передан workspace_id, возвращает только задачи из проектов этого workspace.
         Загружает связанные данные: column, board, project, workspace, author.
         """
         with session_factory() as session:
             # Базовый запрос с подгрузкой всех связей
+            # Ищем задачи, назначенные через старое поле assigned_to ИЛИ через TaskAssignee
             query = (
                 session.query(Task)
                 .options(
                     joinedload(Task.column).joinedload(Column.board).joinedload(Board.project).joinedload(Project.workspace),
                     joinedload(Task.column).joinedload(Column.color),  # загружаем цвет колонки
-                    joinedload(Task.author)
+                    joinedload(Task.author),
+                    joinedload(Task.assignee_links).joinedload(TaskAssignee.user)  # загружаем множественных исполнителей
                 )
-                .filter(Task.assigned_to == user_id)
             )
             
-            # Если указан workspace_id, фильтруем по нему через join
+            # Если указан workspace_id, сначала фильтруем по нему через join
             if workspace_id is not None:
                 query = (
                     query.join(Column, Task.column_id == Column.id)
@@ -953,6 +955,18 @@ class OrmQuery:
                     .join(Project, Board.projects_id == Project.id)
                     .filter(Project.workspaces_id == workspace_id)
                 )
+            
+            # Затем добавляем outerjoin с TaskAssignee и фильтруем по пользователю
+            query = (
+                query.outerjoin(TaskAssignee, Task.id == TaskAssignee.task_id)
+                .filter(
+                    or_(
+                        Task.assigned_to == user_id,  # старое поле
+                        TaskAssignee.user_id == user_id  # новая таблица множественных исполнителей
+                    )
+                )
+                .distinct()  # избегаем дубликатов, если задача назначена и через старое поле, и через TaskAssignee
+            )
             
             return query.order_by(Task.created_at.desc()).all()
 

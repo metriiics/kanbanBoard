@@ -241,3 +241,89 @@
 .status-badge:hover {
   opacity: 0.9;
 }
+
+/* ===== ПУСТЫЕ СОСТОЯНИЯ ===== */
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem 1.5rem;
+  text-align: center;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+  border: 1px solid rgba(0, 0, 0, 0.06);
+  min-height: 180px;
+  position: relative;
+  overflow: hidden;
+}
+
+.empty-state::before {
+  content: '';
+  position: absolute;
+  top: -60px;
+  right: -60px;
+  width: 150px;
+  height: 150px;
+  background: linear-gradient(135deg, #b8a9e0 0%, #d4b5e8 100%);
+  border-radius: 50%;
+  opacity: 0.05;
+  z-index: 0;
+}
+
+.empty-state::after {
+  content: '';
+  position: absolute;
+  bottom: -50px;
+  left: -50px;
+  width: 120px;
+  height: 120px;
+  background: linear-gradient(135deg, #b8a9e0 0%, #d4b5e8 100%);
+  border-radius: 50%;
+  opacity: 0.04;
+  z-index: 0;
+}
+
+.empty-state-icon {
+  margin-bottom: 1rem;
+  opacity: 0.5;
+  position: relative;
+  z-index: 1;
+  color: #764ba2;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.empty-state-icon svg {
+  width: 48px;
+  height: 48px;
+}
+
+.empty-state-title {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #172b4d;
+  margin: 0 0 0.5rem 0;
+  position: relative;
+  z-index: 1;
+}
+
+.empty-state-description {
+  font-size: 0.9rem;
+  color: #6b7280;
+  margin: 0;
+  max-width: 350px;
+  line-height: 1.5;
+  position: relative;
+  z-index: 1;
+}
+
+.empty-projects {
+  grid-column: 1 / -1;
+}
+
+.empty-tasks {
+  margin-top: 1rem;
+}

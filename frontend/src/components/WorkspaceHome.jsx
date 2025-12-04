@@ -202,7 +202,17 @@ export default function WorkspaceHome() {
                     </div>
                   ))
                 ) : (
-                  <p>Нет недавних проектов 😕</p>
+                  <div className="empty-state empty-projects">
+                    <div className="empty-state-icon">
+                      <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path>
+                      </svg>
+                    </div>
+                    <h3 className="empty-state-title">Нет недавних проектов</h3>
+                    <p className="empty-state-description">
+                      Проекты, над которыми вы недавно работали, появятся здесь
+                    </p>
+                  </div>
                 )}
               </div>
             </section>
@@ -213,7 +223,18 @@ export default function WorkspaceHome() {
               {tasksError ? (
                 <p>{tasksError}</p>
               ) : tasks.length === 0 ? (
-                <p>Нет назначенных задач 😕</p>
+                <div className="empty-state empty-tasks">
+                  <div className="empty-state-icon">
+                    <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M9 11l3 3L22 4"></path>
+                      <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path>
+                    </svg>
+                  </div>
+                  <h3 className="empty-state-title">Нет назначенных задач</h3>
+                  <p className="empty-state-description">
+                    Задачи, назначенные вам, будут отображаться здесь
+                  </p>
+                </div>
               ) : (
               <table className="tasks-table">
                 <thead>

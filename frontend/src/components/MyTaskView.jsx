@@ -1,19 +1,23 @@
 import React, { useEffect, useState } from "react";
 import { getUserTasksApi } from "../api/a_tasks";
+import { useWorkspaceContext } from "../contexts/WorkspaceContext";
 
 export default function MyTaskView() {
+  const { workspace, activeWorkspaceId } = useWorkspaceContext();
+  const workspaceId = workspace?.id ?? activeWorkspaceId ?? null;
+  
   const [tasks, setTasks] = useState([]);
   const [tasksLoading, setTasksLoading] = useState(true);
   const [tasksError, setTasksError] = useState("");
 
   useEffect(() => {
-    // Запрос к API для получения всех задач пользователя
+    // Запрос к API для получения задач пользователя из активного рабочего пространства
     const fetchTasks = async () => {
       try {
         setTasksLoading(true);
         setTasksError("");
-        // Без workspace_id - получаем все задачи пользователя
-        const data = await getUserTasksApi(null);
+        // Передаем workspace_id для фильтрации задач по активному рабочему пространству
+        const data = await getUserTasksApi(workspaceId);
         setTasks(data);
       } catch (error) {
         console.error("Ошибка при загрузке задач:", error);
@@ -23,7 +27,7 @@ export default function MyTaskView() {
     };
 
     fetchTasks();
-  }, []);
+  }, [workspaceId]);
 
   const formatDate = (dateStr) => {
     if (!dateStr) return "-";
@@ -137,8 +141,19 @@ export default function MyTaskView() {
                 })
               ) : (
                 <tr>
-                  <td colSpan="7" style={{ textAlign: "center" }}>
-                    Нет назначенных задач 😕
+                  <td colSpan="7" style={{ padding: 0, border: "none" }}>
+                    <div className="empty-tasks-table">
+                      <div className="empty-state-icon">
+                        <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                          <path d="M9 11l3 3L22 4"></path>
+                          <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path>
+                        </svg>
+                      </div>
+                      <h3 className="empty-state-title">Нет назначенных задач</h3>
+                      <p className="empty-state-description">
+                        Задачи, назначенные вам, будут отображаться здесь
+                      </p>
+                    </div>
                   </td>
                 </tr>
               )}
