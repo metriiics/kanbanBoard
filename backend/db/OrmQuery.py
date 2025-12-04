@@ -797,14 +797,16 @@ class OrmQuery:
         """
         Возвращает задачи, назначенные пользователю (assigned_to = user_id).
         Если передан workspace_id, возвращает только задачи из проектов этого workspace.
-        Загружает связанные данные: column, board, project, workspace.
+        Загружает связанные данные: column, board, project, workspace, author.
         """
         with session_factory() as session:
             # Базовый запрос с подгрузкой всех связей
             query = (
                 session.query(Task)
                 .options(
-                    joinedload(Task.column).joinedload(Column.board).joinedload(Board.project).joinedload(Project.workspace)
+                    joinedload(Task.column).joinedload(Column.board).joinedload(Board.project).joinedload(Project.workspace),
+                    joinedload(Task.column).joinedload(Column.color),  # загружаем цвет колонки
+                    joinedload(Task.author)
                 )
                 .filter(Task.assigned_to == user_id)
             )

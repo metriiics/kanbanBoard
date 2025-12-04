@@ -112,11 +112,13 @@ class UserTaskOut(BaseModel):
     """Модель для отображения задач пользователя в таблице"""
     id: int
     title: Optional[str] = None
+    priority: Optional[str] = None
     status: Optional[str] = None  # Название колонки
+    status_color: Optional[str] = None  # Цвет колонки (hex_code)
     created_at: Optional[datetime] = None
     due_date: Optional[datetime] = None
     project_title: Optional[str] = None
-    workspace_name: Optional[str] = None
+    author: Optional[AssigneeOut] = None
 
 class CalendarTaskOut(BaseModel):
     """Модель для задач в календаре"""

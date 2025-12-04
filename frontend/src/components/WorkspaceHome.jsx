@@ -119,35 +119,93 @@ export default function WorkspaceHome() {
               <h2>Мои задачи</h2>
               {tasksError ? (
                 <p>{tasksError}</p>
+              ) : tasks.length === 0 ? (
+                <p>Нет назначенных задач 😕</p>
               ) : (
               <table className="tasks-table">
                 <thead>
                   <tr>
                     <th>Задача</th>
+                    <th>Приоритет</th>
                     <th>Статус</th>
                     <th>Создано</th>
                     <th>Дедлайн</th>
                     <th>Проект</th>
-                    <th>Пространство</th>
+                    <th>Автор</th>
                   </tr>
                 </thead>
                 <tbody>
                   {tasks.length > 0 ? (
-                    tasks.map((task) => {
+                    tasks.slice(0, 7).map((task) => {
                       const formatDate = (dateStr) => {
                         if (!dateStr) return "-";
                         const date = new Date(dateStr);
                         return date.toLocaleDateString("ru-RU");
                       };
                       
+                      const getAuthorName = () => {
+                        if (!task.author) return "-";
+                        if (task.author.first_name || task.author.last_name) {
+                          return `${task.author.first_name || ""} ${task.author.last_name || ""}`.trim() || task.author.username || "-";
+                        }
+                        return task.author.username || "-";
+                      };
+
+                      const getPriorityColor = (priority) => {
+                        switch (priority) {
+                          case 'high': return '#ff4d4f';
+                          case 'medium': return '#ffa940';
+                          case 'low': return '#52c41a';
+                          default: return 'transparent';
+                        }
+                      };
+
+                      const getPriorityLabel = (priority) => {
+                        switch (priority) {
+                          case 'high': return 'Высокий';
+                          case 'medium': return 'Средний';
+                          case 'low': return 'Низкий';
+                          default: return '-';
+                        }
+                      };
+
+                      // Функция для определения контрастного цвета текста (черный или белый)
+                      const getContrastColor = (hexColor) => {
+                        if (!hexColor) return '#333';
+                        // Убираем # если есть
+                        const color = hexColor.replace('#', '');
+                        // Конвертируем в RGB
+                        const r = parseInt(color.substr(0, 2), 16);
+                        const g = parseInt(color.substr(2, 2), 16);
+                        const b = parseInt(color.substr(4, 2), 16);
+                        // Вычисляем яркость
+                        const brightness = (r * 299 + g * 587 + b * 114) / 1000;
+                        // Возвращаем черный или белый в зависимости от яркости
+                        return brightness > 155 ? '#333' : '#fff';
+                      };
+                      
                       return (
                         <tr key={task.id}>
                           <td>{task.title || "Без названия"}</td>
                           <td>
+                            {task.priority ? (
+                              <span
+                                className="priority-badge"
+                                style={{ backgroundColor: getPriorityColor(task.priority) }}
+                              >
+                                {getPriorityLabel(task.priority)}
+                              </span>
+                            ) : (
+                              "-"
+                            )}
+                          </td>
+                          <td>
                             <span
-                              className={`status-badge ${(task.status || "")
-                                .toLowerCase()
-                                .replace(/\s/g, "-")}`}
+                              className="status-badge"
+                              style={{
+                                backgroundColor: task.status_color || '#f3f3f3',
+                                color: getContrastColor(task.status_color || '#f3f3f3')
+                              }}
                             >
                               {task.status || "-"}
                             </span>
@@ -155,13 +213,13 @@ export default function WorkspaceHome() {
                           <td>{formatDate(task.created_at)}</td>
                           <td>{formatDate(task.due_date)}</td>
                           <td>{task.project_title || "-"}</td>
-                          <td>{task.workspace_name || "-"}</td>
+                          <td>{getAuthorName()}</td>
                         </tr>
                       );
                     })
                   ) : (
                     <tr>
-                      <td colSpan="6" style={{ textAlign: "center" }}>
+                      <td colSpan="7" style={{ textAlign: "center" }}>
                         Нет назначенных задач 😕
                       </td>
                     </tr>

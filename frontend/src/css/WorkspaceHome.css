@@ -19,7 +19,7 @@
 .recent-projects h2,
 .my-tasks h2 {
   font-size: 1.5rem;
-  margin-bottom: 1rem;
+  margin-bottom: 0.5rem;
   font-weight: 500;
 }
 
@@ -44,13 +44,20 @@
   box-shadow: 0 6px 18px rgba(0, 0, 0, 0.1);
 }
 
+/* Обертка для таблицы с прокруткой */
+.my-tasks {
+  overflow-x: auto; /* горизонтальный скролл при необходимости */
+  margin-top: 0.5rem;
+}
+
 .tasks-table {
   width: 100%;
+  min-width: 800px; /* минимальная ширина для читаемости */
   border-collapse: collapse;
-  margin-top: 1rem;
   background: white;
   border-radius: 1rem;
   overflow: hidden;
+  table-layout: fixed; /* фиксированная ширина колонок */
 }
 
 .tasks-table th,
@@ -58,11 +65,63 @@
   padding: 0.9rem 1.2rem;
   border-bottom: 1px solid #eee;
   text-align: left;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  word-wrap: break-word;
 }
 
 .tasks-table th {
   background: #f3f4f6;
   font-weight: 500;
+  white-space: nowrap;
+}
+
+/* Ширины колонок */
+.tasks-table th:nth-child(1),
+.tasks-table td:nth-child(1) {
+  width: 20%; /* Задача */
+}
+
+.tasks-table th:nth-child(2),
+.tasks-table td:nth-child(2) {
+  width: 12%; /* Приоритет */
+}
+
+.tasks-table th:nth-child(3),
+.tasks-table td:nth-child(3) {
+  width: 13%; /* Статус */
+}
+
+.tasks-table th:nth-child(4),
+.tasks-table td:nth-child(4) {
+  width: 12%; /* Создано */
+}
+
+.tasks-table th:nth-child(5),
+.tasks-table td:nth-child(5) {
+  width: 12%; /* Дедлайн */
+}
+
+.tasks-table th:nth-child(6),
+.tasks-table td:nth-child(6) {
+  width: 16%; /* Проект */
+}
+
+.tasks-table th:nth-child(7),
+.tasks-table td:nth-child(7) {
+  width: 15%; /* Автор */
+}
+
+/* Индикатор приоритета */
+.priority-badge {
+  display: inline-block;
+  padding: 4px 10px;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 500;
+  color: white;
+  text-align: center;
+  white-space: nowrap;
 }
 
 .status-badge {
@@ -71,19 +130,9 @@
   border-radius: 0.5rem;
   font-size: 0.85rem;
   font-weight: 500;
+  transition: opacity 0.2s ease;
 }
 
-.status-badge.готово {
-  background: #e7f9ee;
-  color: #3a9a5f;
-}
-
-.status-badge.в {
-  background: #fff6e0;
-  color: #d29400;
-}
-
-.status-badge.на {
-  background: #eaf2ff;
-  color: #3a73d9;
+.status-badge:hover {
+  opacity: 0.9;
 }

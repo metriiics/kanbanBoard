@@ -432,8 +432,14 @@ def get_user_tasks(
         column = getattr(task, "column", None)
         status = getattr(column, "title", None) if column else None
         
+        # Получаем цвет колонки
+        status_color = None
+        if column:
+            color = getattr(column, "color", None)
+            if color:
+                status_color = getattr(color, "hex_code", None)
+        
         project_title = None
-        workspace_name = None
         
         if column:
             board = getattr(column, "board", None)
@@ -441,18 +447,28 @@ def get_user_tasks(
                 project = getattr(board, "project", None)
                 if project:
                     project_title = getattr(project, "title", None)
-                    workspace = getattr(project, "workspace", None)
-                    if workspace:
-                        workspace_name = getattr(workspace, "name", None)
+        
+        author = None
+        auth = getattr(task, "author", None)
+        if auth:
+            author = {
+                "id": auth.id,
+                "first_name": getattr(auth, "first_name", None),
+                "last_name": getattr(auth, "last_name", None),
+                "username": getattr(auth, "username", None),
+                "email": getattr(auth, "email", None),
+            }
         
         result.append({
             "id": task.id,
             "title": getattr(task, "title", None),
+            "priority": getattr(task, "priority", None),
             "status": status,
+            "status_color": status_color,
             "created_at": getattr(task, "created_at", None),
             "due_date": getattr(task, "due_date", None),
             "project_title": project_title,
-            "workspace_name": workspace_name
+            "author": author
         })
     
     return result

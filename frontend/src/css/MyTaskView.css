@@ -1,11 +1,12 @@
 /* ===== ОСНОВНОЙ КОНТЕЙНЕР ===== */
 .kanban-MyTask-board {
-  width: 100vw;
-  height: 100vh;
+  width: 100%;
+  height: 100%;
   background: #fff;
   display: flex;
   flex-direction: column;
   overflow: hidden;
+  flex: 1;
 }
 
 /* ===== СЕКЦИЯ С ТАБЛИЦЕЙ ===== */
@@ -13,18 +14,24 @@
   flex: 1;
   display: flex;
   flex-direction: column;
-  overflow-y: auto; /* чтобы можно было скроллить при большом количестве строк */
-  padding: 0;
+  overflow-x: auto; /* горизонтальный скролл при необходимости */
+  overflow-y: auto; /* вертикальный скролл при большом количестве строк */
+  padding: 20px;
   margin: 0;
+  position: relative;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 /* ===== ТАБЛИЦА ===== */
 .tasks-table-board {
   width: 100%;
-  border-collapse: collapse;
-  table-layout: auto; /* <-- естественная ширина по содержимому */
+  min-width: 1000px; /* минимальная ширина для читаемости с учетом padding */
+  border-collapse: collapse; /* объединенные границы */
+  table-layout: fixed; /* фиксированная ширина колонок */
   font-size: 14px;
   color: #444;
+  display: table; /* явно указываем тип отображения */
 }
 
 /* Заголовки таблицы */
@@ -36,21 +43,97 @@
 }
 
 .tasks-table-board th {
-  padding: 10px 12px;
+  padding: 14px 18px; /* одинаковый padding для всех заголовков */
   text-align: left;
   font-weight: 600;
   color: #555;
   border-bottom: 2px solid #e0e0e0;
+  border-right: 1px solid #e0e0e0; /* разделитель между колонками в заголовке */
   background: #f6f6f8;
   white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 /* Ячейки */
 .tasks-table-board td {
-  padding: 10px 12px;
+  padding: 14px 18px; /* одинаковый padding для всех ячеек */
   border-bottom: 1px solid #eee;
+  border-right: 1px solid #f0f0f0; /* разделитель между колонками */
   background: #fff;
   vertical-align: middle;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  word-wrap: break-word;
+}
+
+/* Убираем правую границу у последней колонки */
+.tasks-table-board td:last-child,
+.tasks-table-board th:last-child {
+  border-right: none;
+}
+
+/* Ячейка автора - особый стиль */
+.tasks-table-board td:nth-child(7) {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Индикатор приоритета */
+.priority-badge-board {
+  display: inline-block;
+  padding: 4px 10px;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 500;
+  color: white;
+  text-align: center;
+  white-space: nowrap;
+}
+
+/* Ширины колонок - равномерное распределение */
+.tasks-table-board th:nth-child(1),
+.tasks-table-board td:nth-child(1) {
+  width: 20%; /* Задача */
+  min-width: 160px;
+}
+
+.tasks-table-board th:nth-child(2),
+.tasks-table-board td:nth-child(2) {
+  width: 12%; /* Приоритет */
+  min-width: 100px;
+}
+
+.tasks-table-board th:nth-child(3),
+.tasks-table-board td:nth-child(3) {
+  width: 13%; /* Статус */
+  min-width: 110px;
+}
+
+.tasks-table-board th:nth-child(4),
+.tasks-table-board td:nth-child(4) {
+  width: 12%; /* Создано */
+  min-width: 100px;
+}
+
+.tasks-table-board th:nth-child(5),
+.tasks-table-board td:nth-child(5) {
+  width: 12%; /* Дедлайн */
+  min-width: 100px;
+}
+
+.tasks-table-board th:nth-child(6),
+.tasks-table-board td:nth-child(6) {
+  width: 16%; /* Проект */
+  min-width: 130px;
+}
+
+.tasks-table-board th:nth-child(7),
+.tasks-table-board td:nth-child(7) {
+  width: 15%; /* Автор */
+  min-width: 120px;
+  white-space: nowrap; /* не переносим текст в колонке автора */
 }
 
 /* Наведение */
@@ -65,25 +148,9 @@
   border-radius: 8px;
   font-weight: 500;
   font-size: 13px;
+  transition: opacity 0.2s ease;
 }
 
-/* Цвета статусов */
-.status-badge-board.в-процессе {
-  background: #fef3c7;
-  color: #92400e;
-}
-
-.status-badge-board.на-проверке {
-  background: #e0f2fe;
-  color: #0369a1;
-}
-
-.status-badge-board.готово {
-  background: #dcfce7;
-  color: #166534;
-}
-
-.status-badge-board.ожидает {
-  background: #f3e8ff;
-  color: #6b21a8;
+.status-badge-board:hover {
+  opacity: 0.9;
 }
