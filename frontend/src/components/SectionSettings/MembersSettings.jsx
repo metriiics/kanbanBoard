@@ -31,6 +31,10 @@ export default function MembersSettings() {
   const [projectsPortalRef, setProjectsPortalRef] = useState(null);
   const [projectsPortalSelected, setProjectsPortalSelected] = useState([]);
   const projectsPortalContainerRef = useRef(null);
+  
+  // Состояния для модального окна исключения участника
+  const [removeModalOpen, setRemoveModalOpen] = useState(false);
+  const [memberToRemove, setMemberToRemove] = useState(null);
 
   useEffect(() => {
     let isMounted = true;
@@ -202,20 +206,29 @@ export default function MembersSettings() {
       .toUpperCase();
   };
 
-  const handleRemoveMember = async (member) => {
-    if (!workspace?.id) return;
-    if (!window.confirm(`Исключить пользователя ${getDisplayName(member)}?`)) {
-      return;
-    }
+  const handleOpenRemoveModal = (member) => {
+    setMemberToRemove(member);
+    setRemoveModalOpen(true);
+  };
+
+  const handleCloseRemoveModal = () => {
+    setRemoveModalOpen(false);
+    setMemberToRemove(null);
+  };
+
+  const handleRemoveMember = async () => {
+    if (!workspace?.id || !memberToRemove) return;
+    
     try {
-      setMemberAction({ state: 'loading', message: '', targetId: member.user_id });
-      await removeWorkspaceMember({ workspaceId: workspace.id, userId: member.user_id });
-      setMembers((prev) => prev.filter((item) => item.user_id !== member.user_id));
+      setMemberAction({ state: 'loading', message: '', targetId: memberToRemove.user_id });
+      await removeWorkspaceMember({ workspaceId: workspace.id, userId: memberToRemove.user_id });
+      setMembers((prev) => prev.filter((item) => item.user_id !== memberToRemove.user_id));
       setMemberAction({
         state: 'success',
-        message: `Пользователь ${getDisplayName(member)} исключён`,
+        message: `Пользователь ${getDisplayName(memberToRemove)} исключён`,
         targetId: null,
       });
+      handleCloseRemoveModal();
     } catch (err) {
       setMemberAction({
         state: 'error',
@@ -507,7 +520,28 @@ export default function MembersSettings() {
                 if (el) memberRowRefs.current[member.user_id] = el;
               }}>
                 <div className="member-info-row">
-                  <div className="member-avatar">{getInitials(member)}</div>
+                  <div className="member-avatar">
+                    {member.avatar_url ? (
+                      <img
+                        src={member.avatar_url}
+                        alt={`${getDisplayName(member)} avatar`}
+                        className="member-avatar-image"
+                        onError={(e) => {
+                          e.target.style.display = 'none';
+                          const initialsEl = e.target.parentElement.querySelector('.member-avatar-initials');
+                          if (initialsEl) {
+                            initialsEl.style.display = 'flex';
+                          }
+                        }}
+                      />
+                    ) : null}
+                    <span 
+                      className="member-avatar-initials" 
+                      style={{ display: member.avatar_url ? 'none' : 'flex' }}
+                    >
+                      {getInitials(member)}
+                    </span>
+                  </div>
                   <div className="member-text">
                     <div className="member-name-row">
                       <span className="member-name">{getDisplayName(member)}</span>
@@ -584,7 +618,7 @@ export default function MembersSettings() {
                       )}
                       <button
                         className="remove-button"
-                        onClick={() => handleRemoveMember(member)}
+                        onClick={() => handleOpenRemoveModal(member)}
                         disabled={removeDisabled}
                         title={
                           member.user_id === user?.id
@@ -592,10 +626,7 @@ export default function MembersSettings() {
                             : undefined
                         }
                       >
-                        {memberAction.state === 'loading' &&
-                        memberAction.targetId === member.user_id
-                          ? 'Удаляем...'
-                          : 'Исключить'}
+                        Исключить
                       </button>
                     </>
                   )}
@@ -619,6 +650,63 @@ export default function MembersSettings() {
         </div>
       )}
 
+      {/* Модальное окно для исключения участника */}
+      {removeModalOpen && memberToRemove && createPortal(
+        <div
+          className="remove-member-modal-overlay"
+          onClick={handleCloseRemoveModal}
+        >
+          <div
+            className="remove-member-modal"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="remove-member-modal-header">
+              <h3 className="remove-member-modal-title">Исключить участника</h3>
+              <button
+                className="remove-member-modal-close"
+                onClick={handleCloseRemoveModal}
+              >
+                ×
+              </button>
+            </div>
+            
+            <div className="remove-member-modal-content">
+              <p className="remove-member-modal-text">
+                Вы уверены, что хотите исключить <strong>{getDisplayName(memberToRemove)}</strong> из рабочего пространства?
+              </p>
+              {memberToRemove.email && (
+                <p className="remove-member-modal-email">
+                  {memberToRemove.email}
+                </p>
+              )}
+              <p className="remove-member-modal-warning">
+                Это действие нельзя отменить. Участник потеряет доступ ко всем проектам и доскам этого рабочего пространства.
+              </p>
+            </div>
+            
+            <div className="remove-member-modal-footer">
+              <button
+                className="remove-member-modal-cancel"
+                onClick={handleCloseRemoveModal}
+                disabled={memberAction.state === 'loading' && memberAction.targetId === memberToRemove.user_id}
+              >
+                Отмена
+              </button>
+              <button
+                className="remove-member-modal-confirm"
+                onClick={handleRemoveMember}
+                disabled={memberAction.state === 'loading' && memberAction.targetId === memberToRemove.user_id}
+              >
+                {memberAction.state === 'loading' && memberAction.targetId === memberToRemove.user_id
+                  ? 'Исключаем...'
+                  : 'Исключить'}
+              </button>
+            </div>
+          </div>
+        </div>,
+        document.body
+      )}
+
       {/* Portal для выбора проектов */}
       {projectsPortalOpen && projectsPortalMember && projectsPortalRef && createPortal(
         <div
@@ -637,32 +725,78 @@ export default function MembersSettings() {
               const rect = projectsPortalRef.getBoundingClientRect();
               const viewportHeight = window.innerHeight;
               const viewportWidth = window.innerWidth;
-              const portalHeight = Math.min(400, projects.length * 40 + 100);
+              
+              // Вычисляем реальную высоту portal (с учетом контента)
+              const estimatedPortalHeight = Math.min(400, Math.max(200, projects.length * 40 + 140));
+              const portalWidth = 320;
+              const padding = 8; // минимальный отступ от краев
+              
+              let top, left;
+              
+              // === Позиционирование по вертикали ===
               const spaceBelow = viewportHeight - rect.bottom;
               const spaceAbove = rect.top;
               
-              let top, left;
-              // Позиционирование по вертикали
-              if (spaceBelow < portalHeight && spaceAbove > portalHeight) {
-                top = `${rect.top - portalHeight - 8}px`;
+              if (spaceBelow >= estimatedPortalHeight + padding) {
+                // Помещается снизу
+                top = `${rect.bottom + padding}px`;
+              } else if (spaceAbove >= estimatedPortalHeight + padding) {
+                // Помещается сверху
+                top = `${rect.top - estimatedPortalHeight - padding}px`;
               } else {
-                top = `${rect.bottom + 8}px`;
+                // Не помещается ни сверху, ни снизу - выбираем сторону с большим пространством
+                if (spaceBelow > spaceAbove) {
+                  // Больше места снизу - прижимаем к низу экрана, но не меньше padding
+                  const calculatedTop = viewportHeight - estimatedPortalHeight - padding;
+                  top = `${Math.max(padding, calculatedTop)}px`;
+                } else {
+                  // Больше места сверху - прижимаем к верху экрана
+                  top = `${padding}px`;
+                }
               }
               
-              // Позиционирование по горизонтали
-              const portalWidth = 320;
-              if (rect.left + portalWidth > viewportWidth) {
-                left = `${Math.max(8, viewportWidth - portalWidth - 8)}px`;
+              // Дополнительная проверка: если portal все еще выходит за верхнюю границу
+              const topValue = parseFloat(top);
+              if (topValue < padding) {
+                top = `${padding}px`;
+              }
+              
+              // === Позиционирование по горизонтали ===
+              if (rect.left + portalWidth + padding > viewportWidth) {
+                // Не помещается справа - сдвигаем влево
+                if (rect.right - portalWidth - padding < padding) {
+                  // Не помещается даже если прижать к левому краю кнопки - прижимаем к левому краю экрана
+                  left = `${padding}px`;
+                } else {
+                  // Выравниваем по правому краю кнопки
+                  left = `${rect.right - portalWidth}px`;
+                }
+              } else if (rect.left - padding < 0) {
+                // Кнопка слишком близко к левому краю - прижимаем portal к левому краю
+                left = `${padding}px`;
               } else {
+                // Помещается - выравниваем по левому краю кнопки
                 left = `${rect.left}px`;
               }
+              
+              // Дополнительная проверка: если portal все еще выходит за границы
+              const leftValue = parseFloat(left);
+              if (leftValue < padding) {
+                left = `${padding}px`;
+              } else if (leftValue + portalWidth > viewportWidth - padding) {
+                left = `${viewportWidth - portalWidth - padding}px`;
+              }
+              
+              // Ограничиваем максимальную высоту, чтобы не выходило за границы
+              const maxAvailableHeight = viewportHeight - padding * 2;
+              const finalMaxHeight = Math.min(400, maxAvailableHeight);
               
               return {
                 position: 'fixed',
                 top,
                 left,
                 width: `${portalWidth}px`,
-                maxHeight: '400px',
+                maxHeight: `${finalMaxHeight}px`,
               };
             })()}
             onClick={(e) => e.stopPropagation()}
