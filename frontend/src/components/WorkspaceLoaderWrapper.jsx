@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useWorkspace, useProjects } from '../hooks/h_workspace';
 import { useCurrentUser } from '../hooks/h_useCurrentUser';
+import { useAuth } from '../contexts/AuthContext';
 import PageLoader from './PageLoader';
 import ErrorPage from './ErrorPage';
 
@@ -13,6 +14,7 @@ const ERROR_CHECK_DELAY = 500; // Задержка перед проверкой
  * пока не загрузятся все необходимые данные, или страницу ошибки при ошибках
  */
 export default function WorkspaceLoaderWrapper({ children, additionalLoadingStates = [], additionalErrors = [] }) {
+  const { loading: authLoading } = useAuth();
   const { workspaceLoading, workspaceListLoading, workspaceError, workspaceListError } = useWorkspace();
   const { loading: projectsLoading, error: projectsError } = useProjects();
   const { loading: userLoading, error: userError } = useCurrentUser();
@@ -23,8 +25,9 @@ export default function WorkspaceLoaderWrapper({ children, additionalLoadingStat
   const minLoadingTimerRef = useRef(null);
   const errorCheckTimerRef = useRef(null);
 
-  // Проверяем все состояния загрузки
+  // Проверяем все состояния загрузки (включая аутентификацию)
   const isLoading = 
+    authLoading ||
     workspaceLoading || 
     workspaceListLoading || 
     projectsLoading ||

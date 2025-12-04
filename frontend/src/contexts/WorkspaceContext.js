@@ -1,9 +1,12 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from "react";
 import { getCurrentWorkspace, getUserWorkspaces } from "../api/a_workspaces";
+import { useAuth } from "./AuthContext";
 
 export const WorkspaceContext = createContext(null);
 
 export default function WorkspaceProvider({ children }) {
+  const { loading: authLoading, isAuthenticated } = useAuth();
+  
   const [workspace, setWorkspace] = useState(null);
   const [workspaceLoading, setWorkspaceLoading] = useState(true);
   const [workspaceError, setWorkspaceError] = useState("");
@@ -23,6 +26,12 @@ export default function WorkspaceProvider({ children }) {
 
   const loadWorkspace = useCallback(
     async (targetWorkspaceId = null) => {
+      // Не загружаем, если аутентификация еще не завершена или пользователь не авторизован
+      if (authLoading || !isAuthenticated) {
+        setWorkspaceLoading(false);
+        return;
+      }
+
       try {
         setWorkspaceLoading(true);
         setWorkspaceError("");
@@ -51,21 +60,35 @@ export default function WorkspaceProvider({ children }) {
         setWorkspaceLoading(false);
       }
     },
-    [activeWorkspaceId]
+    [activeWorkspaceId, authLoading, isAuthenticated]
   );
 
   const loadWorkspaceList = useCallback(async () => {
-    try {
-      setWorkspaceListLoading(true);
-      setWorkspaceListError("");
-      const data = await getUserWorkspaces();
-      setWorkspaceList(data);
-    } catch (err) {
-      setWorkspaceListError(err?.response?.data?.detail || "Не удалось загрузить список пространств");
-    } finally {
-      setWorkspaceListLoading(false);
-    }
-  }, []);
+      // Не загружаем, если аутентификация еще не завершена или пользователь не авторизован
+      if (authLoading || !isAuthenticated) {
+        setWorkspaceListLoading(false);
+        return;
+      }
+
+      try {
+        setWorkspaceListLoading(true);
+        setWorkspaceListError("");
+        const data = await getUserWorkspaces();
+        setWorkspaceList(data);
+      } catch (err) {
+        const status = err?.response?.status;
+        if (status === 401) {
+          // Ошибка 401 не критична - просто не показываем список
+          setWorkspaceListError("");
+        } else {
+          setWorkspaceListError(err?.response?.data?.detail || "Не удалось загрузить список пространств");
+        }
+      } finally {
+        setWorkspaceListLoading(false);
+      }
+    },
+    [authLoading, isAuthenticated]
+  );
 
   useEffect(() => {
     loadWorkspace();
