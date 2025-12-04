@@ -374,7 +374,7 @@ export default function CalendarView() {
                 <div className="day-content">
                   {dayTasks.length > 0 && (
                     <div className="tasks-list">
-                      {dayTasks.slice(0, 3).map((task) => (
+                      {dayTasks.map((task) => (
                         <div
                           key={task.id}
                           className="calendar-task-item"
@@ -387,9 +387,6 @@ export default function CalendarView() {
                           <span className="task-title">{task.title || "Без названия"}</span>
                         </div>
                       ))}
-                      {dayTasks.length > 3 && (
-                        <div className="more-tasks">+{dayTasks.length - 3} еще</div>
-                      )}
                     </div>
                   )}
                   {dayTasks.length === 0 && (
