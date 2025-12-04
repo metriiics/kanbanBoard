@@ -10,7 +10,7 @@ import BoardsSettings from './SectionSettings/BoardsSettings';
 import SettingsWorkspace from './SectionSettings/SettingsWorkspace';
 
 export default function Settings() {
-  const { user, isAuthenticated, logout } = useAuth();
+  const { user, isAuthenticated, logout, loading } = useAuth();
   const [activeSection, setActiveSection] = useState('profile');
   const navigate = useNavigate();
 
@@ -40,12 +40,32 @@ export default function Settings() {
     }
   };
 
+  if (loading) {
+    return (
+      <div className="settings-page">
+        <div className="settings-wrapper">
+          <p>Загрузка...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (!user) {
+    return (
+      <div className="settings-page">
+        <div className="settings-wrapper">
+          <p>Пользователь не найден</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="settings-page">
       <div className="settings-wrapper">
         <aside className="settings-menu">
           <div className="settings-header">
-            <Link to={`/${user.username}`} className="back-button-settings">
+            <Link to={`/${user?.username || ''}`} className="back-button-settings">
               ← Назад
             </Link>
           </div>
