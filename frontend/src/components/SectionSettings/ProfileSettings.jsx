@@ -1,8 +1,11 @@
 import { useEffect, useState } from 'react';
 import { useCurrentUser } from '../../hooks/h_useCurrentUser';
+import { updateUser } from '../../api/a_users';
+import { useAuth } from '../../contexts/AuthContext';
 
 export default function ProfileSettings() {
-  const { user, loading, error } = useCurrentUser();
+  const { checkAuth } = useAuth();
+  const { user, loading, error, refetch } = useCurrentUser();
 
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
@@ -11,6 +14,10 @@ export default function ProfileSettings() {
   const [bio, setBio] = useState('');
   const [avatar, setAvatar] = useState(null); // из базы
   const [previewAvatar, setPreviewAvatar] = useState(null); // только для новых файлов
+  const [avatarFile, setAvatarFile] = useState(null); // файл для отправки
+  const [saving, setSaving] = useState(false);
+  const [saveError, setSaveError] = useState(null);
+  const [saveSuccess, setSaveSuccess] = useState(false);
 
   useEffect(() => {
     if (user) {
@@ -19,6 +26,8 @@ export default function ProfileSettings() {
       setUsername(user.username || '');
       setEmail(user.email || '');
       setAvatar(user.avatar_url || null);
+      setPreviewAvatar(null);
+      setAvatarFile(null);
     }
   }, [user]);
 
@@ -29,19 +38,49 @@ export default function ProfileSettings() {
     if (file) {
       const imageUrl = URL.createObjectURL(file);
       setPreviewAvatar(imageUrl);
+      setAvatarFile(file);
     }
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log({
-      firstName,
-      lastName,
-      username,
-      email,
-      bio,
-      avatar: previewAvatar || avatar,
-    });
+    setSaving(true);
+    setSaveError(null);
+    setSaveSuccess(false);
+
+    try {
+      const updateData = {
+        first_name: firstName,
+        last_name: lastName,
+        username: username,
+      };
+
+      if (avatarFile) {
+        updateData.avatar = avatarFile;
+      }
+
+      const updatedUser = await updateUser(updateData);
+      
+      // Обновляем данные пользователя
+      if (refetch) {
+        await refetch();
+      } else {
+        // Если refetch недоступен, обновляем через AuthContext
+        await checkAuth();
+      }
+
+      setSaveSuccess(true);
+      setPreviewAvatar(null);
+      setAvatarFile(null);
+      
+      // Скрываем сообщение об успехе через 3 секунды
+      setTimeout(() => setSaveSuccess(false), 3000);
+    } catch (error) {
+      setSaveError(error.message || 'Ошибка при сохранении данных');
+      console.error('Ошибка обновления профиля:', error);
+    } finally {
+      setSaving(false);
+    }
   };
 
   if (loading) return <div className="profile-settings"><p>Загрузка...</p></div>;
@@ -131,10 +170,44 @@ export default function ProfileSettings() {
             className="form-input-userEm"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
+            disabled
           />
+          <p className="username-hint-userNi" style={{ marginTop: '8px', fontSize: '12px', color: '#666' }}>
+            Email нельзя изменить
+          </p>
         </div>
 
-        <button type="submit" className="save-button">Сохранить</button>
+        {saveError && (
+          <div style={{ 
+            padding: '12px', 
+            backgroundColor: '#fee', 
+            color: '#c33', 
+            borderRadius: '4px', 
+            marginBottom: '16px' 
+          }}>
+            {saveError}
+          </div>
+        )}
+
+        {saveSuccess && (
+          <div style={{ 
+            padding: '12px', 
+            backgroundColor: '#efe', 
+            color: '#3c3', 
+            borderRadius: '4px', 
+            marginBottom: '16px' 
+          }}>
+            Профиль успешно обновлен!
+          </div>
+        )}
+
+        <button 
+          type="submit" 
+          className="save-button" 
+          disabled={saving}
+        >
+          {saving ? 'Сохранение...' : 'Сохранить'}
+        </button>
       </form>
     </div>
   );

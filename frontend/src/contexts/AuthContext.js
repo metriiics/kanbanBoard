@@ -119,6 +119,7 @@ export default function AuthProvider({ children }) {
     error,
     setError,
     isAuthenticated: !!user,
+    checkAuth,
   };
 
   return (

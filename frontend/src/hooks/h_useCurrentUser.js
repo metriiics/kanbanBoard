@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { getCurrentUser } from '../api/a_users';
 
 export function useCurrentUser() {
@@ -6,12 +6,22 @@ export function useCurrentUser() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  useEffect(() => {
-    getCurrentUser()
-      .then(setUser)
-      .catch((err) => setError(err))
-      .finally(() => setLoading(false));
+  const fetchUser = useCallback(async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      const userData = await getCurrentUser();
+      setUser(userData);
+    } catch (err) {
+      setError(err);
+    } finally {
+      setLoading(false);
+    }
   }, []);
 
-  return { user, loading, error };
+  useEffect(() => {
+    fetchUser();
+  }, [fetchUser]);
+
+  return { user, loading, error, refetch: fetchUser };
 }
