@@ -10,6 +10,7 @@ import {
   useUpdateProject
 } from '../hooks/h_workspace';
 import { useCurrentUser } from '../hooks/h_useCurrentUser';
+import { useUserRole } from '../hooks/h_userRole';
 import InviteModal from "../components/InviteModal";
 import PageLoader from "./PageLoader";
 
@@ -42,6 +43,7 @@ export default function Sidebar({ isCollapsed, onToggle }) {
   } = useWorkspace();
   const { projects, setProjects, loading, error } = useProjects();
   const { user } = useCurrentUser();
+  const { canManageProjects, canManageBoards, isOwner } = useUserRole();
   const location = useLocation();
   const navigate = useNavigate();
 
@@ -316,30 +318,34 @@ export default function Sidebar({ isCollapsed, onToggle }) {
           left: dropdownData.x,
         }}
       >
-        <button
-          onClick={() =>
-            openRenameModal(
-              dropdownData.type === 'project'
-                ? projects.find((p) => p.id === dropdownData.id)
-                : selectedProject.boards.find((b) => b.id === dropdownData.id),
-              dropdownData.type
-            )
-          }
-        >
-          Переименовать
-        </button>
-        <button
-          onClick={() =>
-            openDeleteModal(
-              dropdownData.type === 'project'
-                ? projects.find((p) => p.id === dropdownData.id)
-                : selectedProject.boards.find((b) => b.id === dropdownData.id),
-              dropdownData.type
-            )
-          }
-        >
-          Удалить
-        </button>
+        {(dropdownData.type === 'project' ? canManageProjects : canManageBoards) && (
+          <>
+            <button
+              onClick={() =>
+                openRenameModal(
+                  dropdownData.type === 'project'
+                    ? projects.find((p) => p.id === dropdownData.id)
+                    : selectedProject.boards.find((b) => b.id === dropdownData.id),
+                  dropdownData.type
+                )
+              }
+            >
+              Переименовать
+            </button>
+            <button
+              onClick={() =>
+                openDeleteModal(
+                  dropdownData.type === 'project'
+                    ? projects.find((p) => p.id === dropdownData.id)
+                    : selectedProject.boards.find((b) => b.id === dropdownData.id),
+                  dropdownData.type
+                )
+              }
+            >
+              Удалить
+            </button>
+          </>
+        )}
       </div>,
       document.body
     );
@@ -433,8 +439,12 @@ export default function Sidebar({ isCollapsed, onToggle }) {
                 </div>
                 <button
                   className="create-btn"
-                  onClick={handleCreateProject}
-                  title="Создать проект"
+                  onClick={canManageProjects ? handleCreateProject : undefined}
+                  title={canManageProjects ? "Создать проект" : undefined}
+                  style={{
+                    visibility: canManageProjects ? 'visible' : 'hidden',
+                    pointerEvents: canManageProjects ? 'auto' : 'none'
+                  }}
                 >
                   +
                 </button>
@@ -452,17 +462,19 @@ export default function Sidebar({ isCollapsed, onToggle }) {
                       <span className="project-icon"></span>
                       <span className="project-name">{project.title}</span>
 
-                      <div
-                        className="menu-wrapper"
-                        onClick={(e) => e.stopPropagation()}
-                      >
-                        <button
-                          className="menu-button"
-                          onClick={(e) => openDropdown(e, project.id, 'project')}
+                      {canManageProjects && (
+                        <div
+                          className="menu-wrapper"
+                          onClick={(e) => e.stopPropagation()}
                         >
-                          ...
-                        </button>
-                      </div>
+                          <button
+                            className="menu-button"
+                            onClick={(e) => openDropdown(e, project.id, 'project')}
+                          >
+                            ...
+                          </button>
+                        </div>
+                      )}
                     </div>
                   </div>
                 ))}
@@ -475,11 +487,18 @@ export default function Sidebar({ isCollapsed, onToggle }) {
                 <div className="section-header">
                   <div className="boards-header">
                     <h4 className="section-title">ДОСКИ</h4>
-                    <span className="selected-project-name">
-                      {projectForBoards.title}
-                    </span>
                   </div>
-                  <button className="create-btn" onClick={handleCreateBoard}>+</button>
+                  <button 
+                    className="create-btn" 
+                    onClick={canManageBoards ? handleCreateBoard : undefined}
+                    title={canManageBoards ? "Создать доску" : undefined}
+                    style={{
+                      visibility: canManageBoards ? 'visible' : 'hidden',
+                      pointerEvents: canManageBoards ? 'auto' : 'none'
+                    }}
+                  >
+                    +
+                  </button>
                 </div>
 
                 <div className="boards-list">
@@ -492,18 +511,20 @@ export default function Sidebar({ isCollapsed, onToggle }) {
                         <span className="board-icon"></span>
                         <span className="board-name">{board.title}</span>
                         
-                        <div className="menu-wrapper" onClick={(e) => e.stopPropagation()}>
-                          <button
-                            className="menu-button"
-                            onClick={(e) => {
-                              e.preventDefault();
-                              e.stopPropagation();
-                              openDropdown(e, board.id, 'board');
-                            }}
-                          >
-                            ...
-                          </button>
-                        </div>
+                        {canManageBoards && (
+                          <div className="menu-wrapper" onClick={(e) => e.stopPropagation()}>
+                            <button
+                              className="menu-button"
+                              onClick={(e) => {
+                                e.preventDefault();
+                                e.stopPropagation();
+                                openDropdown(e, board.id, 'board');
+                              }}
+                            >
+                              ...
+                            </button>
+                          </div>
+                        )}
                       </Link>
                     </div>
                   ))}
@@ -515,18 +536,20 @@ export default function Sidebar({ isCollapsed, onToggle }) {
 
         {/* === ОБЩЕЕ === */}
         <div className="general-section-bottom">
-          {user?.username && (
+          {user?.username && isOwner && (
             <Link to={`/${user.username}/settings`} className="general-item">
               Настройки
             </Link>
           )}
-          <div
-            className="general-item"
-            onClick={() => setShowInviteModal(true)}
-            style={{ cursor: "pointer" }}
-          >
-            Пригласить
-          </div>
+          {isOwner && (
+            <div
+              className="general-item"
+              onClick={() => setShowInviteModal(true)}
+              style={{ cursor: "pointer" }}
+            >
+              Пригласить
+            </div>
+          )}
         </div>
       </div>
 

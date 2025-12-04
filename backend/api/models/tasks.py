@@ -30,7 +30,8 @@ class TaskOut(BaseModel):
     column_id: Optional[int] = None
     created_at: Optional[datetime] = None
     labels: List[LabelOut] = Field(default_factory=list)
-    assignee: Optional[AssigneeOut] = None
+    assignee: Optional[AssigneeOut] = None  # Оставляем для обратной совместимости
+    assignees: List[AssigneeOut] = Field(default_factory=list)  # Новое поле для множественных исполнителей
 
 class ColumnWithTasksOut(BaseModel):
     id: int
@@ -59,7 +60,8 @@ class TaskCardOut(BaseModel):
     id: int
     title: Optional[str] = None
     labels: List[LabelOut] = Field(default_factory=list)
-    assignee: Optional[AssigneeOut] = None
+    assignee: Optional[AssigneeOut] = None  # Оставляем для обратной совместимости
+    assignees: List[AssigneeOut] = Field(default_factory=list)  # Новое поле для множественных исполнителей
 
 class ColumnOut(BaseModel):
     id: int
@@ -83,7 +85,8 @@ class TaskDetailOut(BaseModel):
     due_date: Optional[datetime] = None
     column: Optional[ColumnOut] = None
     labels: List[LabelOut] = Field(default_factory=list)
-    assignee: Optional[AssigneeOut] = None
+    assignee: Optional[AssigneeOut] = None  # Оставляем для обратной совместимости
+    assignees: List[AssigneeOut] = Field(default_factory=list)  # Новое поле для множественных исполнителей
     author: Optional[AssigneeOut] = None
     comments: List[TaskCommentOut] = Field(default_factory=list)
 
@@ -98,7 +101,8 @@ class TaskUpdate(BaseModel):
     priority: Optional[str] = None
     due_date: Optional[datetime] = None
     column_id: Optional[int] = None
-    assigned_to: Optional[int] = None
+    assigned_to: Optional[int] = None  # Оставляем для обратной совместимости
+    assigned_to_ids: Optional[List[int]] = None  # Новое поле для множественных исполнителей
     label_ids: Optional[List[int]] = None
 
 class CommentCreate(BaseModel):

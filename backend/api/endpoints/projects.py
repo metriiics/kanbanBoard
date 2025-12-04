@@ -14,6 +14,7 @@ from api.models.projects import (
     ProjectUserAccessOut,
 )
 from api.utils.workspaces import resolve_membership
+from api.utils.permissions import get_user_accessible_projects, can_view_project, can_edit_project
 from db.database import get_db
 
 router = APIRouter(tags=["📁 Проекты"])
@@ -30,11 +31,13 @@ def get_workspace_projects(
 
     """
     Возвращает проекты текущего пользователя по его workspace_id.
-    workspace_id берётся из связанной таблицы user_workspaces.
+    Фильтрует проекты по доступу пользователя (роль и UserProjectAccess).
+    Владелец получает все проекты, остальные - только те, к которым есть доступ.
     """
     
     membership = resolve_membership(db, current_user.id, workspace_id)
-    projects = OrmQuery.get_projects_by_workspace_id(membership.workspace_id)
+    # Получаем только доступные проекты
+    projects = get_user_accessible_projects(current_user.id, membership.workspace_id, db)
     return projects or []
 
 @router.post("/api/projects/create", response_model=ProjectOut)
@@ -43,7 +46,14 @@ def create_project_endpoint(
     current_user=Depends(get_current_user),
     db: Session = Depends(get_db),
 ):
-    resolve_membership(db, current_user.id, project.workspaces_id)
+    membership = resolve_membership(db, current_user.id, project.workspaces_id)
+    
+    # Только владелец может создавать проекты
+    if not membership.can_create_projects and membership.role.lower() != "owner":
+        raise HTTPException(
+            status_code=403,
+            detail="Только владелец рабочего пространства может создавать проекты"
+        )
 
     new_project = OrmQuery.create_project(project)
     return new_project
@@ -59,7 +69,13 @@ def update_project_title(
     if not project:
         raise HTTPException(status_code=404, detail="Проект не найден")
 
-    resolve_membership(db, current_user.id, project.workspaces_id)
+    # Проверяем доступ к проекту
+    if not can_view_project(current_user.id, project_id, db):
+        raise HTTPException(status_code=403, detail="Нет доступа к проекту")
+    
+    # Проверяем право на редактирование (только владелец)
+    if not can_edit_project(current_user.id, project_id, db):
+        raise HTTPException(status_code=403, detail="Только владелец может редактировать проекты")
 
     updated_project = OrmQuery.update_project_title(project_id, project_update.title)
     return updated_project

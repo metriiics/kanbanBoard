@@ -2,6 +2,7 @@ import React, { useRef, useState, useEffect, memo } from 'react';
 import { createPortal } from 'react-dom';
 import { useDrop, useDrag } from 'react-dnd';
 import { useColors } from '../hooks/h_useColors';
+import { useUserRole } from '../hooks/h_userRole';
 import KanbanTask from "./KanbanTask";
 
 const KanbanColumn = ({ 
@@ -28,6 +29,7 @@ const KanbanColumn = ({
   const [showDeleteModal, setShowDeleteModal] = useState(false);
 
   const { colors, loading: colorsLoading, saveColumnColor } = useColors();
+  const { canManageColumns, canCreateTasks } = useUserRole();
 
   const ref = useRef(null);
   const menuRef = useRef(null);
@@ -209,7 +211,7 @@ const KanbanColumn = ({
         </div>
 
         <div className="column-title">
-          {isEditingTitle ? (
+          {isEditingTitle && canManageColumns ? (
             <input
               type="text"
               value={editedTitle}
@@ -220,7 +222,11 @@ const KanbanColumn = ({
               className="column-title-input"
             />
           ) : (
-            <h3 onClick={handleTitleEdit} title="Нажмите, чтобы переименовать">
+            <h3 
+              onClick={canManageColumns ? handleTitleEdit : undefined} 
+              title={canManageColumns ? "Нажмите, чтобы переименовать" : undefined}
+              style={{ cursor: canManageColumns ? 'pointer' : 'default' }}
+            >
               {column.title}
             </h3>
           )}
@@ -229,13 +235,17 @@ const KanbanColumn = ({
 
         <button
           className="column-menu"
-          onClick={() => setIsMenuOpen(!isMenuOpen)}
+          onClick={canManageColumns ? () => setIsMenuOpen(!isMenuOpen) : undefined}
           ref={menuRef}
+          style={{
+            visibility: canManageColumns ? 'visible' : 'hidden',
+            pointerEvents: canManageColumns ? 'auto' : 'none'
+          }}
         >
           ⋯
         </button>
 
-        {isMenuOpen && (
+        {isMenuOpen && canManageColumns && (
           <div className="column-dropdown" ref={menuRef}>
             <button onClick={handleTitleEdit}>Переименовать</button>
             <button onClick={() => setShowColorModal(true)}>Цвет</button>
@@ -262,9 +272,11 @@ const KanbanColumn = ({
 
       <div className="column-footer">
         {!isAddingTask ? (
-          <button className="add-task-btn" onClick={() => setIsAddingTask(true)}>
-            + Добавить задачу
-          </button>
+          canCreateTasks && (
+            <button className="add-task-btn" onClick={() => setIsAddingTask(true)}>
+              + Добавить задачу
+            </button>
+          )
         ) : (
           <div className="add-task-form">
             <textarea
@@ -353,12 +365,38 @@ const KanbanColumn = ({
 
 // Мемоизируем компонент для предотвращения лишних ререндеров
 export default memo(KanbanColumn, (prevProps, nextProps) => {
-  // Сравниваем только необходимые поля
-  return (
-    prevProps.column.id === nextProps.column.id &&
-    prevProps.column.title === nextProps.column.title &&
-    prevProps.column.tasks.length === nextProps.column.tasks.length &&
-    prevProps.index === nextProps.index &&
-    JSON.stringify(prevProps.column.color) === JSON.stringify(nextProps.column.color)
-  );
+  // Сравниваем основные поля колонки
+  if (prevProps.column.id !== nextProps.column.id) return false;
+  if (prevProps.column.title !== nextProps.column.title) return false;
+  if (prevProps.column.tasks.length !== nextProps.column.tasks.length) return false;
+  if (prevProps.index !== nextProps.index) return false;
+  if (JSON.stringify(prevProps.column.color) !== JSON.stringify(nextProps.column.color)) return false;
+  
+  // Проверяем версии задач - если хотя бы у одной задачи изменилась версия, нужен ререндер
+  for (let i = 0; i < prevProps.column.tasks.length; i++) {
+    const prevTask = prevProps.column.tasks[i];
+    const nextTask = nextProps.column.tasks[i];
+    
+    if (!prevTask || !nextTask) return false;
+    if (prevTask.id !== nextTask.id) return false;
+    
+    // Проверяем версию задачи - если версия изменилась, нужен ререндер
+    const prevVersion = prevTask._version || 0;
+    const nextVersion = nextTask._version || 0;
+    if (prevVersion !== nextVersion) {
+      console.log('[KanbanColumn] Task version changed, forcing re-render:', {
+        taskId: prevTask.id,
+        prevVersion,
+        nextVersion
+      });
+      return false; // Версия изменилась - нужен ререндер
+    }
+    
+    // Также проверяем основные поля на случай, если версия не используется
+    if (prevTask.title !== nextTask.title) return false;
+    if (prevTask.priority !== nextTask.priority) return false;
+    if (prevTask.description !== nextTask.description) return false;
+  }
+  
+  return true; // Все одинаково - не нужен ререндер
 });

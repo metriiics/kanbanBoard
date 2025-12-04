@@ -5,7 +5,7 @@ from typing import Optional
 from db.database import session_factory, get_db
 from db.OrmQuery import OrmQuery
 from api.models.user import UserRead
-from api.models.workspace import WorkspaceOut
+from api.models.workspace import WorkspaceOut, WorkspaceWithRoleOut
 from db.dbstruct import User 
 from core.security import get_current_user
 from api.utils.workspaces import resolve_membership
@@ -41,7 +41,7 @@ def get_user_endpoint(user_id: int):
     return UserRead.model_validate(db_user)
 
 
-@router.get("/api/workspace/me", response_model=WorkspaceOut)
+@router.get("/api/workspace/me", response_model=WorkspaceWithRoleOut)
 def get_user_workspace(
     workspace_id: int | None = Query(
         default=None,
@@ -54,7 +54,18 @@ def get_user_workspace(
     workspace = membership.workspace
     if not workspace:
         raise HTTPException(status_code=404, detail="Рабочее пространство не найдено")
-    return workspace
+    
+    # Возвращаем workspace с информацией о роли пользователя
+    return WorkspaceWithRoleOut(
+        id=workspace.id,
+        name=getattr(workspace, "name", None),
+        description=getattr(workspace, "description", None),
+        created_at=getattr(workspace, "created_at", None),
+        role=membership.role,
+        can_invite_users=membership.can_invite_users,
+        can_create_projects=membership.can_create_projects,
+        is_personal=False,  # Можно добавить логику определения личного пространства
+    )
 
 @router.put("/api/users/me")
 def update_user_profile(

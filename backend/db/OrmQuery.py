@@ -8,12 +8,12 @@ from core.avatar_generator import generate_avatar
 from core.logger import logger
 
 from db.database import engine, Base, session_factory
-from db.dbstruct import User, Workspace, Project, Board, Column, Task, UserWorkspace, Comment, Label, ColorPalette, WorkspaceInvite, UserProjectAccess, TaskLabel
+from db.dbstruct import User, Workspace, Project, Board, Column, Task, UserWorkspace, Comment, Label, ColorPalette, WorkspaceInvite, UserProjectAccess, TaskLabel, TaskAssignee
 from api.models.user import UserCreate
 from api.models.projects import ProjectCreate
 from api.models.boards import BoardCreate
 
-from typing import Optional
+from typing import Optional, List
 from datetime import datetime
 
 from sqlalchemy.orm import joinedload
@@ -165,6 +165,8 @@ class OrmQuery:
                     joinedload(Column.tasks)  # подгружаем задачи колонки
                         .joinedload(Task.assignee),
                     joinedload(Column.tasks)
+                        .joinedload(Task.assignee_links).joinedload(TaskAssignee.user),  # Загружаем множественных исполнителей через TaskAssignee с данными пользователей
+                    joinedload(Column.tasks)
                         .joinedload(Task.labels),
                     joinedload(Column.board).joinedload(Board.project),
                     joinedload(Column.color) 
@@ -187,7 +189,7 @@ class OrmQuery:
     def get_task_with_relations(task_id: int):
 
         """
-        Возвращает задачу вместе с подгруженными relations (labels, assignee, author, column->board, comments->user),
+        Возвращает задачу вместе с подгруженными relations (labels, assignee, assignees, author, column->board, comments->user),
         чтобы работать с ними после закрытия сессии.
         """
 
@@ -197,6 +199,7 @@ class OrmQuery:
                 .options(
                     joinedload(Task.labels),
                     joinedload(Task.assignee),
+                    joinedload(Task.assignee_links).joinedload(TaskAssignee.user),  # Загружаем множественных исполнителей через TaskAssignee
                     joinedload(Task.author),
                     joinedload(Task.column).joinedload(Column.board).joinedload(Board.project),
                     joinedload(Task.comments).joinedload(Comment.user)
@@ -274,6 +277,23 @@ class OrmQuery:
                     task.labels = labels
                 except Exception:
                     pass
+
+            # Обновляем множественных исполнителей (assigned_to_ids)
+            if "assigned_to_ids" in data and data["assigned_to_ids"] is not None:
+                assignee_ids = [int(i) for i in data["assigned_to_ids"]] if data["assigned_to_ids"] else []
+                
+                # Удаляем старые связи TaskAssignee
+                session.query(TaskAssignee).filter(TaskAssignee.task_id == task_id).delete()
+                
+                # Создаем новые связи TaskAssignee
+                for user_id in assignee_ids:
+                    # Проверяем, существует ли пользователь
+                    user_exists = session.query(User).filter(User.id == user_id).first()
+                    if user_exists:
+                        task_assignee = TaskAssignee(task_id=task_id, user_id=user_id)
+                        session.add(task_assignee)
+                
+                session.flush()  # Принудительно сохраняем изменения
 
             session.add(task)
             session.commit()
@@ -658,6 +678,119 @@ class OrmQuery:
             return accesses
 
     @staticmethod
+    def get_user_project_accesses(user_id: int, workspace_id: int) -> List[int]:
+        """
+        Получить список ID проектов, к которым у пользователя есть доступ в workspace.
+        """
+        with session_factory() as session:
+            # Получаем все проекты workspace
+            workspace_projects = session.query(Project).filter(
+                Project.workspaces_id == workspace_id
+            ).all()
+            project_ids = [p.id for p in workspace_projects]
+            
+            if not project_ids:
+                return []
+            
+            # Получаем доступы пользователя к этим проектам
+            accesses = session.query(UserProjectAccess).filter(
+                UserProjectAccess.user_id == user_id,
+                UserProjectAccess.project_id.in_(project_ids)
+            ).all()
+            
+            return [a.project_id for a in accesses]
+
+    @staticmethod
+    def update_user_workspace_role(user_id: int, workspace_id: int, role: str) -> bool:
+        """
+        Обновить роль пользователя в workspace.
+        Возвращает True, если обновление успешно, False, если связь не найдена.
+        """
+        with session_factory() as session:
+            user_workspace = session.query(UserWorkspace).filter(
+                UserWorkspace.user_id == user_id,
+                UserWorkspace.workspace_id == workspace_id
+            ).first()
+            
+            if not user_workspace:
+                return False
+            
+            # Обновляем роль и права в зависимости от роли
+            user_workspace.role = role
+            
+            # Устанавливаем права в зависимости от роли
+            if role.lower() == "owner":
+                user_workspace.can_create_projects = True
+                user_workspace.can_invite_users = True
+            elif role.lower() == "participant":
+                user_workspace.can_create_projects = False
+                user_workspace.can_invite_users = False
+            else:  # reader, commenter
+                user_workspace.can_create_projects = False
+                user_workspace.can_invite_users = False
+            
+            session.add(user_workspace)
+            session.commit()
+            return True
+
+    @staticmethod
+    def update_user_project_accesses(user_id: int, workspace_id: int, project_ids: List[int]) -> bool:
+        """
+        Обновить список проектов, к которым у пользователя есть доступ.
+        Удаляет старые доступы и создает новые.
+        Возвращает True, если обновление успешно.
+        """
+        with session_factory() as session:
+            # Проверяем, что пользователь является участником workspace
+            user_workspace = session.query(UserWorkspace).filter(
+                UserWorkspace.user_id == user_id,
+                UserWorkspace.workspace_id == workspace_id
+            ).first()
+            
+            if not user_workspace:
+                return False
+            
+            # Получаем все проекты workspace
+            workspace_projects = session.query(Project).filter(
+                Project.workspaces_id == workspace_id
+            ).all()
+            valid_project_ids = {p.id for p in workspace_projects}
+            
+            # Фильтруем project_ids, оставляя только те, что принадлежат workspace
+            valid_ids = [pid for pid in project_ids if pid in valid_project_ids]
+            
+            # Получаем текущие доступы пользователя к проектам workspace
+            current_accesses = session.query(UserProjectAccess).filter(
+                UserProjectAccess.user_id == user_id,
+                UserProjectAccess.project_id.in_([p.id for p in workspace_projects])
+            ).all()
+            
+            current_project_ids = {a.project_id for a in current_accesses}
+            new_project_ids = set(valid_ids)
+            
+            # Удаляем доступы к проектам, которые больше не нужны
+            to_remove = current_project_ids - new_project_ids
+            if to_remove:
+                session.query(UserProjectAccess).filter(
+                    UserProjectAccess.user_id == user_id,
+                    UserProjectAccess.project_id.in_(to_remove)
+                ).delete(synchronize_session=False)
+            
+            # Добавляем доступы к новым проектам
+            to_add = new_project_ids - current_project_ids
+            for project_id in to_add:
+                new_access = UserProjectAccess(
+                    user_id=user_id,
+                    project_id=project_id,
+                    can_view=True,
+                    can_edit=False  # По умолчанию только просмотр
+                )
+                session.add(new_access)
+            
+            session.commit()
+            return True
+
+    @staticmethod
     def get_user_workspace_role(user_id: int, workspace_id: int) -> str | None:
         """
         Получить роль пользователя в workspace.
@@ -893,6 +1026,7 @@ class OrmQuery:
                 .filter(Column.board_id == board_id)
                 .options(
                     joinedload(Task.assignee),
+                    joinedload(Task.assignee_links).joinedload(TaskAssignee.user),  # Загружаем множественных исполнителей через TaskAssignee
                     joinedload(Task.labels),
                     joinedload(Task.column)
                 )

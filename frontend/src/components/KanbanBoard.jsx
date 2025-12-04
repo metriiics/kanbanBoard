@@ -13,6 +13,7 @@ import MyTaskView from './MyTaskView';
 import { normalizeTaskCard } from "../utils/taskMapper";
 import { useTasks } from "../hooks/h_useTasks";
 import { createColumn } from "../api/a_columns";
+import { useUserRole } from "../hooks/h_userRole";
 
 // Создаем backend один раз вне компонента, чтобы избежать ошибки "Cannot have two HTML5 backends"
 const html5Backend = HTML5Backend;
@@ -21,6 +22,7 @@ export default function KanbanBoard() {
   const { boardId } = useParams();
   const { columns, setColumns, projectData, loading, error, saveColumnPositions, saveColumnTitle, onAddTask, refetch } = useBoard(boardId);
   const { updateTask } = useTasks();
+  const { canManageColumns } = useUserRole();
 
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
   const [activeNav, setActiveNav] = useState('board'); // Активный пункт навигации
@@ -36,68 +38,79 @@ export default function KanbanBoard() {
 
     setColumns((prevColumns) => {
       let taskFound = false;
-      let hasChanges = false;
       
+      // Создаем новый массив колонок, чтобы гарантировать ререндер
       const nextColumns = prevColumns.map((column) => {
         const taskIndex = column.tasks.findIndex((t) => t.id === updatedTask.id);
         if (taskIndex === -1) {
-          return column; // Возвращаем тот же объект, если задача не найдена
+          // Возвращаем новый объект колонки, даже если задача не найдена
+          return { ...column };
         }
         taskFound = true;
         const existingTask = column.tasks[taskIndex];
         
-        // Проверяем, есть ли реальные изменения
-        const newTitle = normalizedCard.title || existingTask.title;
+        // Получаем новые значения для всех полей из normalizedCard
+        // Используем значения из normalizedCard, если они определены, иначе оставляем существующие
+        const newTitle = normalizedCard.title ?? existingTask.title;
+        const newDescription = normalizedCard.description ?? existingTask.description;
         const newPriority = normalizedCard.priority ?? existingTask.priority;
         const newDueDate = normalizedCard.dueDate || normalizedCard.due_date || existingTask.dueDate || existingTask.due_date;
-        const newLabels = normalizedCard.labels && normalizedCard.labels.length > 0 ? normalizedCard.labels : existingTask.labels;
-        const newAssignee = normalizedCard.assignee || existingTask.assignee;
+        const newLabels = normalizedCard.labels ?? (existingTask.labels || []);
+        const newAssignee = normalizedCard.assignee ?? existingTask.assignee;
+        const newAssignees = normalizedCard.assignees ?? (existingTask.assignees || []);
         
-        // Проверяем, изменилось ли что-то
-        const titleChanged = newTitle !== existingTask.title;
-        const priorityChanged = newPriority !== existingTask.priority;
-        const dueDateChanged = newDueDate !== (existingTask.dueDate || existingTask.due_date);
-        const labelsChanged = JSON.stringify(newLabels) !== JSON.stringify(existingTask.labels);
-        const assigneeChanged = JSON.stringify(newAssignee) !== JSON.stringify(existingTask.assignee);
+        // Нормализуем значения для сравнения (null/undefined -> null)
+        const normalizeForCompare = (val) => val === undefined ? null : val;
+        const existingTitle = normalizeForCompare(existingTask.title);
+        const existingDescription = normalizeForCompare(existingTask.description);
+        const existingPriority = normalizeForCompare(existingTask.priority);
+        const existingDueDate = existingTask.dueDate || existingTask.due_date || null;
         
-        if (!titleChanged && !priorityChanged && !dueDateChanged && !labelsChanged && !assigneeChanged) {
-          return column; // Нет изменений - возвращаем тот же объект
-        }
-        
-        hasChanges = true;
+        // Всегда обновляем задачу новыми данными из normalizedCard
         const updatedTasks = [...column.tasks];
         
-        // Обновляем только измененную задачу
+        // Создаем новые массивы для labels и assignees, чтобы гарантировать новую ссылку
+        const newLabelsArray = Array.isArray(newLabels) ? [...newLabels] : [];
+        const newAssigneesArray = Array.isArray(newAssignees) ? [...newAssignees] : [];
+        
+        // Увеличиваем версию для принудительного ререндера
+        const newVersion = (existingTask._version || 0) + 1;
+        
+        // Обновляем задачу со всеми полями из normalizedCard
         updatedTasks[taskIndex] = { 
           ...existingTask,
           title: newTitle,
+          description: newDescription,
           priority: newPriority,
           dueDate: newDueDate,
           due_date: newDueDate,
-          labels: newLabels,
-          assignee: newAssignee,
+          labels: newLabelsArray,
+          assignee: newAssignee ? { ...newAssignee } : null,
+          assignees: newAssigneesArray,
           column_id: normalizedCard.column_id || existingTask.column_id,
+          _version: newVersion, // Увеличиваем версию для принудительного ререндера
         };
+        
+        console.log('[KanbanBoard] Task updated with version:', {
+          taskId: updatedTasks[taskIndex].id,
+          oldVersion: existingTask._version || 0,
+          newVersion: newVersion,
+          title: newTitle,
+          priority: newPriority
+        });
         
         return { ...column, tasks: updatedTasks };
       });
 
-      // Возвращаем предыдущее состояние, если не было изменений
-      return (taskFound && hasChanges) ? nextColumns : prevColumns;
+      // Возвращаем новый массив, если задача была найдена
+      return taskFound ? nextColumns : prevColumns;
     });
 
+    // Обновляем selectedTask, если модальное окно открыто для этой задачи
     setSelectedTask((prev) => {
       if (!prev || prev.id !== updatedTask.id) return prev;
       const normalized = normalizeTaskCard(updatedTask);
-      // Проверяем, есть ли изменения
-      if (
-        prev.title === normalized.title &&
-        prev.priority === normalized.priority &&
-        JSON.stringify(prev.labels) === JSON.stringify(normalized.labels) &&
-        JSON.stringify(prev.assignee) === JSON.stringify(normalized.assignee)
-      ) {
-        return prev; // Нет изменений
-      }
+      // Всегда обновляем selectedTask, чтобы модальное окно показывало актуальные данные
       return {
         ...prev,
         ...normalized,
@@ -323,6 +336,7 @@ export default function KanbanBoard() {
             ))}
             
             {/* 🔹 Блок добавления новой колонки */}
+            {canManageColumns && (
             <div className="add-column">
               {isAddingColumn ? (
                 <form onSubmit={handleAddColumn} className="add-column-form">
@@ -355,6 +369,7 @@ export default function KanbanBoard() {
                 </button>
               )}
             </div>
+            )}
           </div>
         );
       case 'my-tasks':

@@ -7,11 +7,13 @@ import { createTaskApi, updateTaskApi } from "../api/a_tasks";
 import { getWorkspaceMembers } from "../api/a_members";
 import { getWorkspaceLabels } from "../api/a_workspaces";
 import { useWorkspace } from "../hooks/h_workspace";
+import { useUserRole } from "../hooks/h_userRole";
 import TaskModal from "./TaskModal";
 
 export default function CalendarView() {
   const { boardId } = useParams();
   const { workspace } = useWorkspace();
+  const { canCreateTasks } = useUserRole();
   const [viewMode, setViewMode] = useState("month");
   const [currentDate, setCurrentDate] = useState(new Date());
   const [tasks, setTasks] = useState([]);
@@ -368,7 +370,8 @@ export default function CalendarView() {
                 className={`calendar-cell ${d.currentMonth ? "" : "inactive"} ${
                   isToday ? "today" : ""
                 }`}
-                onClick={() => handleCellClick(d.date, cellRefs.current[cellKey])}
+                onClick={canCreateTasks ? () => handleCellClick(d.date, cellRefs.current[cellKey]) : undefined}
+                style={canCreateTasks ? {} : { cursor: 'default' }}
               >
                 <div className="day-number">{d.date.getDate()}</div>
                 <div className="day-content">
@@ -389,7 +392,7 @@ export default function CalendarView() {
                       ))}
                     </div>
                   )}
-                  {dayTasks.length === 0 && (
+                  {dayTasks.length === 0 && canCreateTasks && (
                     <div className="add-task-hint">
                       <Plus size={14} />
                       <span>Добавить</span>

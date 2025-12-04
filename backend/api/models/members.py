@@ -1,5 +1,5 @@
 from datetime import datetime
-from typing import Optional
+from typing import Optional, List
 
 from pydantic import BaseModel, Field
 
@@ -17,4 +17,13 @@ class WorkspaceMemberOut(BaseModel):
     can_create_projects: bool = Field(default=False)
     can_invite_users: bool = Field(default=False)
     joined_at: datetime = Field(..., description="Дата присоединения")
+    accessible_project_ids: List[int] = Field(default_factory=list, description="ID проектов, к которым есть доступ")
+
+
+class MemberRoleUpdate(BaseModel):
+    role: str = Field(..., description="Роль: reader, commenter, participant, owner")
+
+
+class MemberProjectsUpdate(BaseModel):
+    project_ids: List[int] = Field(default_factory=list, description="Список ID проектов для доступа")
 

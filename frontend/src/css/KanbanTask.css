@@ -131,10 +131,24 @@
   border-color: #ff4d4f;
 }
 
+/* Контейнер для множественных исполнителей */
+.task-assignees {
+  display: flex;
+  align-items: center;
+  gap: 0;
+  flex-direction: row;
+}
+
 /* Аватар исполнителя */
 .task-user {
   position: relative;
   cursor: pointer;
+  transition: transform 0.2s ease, z-index 0.2s ease;
+}
+
+.task-user:hover {
+  transform: scale(1.1);
+  z-index: 10;
 }
 
 .user-avatar {

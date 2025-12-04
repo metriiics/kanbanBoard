@@ -1,11 +1,13 @@
-import { useEffect, useMemo, useState } from 'react';
-import { useWorkspace } from '../../hooks/h_workspace';
+import { useEffect, useMemo, useState, useRef } from 'react';
+import { createPortal } from 'react-dom';
+import { useWorkspace, useProjects } from '../../hooks/h_workspace';
 import { useCurrentUser } from '../../hooks/h_useCurrentUser';
 import { createInviteLink, deleteInviteLink, getActiveInvite } from '../../api/a_invites';
-import { getWorkspaceMembers, removeWorkspaceMember } from '../../api/a_members';
+import { getWorkspaceMembers, removeWorkspaceMember, updateMemberRole, updateMemberProjects } from '../../api/a_members';
 
 export default function MembersSettings() {
   const { workspace, loading: workspaceLoading } = useWorkspace();
+  const { projects } = useProjects();
   const { user } = useCurrentUser();
   const [members, setMembers] = useState([]);
   const [membersLoading, setMembersLoading] = useState(true);
@@ -15,6 +17,20 @@ export default function MembersSettings() {
   const [activeInvite, setActiveInvite] = useState(null);
   const [inviteLoading, setInviteLoading] = useState(false);
   const [inviteStatus, setInviteStatus] = useState({ state: 'idle', message: '' });
+  
+  // Состояния для редактирования участника
+  const [editingMember, setEditingMember] = useState(null);
+  const [editingRole, setEditingRole] = useState('');
+  const [editingProjects, setEditingProjects] = useState([]);
+  const [isSaving, setIsSaving] = useState(false);
+  const memberRowRefs = useRef({});
+  
+  // Состояния для portal выбора проектов
+  const [projectsPortalOpen, setProjectsPortalOpen] = useState(false);
+  const [projectsPortalMember, setProjectsPortalMember] = useState(null);
+  const [projectsPortalRef, setProjectsPortalRef] = useState(null);
+  const [projectsPortalSelected, setProjectsPortalSelected] = useState([]);
+  const projectsPortalContainerRef = useRef(null);
 
   useEffect(() => {
     let isMounted = true;
@@ -215,6 +231,191 @@ export default function MembersSettings() {
     return true;
   };
 
+  const canEditMember = (member) => {
+    if (!user) return false;
+    if (member.user_id === user.id) return false;
+    // Проверяем, что текущий пользователь может управлять участниками
+    // Это должно проверяться на бэкенде, но для UI можно проверить роль
+    return true;
+  };
+
+  const getRoleDisplayName = (role) => {
+    const roleMap = {
+      reader: 'Читатель',
+      commenter: 'Комментатор',
+      participant: 'Участник',
+      owner: 'Владелец',
+      member: 'Участник', // для обратной совместимости
+    };
+    return roleMap[role?.toLowerCase()] || role || 'Участник';
+  };
+
+  const handleEditMember = (member) => {
+    setEditingMember(member);
+    setEditingRole(member.role || 'participant');
+    setEditingProjects(member.accessible_project_ids || []);
+  };
+
+  const handleCancelEdit = () => {
+    setEditingMember(null);
+    setEditingRole('');
+    setEditingProjects([]);
+  };
+
+  const handleSaveMember = async () => {
+    if (!editingMember || !workspace?.id) return;
+    
+    setIsSaving(true);
+    try {
+      // Обновляем роль
+      if (editingRole !== editingMember.role) {
+        await updateMemberRole({
+          workspaceId: workspace.id,
+          userId: editingMember.user_id,
+          role: editingRole,
+        });
+      }
+      
+      // Обновляем проекты
+      const currentProjectIds = editingMember.accessible_project_ids || [];
+      const projectIdsChanged = JSON.stringify(currentProjectIds.sort()) !== JSON.stringify(editingProjects.sort());
+      if (projectIdsChanged) {
+        await updateMemberProjects({
+          workspaceId: workspace.id,
+          userId: editingMember.user_id,
+          projectIds: editingProjects,
+        });
+      }
+      
+      // Обновляем локальное состояние
+      setMembers((prev) =>
+        prev.map((m) =>
+          m.user_id === editingMember.user_id
+            ? {
+                ...m,
+                role: editingRole,
+                accessible_project_ids: editingProjects,
+              }
+            : m
+        )
+      );
+      
+      setMemberAction({
+        state: 'success',
+        message: `Настройки участника ${getDisplayName(editingMember)} обновлены`,
+        targetId: null,
+      });
+      
+      handleCancelEdit();
+    } catch (err) {
+      setMemberAction({
+        state: 'error',
+        message: err?.response?.data?.detail || 'Не удалось обновить настройки участника',
+        targetId: null,
+      });
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  const handleToggleProject = (projectId) => {
+    setEditingProjects((prev) =>
+      prev.includes(projectId)
+        ? prev.filter((id) => id !== projectId)
+        : [...prev, projectId]
+    );
+  };
+
+  const handleOpenProjectsPortal = (member, event) => {
+    event?.stopPropagation();
+    setProjectsPortalMember(member);
+    setProjectsPortalSelected(member.accessible_project_ids || []);
+    setProjectsPortalRef(event?.currentTarget || null);
+    setProjectsPortalOpen(true);
+  };
+
+  const handleCloseProjectsPortal = () => {
+    setProjectsPortalOpen(false);
+    setProjectsPortalMember(null);
+    setProjectsPortalRef(null);
+    setProjectsPortalSelected([]);
+  };
+
+  const handleToggleProjectInPortal = (projectId) => {
+    setProjectsPortalSelected((prev) =>
+      prev.includes(projectId)
+        ? prev.filter((id) => id !== projectId)
+        : [...prev, projectId]
+    );
+  };
+
+  const handleSaveProjectsFromPortal = () => {
+    if (!projectsPortalMember || !workspace?.id) return;
+    
+    handleSaveMemberProjects(projectsPortalMember, projectsPortalSelected);
+    handleCloseProjectsPortal();
+  };
+
+  const handleSaveMemberProjects = async (member, projectIds) => {
+    if (!workspace?.id) return;
+    
+    setIsSaving(true);
+    try {
+      await updateMemberProjects({
+        workspaceId: workspace.id,
+        userId: member.user_id,
+        projectIds: projectIds,
+      });
+      
+      // Обновляем локальное состояние
+      setMembers((prev) =>
+        prev.map((m) =>
+          m.user_id === member.user_id
+            ? {
+                ...m,
+                accessible_project_ids: projectIds,
+              }
+            : m
+        )
+      );
+      
+      setMemberAction({
+        state: 'success',
+        message: `Проекты участника ${getDisplayName(member)} обновлены`,
+        targetId: null,
+      });
+    } catch (err) {
+      setMemberAction({
+        state: 'error',
+        message: err?.response?.data?.detail || 'Не удалось обновить проекты',
+        targetId: null,
+      });
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  // Закрытие portal при клике вне его
+  useEffect(() => {
+    if (!projectsPortalOpen) return;
+
+    const handleClickOutside = (event) => {
+      if (
+        projectsPortalContainerRef.current &&
+        !projectsPortalContainerRef.current.contains(event.target) &&
+        projectsPortalRef &&
+        !projectsPortalRef.contains(event.target)
+      ) {
+        handleCloseProjectsPortal();
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [projectsPortalOpen, projectsPortalRef]);
+
   return (
     <div className="members-settings">
       <h3 className="members-title">
@@ -277,6 +478,8 @@ export default function MembersSettings() {
       <div className="members-table">
         <div className="members-header">
           <span>Пользователь</span>
+          <span>Роль</span>
+          <span>Проекты</span>
           <span>Действия</span>
         </div>
 
@@ -295,14 +498,19 @@ export default function MembersSettings() {
               !canRemoveMember(member) ||
               (memberAction.state === 'loading' &&
                 memberAction.targetId === member.user_id);
+            const isEditing = editingMember?.user_id === member.user_id;
+            const accessibleProjects = member.accessible_project_ids || [];
+            const accessibleProjectsCount = accessibleProjects.length;
+            
             return (
-              <div key={member.workspace_link_id} className="member-row">
+              <div key={member.workspace_link_id} className="member-row" ref={(el) => {
+                if (el) memberRowRefs.current[member.user_id] = el;
+              }}>
                 <div className="member-info-row">
                   <div className="member-avatar">{getInitials(member)}</div>
                   <div className="member-text">
                     <div className="member-name-row">
                       <span className="member-name">{getDisplayName(member)}</span>
-                      <span className="role-chip">{member.role || 'member'}</span>
                     </div>
                     <div className="member-username">
                       {member.email || member.username || '—'}
@@ -310,22 +518,87 @@ export default function MembersSettings() {
                   </div>
                 </div>
 
+                <div className="member-role-cell">
+                  {isEditing ? (
+                    <select
+                      className="role-select"
+                      value={editingRole}
+                      onChange={(e) => setEditingRole(e.target.value)}
+                      disabled={member.role?.toLowerCase() === 'owner'}
+                    >
+                      <option value="reader">Читатель</option>
+                      <option value="commenter">Комментатор</option>
+                      <option value="participant">Участник</option>
+                      {member.role?.toLowerCase() === 'owner' && (
+                        <option value="owner">Владелец</option>
+                      )}
+                    </select>
+                  ) : (
+                    <span className="role-chip">{getRoleDisplayName(member.role)}</span>
+                  )}
+                </div>
+
+                <div className="member-projects-cell">
+                  {member.role?.toLowerCase() === 'owner' ? (
+                    <span className="projects-owner-badge">Все проекты</span>
+                  ) : (
+                    <button
+                      className="projects-select-button"
+                      onClick={(e) => handleOpenProjectsPortal(member, e)}
+                      disabled={isEditing}
+                    >
+                      {accessibleProjectsCount === 0
+                        ? 'Выбрать проекты'
+                        : `${accessibleProjectsCount} ${accessibleProjectsCount === 1 ? 'проект' : 'проектов'}`}
+                    </button>
+                  )}
+                </div>
+
                 <div className="member-actions">
-                  <button
-                    className="remove-button"
-                    onClick={() => handleRemoveMember(member)}
-                    disabled={removeDisabled}
-                    title={
-                      member.user_id === user?.id
-                        ? 'Нельзя удалить себя'
-                        : undefined
-                    }
-                  >
-                    {memberAction.state === 'loading' &&
-                    memberAction.targetId === member.user_id
-                      ? 'Удаляем...'
-                      : 'Исключить'}
-                  </button>
+                  {isEditing ? (
+                    <>
+                      <button
+                        className="save-button"
+                        onClick={handleSaveMember}
+                        disabled={isSaving}
+                      >
+                        {isSaving ? 'Сохранение...' : 'Сохранить'}
+                      </button>
+                      <button
+                        className="cancel-button"
+                        onClick={handleCancelEdit}
+                        disabled={isSaving}
+                      >
+                        Отмена
+                      </button>
+                    </>
+                  ) : (
+                    <>
+                      {canEditMember(member) && (
+                        <button
+                          className="edit-button"
+                          onClick={() => handleEditMember(member)}
+                        >
+                          Редактировать
+                        </button>
+                      )}
+                      <button
+                        className="remove-button"
+                        onClick={() => handleRemoveMember(member)}
+                        disabled={removeDisabled}
+                        title={
+                          member.user_id === user?.id
+                            ? 'Нельзя удалить себя'
+                            : undefined
+                        }
+                      >
+                        {memberAction.state === 'loading' &&
+                        memberAction.targetId === member.user_id
+                          ? 'Удаляем...'
+                          : 'Исключить'}
+                      </button>
+                    </>
+                  )}
                 </div>
               </div>
             );
@@ -344,6 +617,111 @@ export default function MembersSettings() {
         <div className={`members-alert ${memberAction.state}`}>
           {memberAction.message}
         </div>
+      )}
+
+      {/* Portal для выбора проектов */}
+      {projectsPortalOpen && projectsPortalMember && projectsPortalRef && createPortal(
+        <div
+          className="projects-portal-overlay"
+          onClick={(e) => {
+            if (e.target === e.currentTarget) {
+              handleCloseProjectsPortal();
+            }
+          }}
+        >
+          <div
+            ref={projectsPortalContainerRef}
+            className="projects-portal"
+            style={(() => {
+              if (!projectsPortalRef) return {};
+              const rect = projectsPortalRef.getBoundingClientRect();
+              const viewportHeight = window.innerHeight;
+              const viewportWidth = window.innerWidth;
+              const portalHeight = Math.min(400, projects.length * 40 + 100);
+              const spaceBelow = viewportHeight - rect.bottom;
+              const spaceAbove = rect.top;
+              
+              let top, left;
+              // Позиционирование по вертикали
+              if (spaceBelow < portalHeight && spaceAbove > portalHeight) {
+                top = `${rect.top - portalHeight - 8}px`;
+              } else {
+                top = `${rect.bottom + 8}px`;
+              }
+              
+              // Позиционирование по горизонтали
+              const portalWidth = 320;
+              if (rect.left + portalWidth > viewportWidth) {
+                left = `${Math.max(8, viewportWidth - portalWidth - 8)}px`;
+              } else {
+                left = `${rect.left}px`;
+              }
+              
+              return {
+                position: 'fixed',
+                top,
+                left,
+                width: `${portalWidth}px`,
+                maxHeight: '400px',
+              };
+            })()}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="projects-portal-header">
+              <h4 className="projects-portal-title">
+                Выбор проектов для {getDisplayName(projectsPortalMember)}
+              </h4>
+              <button
+                className="projects-portal-close"
+                onClick={handleCloseProjectsPortal}
+              >
+                ×
+              </button>
+            </div>
+            
+            <div className="projects-portal-content">
+              {projects.length === 0 ? (
+                <div className="projects-portal-empty">
+                  Нет проектов в рабочем пространстве
+                </div>
+              ) : (
+                <div className="projects-portal-list">
+                  {projects.map((project) => (
+                    <label
+                      key={project.id}
+                      className="project-portal-checkbox-label"
+                    >
+                      <input
+                        type="checkbox"
+                        checked={projectsPortalSelected.includes(project.id)}
+                        onChange={() => handleToggleProjectInPortal(project.id)}
+                      />
+                      <span className="project-portal-name">{project.title}</span>
+                    </label>
+                  ))}
+                </div>
+              )}
+            </div>
+            
+            <div className="projects-portal-footer">
+              <button
+                className="projects-portal-cancel"
+                onClick={handleCloseProjectsPortal}
+                disabled={isSaving}
+              >
+                Отмена
+              </button>
+              <button
+                className="projects-portal-save"
+                onClick={handleSaveProjectsFromPortal}
+                disabled={isSaving}
+              >
+                {isSaving ? 'Сохранение...' : 'Сохранить'}
+              </button>
+            </div>
+          </div>
+        </div>,
+        document.body
       )}
     </div>
   );

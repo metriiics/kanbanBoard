@@ -1,6 +1,7 @@
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useUserRole } from '../hooks/h_userRole';
 import ProfileSettings from './SectionSettings/ProfileSettings';
 import AppearanceSettings from './SectionSettings/AppearanceSettings';
 import MembersSettings from './SectionSettings/MembersSettings';
@@ -11,8 +12,16 @@ import SettingsWorkspace from './SectionSettings/SettingsWorkspace';
 
 export default function Settings() {
   const { user, isAuthenticated, logout, loading } = useAuth();
+  const { isOwner } = useUserRole();
   const [activeSection, setActiveSection] = useState('profile');
   const navigate = useNavigate();
+
+  // Редирект не-владельцев на главную страницу workspace
+  useEffect(() => {
+    if (!loading && user && !isOwner) {
+      navigate(`/${user.username || ''}`);
+    }
+  }, [loading, user, isOwner, navigate]);
 
   const personalSections = [
     { key: 'profile', label: 'Профиль' },
@@ -28,6 +37,11 @@ export default function Settings() {
   ];
 
   const renderSection = () => {
+    // Не-владельцы могут видеть только персональные настройки
+    if (!isOwner && (activeSection === 'members' || activeSection === 'boards' || activeSection === 'settings_workspace' || activeSection === 'notifications' || activeSection === 'billing')) {
+      return <div>У вас нет доступа к этим настройкам</div>;
+    }
+
     switch (activeSection) {
       case 'profile': return <ProfileSettings />;
       case 'appearance': return <AppearanceSettings />;
@@ -83,18 +97,22 @@ export default function Settings() {
             ))}
           </ul>
 
-          <h3 className="menu-group-title">Рабочее пространство</h3>
-          <ul>
-            {workspaceSections.map((item) => (
-              <li
-                key={item.key}
-                className={activeSection === item.key ? 'active' : ''}
-                onClick={() => setActiveSection(item.key)}
-              >
-                {item.label}
-              </li>
-            ))}
-          </ul>
+          {isOwner && (
+            <>
+              <h3 className="menu-group-title">Рабочее пространство</h3>
+              <ul>
+                {workspaceSections.map((item) => (
+                  <li
+                    key={item.key}
+                    className={activeSection === item.key ? 'active' : ''}
+                    onClick={() => setActiveSection(item.key)}
+                  >
+                    {item.label}
+                  </li>
+                ))}
+              </ul>
+            </>
+          )}
         </aside>
 
         <main className="settings-content">{renderSection()}</main>

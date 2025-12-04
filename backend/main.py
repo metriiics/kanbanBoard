@@ -14,6 +14,7 @@ from api.endpoints import (
 )
 from fastapi.staticfiles import StaticFiles
 from db.database import Base, engine
+from db import dbstruct  # Импортируем все модели для создания таблиц
 from core.logger import logger
 import time
 

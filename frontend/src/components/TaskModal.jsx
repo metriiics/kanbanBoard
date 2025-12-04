@@ -4,6 +4,7 @@ import { getTaskDetailsApi, createCommentApi } from "../api/a_tasks";
 import { getWorkspaceMembers } from "../api/a_members";
 import { getWorkspaceLabels, createWorkspaceLabel } from "../api/a_workspaces";
 import { useWorkspaceContext } from "../contexts/WorkspaceContext";
+import { useUserRole } from "../hooks/h_userRole";
 import { normalizeTaskDetail, getAssigneeDisplayName } from "../utils/taskMapper";
 
 const formatMemberName = (member) => {
@@ -90,7 +91,7 @@ export default function TaskModal({
   const [description, setDescription] = useState(task?.description || "");
   const [dueDate, setDueDate] = useState(task?.dueDate || task?.due_date || null);
   const [priority, setPriority] = useState(task?.priority || "");
-  const [assignee, setAssignee] = useState(task?.assignee || null);
+  const [assignees, setAssignees] = useState(task?.assignees || task?.assignee ? [task.assignee] : []);
   const [selectedLabels, setSelectedLabels] = useState(task?.labels || []);
 
   const [isAssigneeDropdownOpen, setIsAssigneeDropdownOpen] = useState(false);
@@ -120,6 +121,7 @@ export default function TaskModal({
   });
 
   const { updateTask } = useTasks();
+  const { canEditTasks, canComment, isReader } = useUserRole();
   const [isSaving, setIsSaving] = useState(false);
   const savingCounterRef = useRef(0);
 
@@ -134,7 +136,14 @@ export default function TaskModal({
     setDescription(detail.description ?? "");
     setDueDate(detail.dueDate ?? null);
     setPriority(detail.priority ?? "");
-    setAssignee(detail.assignee ?? null);
+    // Поддержка как нового формата (assignees), так и старого (assignee)
+    if (detail.assignees && detail.assignees.length > 0) {
+      setAssignees(detail.assignees);
+    } else if (detail.assignee) {
+      setAssignees([detail.assignee]);
+    } else {
+      setAssignees([]);
+    }
     setSelectedLabels(detail.labels ?? []);
   }, []);
 
@@ -144,7 +153,14 @@ export default function TaskModal({
     setDescription(task.description ?? "");
     setDueDate(task.dueDate ?? task.due_date ?? null);
     setPriority(task.priority ?? "");
-    setAssignee(task.assignee ?? null);
+    // Поддержка как нового формата (assignees), так и старого (assignee)
+    if (task.assignees && task.assignees.length > 0) {
+      setAssignees(task.assignees);
+    } else if (task.assignee) {
+      setAssignees([task.assignee]);
+    } else {
+      setAssignees([]);
+    }
     setSelectedLabels(task.labels ?? []);
   }, [isOpen, task, taskDetail]);
 
@@ -376,17 +392,26 @@ export default function TaskModal({
     saveTaskChanges({ priority: null });
   };
 
-  const handleAssigneeSelect = (member) => {
+  const handleAssigneeToggle = (member) => {
     const normalized = mapMemberToAssignee(member);
-    setAssignee(normalized);
-    setIsAssigneeDropdownOpen(false);
-    saveTaskChanges({ assigned_to: member.user_id });
+    const exists = assignees.some((a) => a.id === member.user_id);
+    let updatedAssignees;
+    
+    if (exists) {
+      updatedAssignees = assignees.filter((a) => a.id !== member.user_id);
+    } else {
+      updatedAssignees = [...assignees, normalized];
+    }
+    
+    setAssignees(updatedAssignees);
+    saveTaskChanges({ assigned_to_ids: updatedAssignees.map((a) => a.id) });
   };
 
-  const handleAssigneeClear = (event) => {
+  const handleAssigneeRemove = (event, assigneeId) => {
     event?.stopPropagation();
-    setAssignee(null);
-    saveTaskChanges({ assigned_to: null });
+    const updatedAssignees = assignees.filter((a) => a.id !== assigneeId);
+    setAssignees(updatedAssignees);
+    saveTaskChanges({ assigned_to_ids: updatedAssignees.map((a) => a.id) });
   };
 
   const handleLabelToggle = (label) => {
@@ -463,7 +488,6 @@ export default function TaskModal({
 
   const createdAt = taskDetail?.createdAt || task?.createdAt || task?.created_at || null;
   const comments = taskDetail?.comments ?? [];
-  const assigneeName = getAssigneeDisplayName(assignee);
   const author = taskDetail?.author || null;
   const authorName = getAssigneeDisplayName(author);
   const projectName = taskDetail?.column?.project?.title || task?.projectName || "Без проекта";
@@ -567,24 +591,38 @@ export default function TaskModal({
       >
         <div className="modal-header">
           <div className="modal-title">
-            <input
-              type="text"
-              className="task-title-input"
-              value={title}
-              onChange={(e) => handleTitleChange(e.target.value)}
-              placeholder="Название задачи..."
-              style={{
+            {canEditTasks ? (
+              <input
+                type="text"
+                className="task-title-input"
+                value={title}
+                onChange={(e) => handleTitleChange(e.target.value)}
+                placeholder="Название задачи..."
+                style={{
+                  fontSize: "20px",
+                  fontWeight: "600",
+                  border: "none",
+                  outline: "none",
+                  background: "transparent",
+                  width: "100%",
+                  padding: "4px 0",
+                  color: "#172b4d",
+                  marginBottom: "8px",
+                }}
+              />
+            ) : (
+              <h2 style={{
                 fontSize: "20px",
                 fontWeight: "600",
-                border: "none",
-                outline: "none",
-                background: "transparent",
                 width: "100%",
                 padding: "4px 0",
                 color: "#172b4d",
                 marginBottom: "8px",
-              }}
-            />
+                margin: "0 0 8px 0",
+              }}>
+                {title || "Без названия"}
+              </h2>
+            )}
 
             <div className="task-meta-header">
               <span className="created-date">
@@ -636,149 +674,162 @@ export default function TaskModal({
           {detailLoading && !taskDetail && <div className="loading-placeholder">Загрузка данных...</div>}
 
           <div className="task-details">
-            <div className="detail-item">
-              <span className="detail-label">Исполнитель</span>
-              <div className="tags-dropdown-container" ref={assigneeDropdownRef}>
-                <div
-                  className="tags-main-row"
-                  onClick={() => setIsAssigneeDropdownOpen((prev) => !prev)}
-                >
-                  <div className="tags-list">
-                    {assignee ? (
-                      <span className="tag-item assignee-tag">
-                        {assigneeName}
-                        <button className="tag-remove" onClick={handleAssigneeClear}>
-                          ×
-                        </button>
-                      </span>
-                    ) : (
-                      <span className="tags-placeholder">Назначить...</span>
-                    )}
-                  </div>
-                </div>
-
-                {isAssigneeDropdownOpen && (
-                  <div className="tags-dropdown">
-                    <span className="field-hint">
-                      Начните вводить имя или email, чтобы найти участника пространства.
-                    </span>
-                    <div className="assignee-search">
-                      <input
-                        type="text"
-                        className="assignee-search-input"
-                        placeholder="Поиск исполнителя..."
-                        value={assigneeSearch}
-                        onChange={(e) => setAssigneeSearch(e.target.value)}
-                        autoFocus
-                      />
-                    </div>
-                    <div className="existing-tags">
-                      <div className="existing-tags-list">
-                        {membersLoading ? (
-                          <div className="dropdown-status">Загрузка участников...</div>
-                        ) : membersError ? (
-                          <div className="dropdown-status error">{membersError}</div>
-                        ) : !workspaceId ? (
-                          <div className="dropdown-status">Нет активного пространства</div>
-                        ) : filteredMembers.length ? (
-                          filteredMembers.map((member) => (
-                            <div
-                              key={member.user_id}
-                              className="existing-tag-item user-suggestion"
-                              onClick={() => handleAssigneeSelect(member)}
-                            >
-                              <span className="tag-label">
-                                {formatMemberName(member)}
-                                {member.email && (
-                                  <span className="member-email">{member.email}</span>
-                                )}
-                              </span>
-                            </div>
+            {canEditTasks && (
+              <>
+                <div className="detail-item">
+                  <span className="detail-label">Исполнители</span>
+                  <div className="tags-dropdown-container" ref={assigneeDropdownRef}>
+                    <div
+                      className="tags-main-row"
+                      onClick={() => setIsAssigneeDropdownOpen((prev) => !prev)}
+                    >
+                      <div className="tags-list">
+                        {assignees.length > 0 ? (
+                          assignees.map((assignee) => (
+                            <span key={assignee.id} className="tag-item assignee-tag">
+                              {getAssigneeDisplayName(assignee)}
+                              <button 
+                                className="tag-remove" 
+                                onClick={(e) => handleAssigneeRemove(e, assignee.id)}
+                              >
+                                ×
+                              </button>
+                            </span>
                           ))
                         ) : (
-                          <div className="dropdown-status">Участники не найдены</div>
+                          <span className="tags-placeholder">Назначить...</span>
                         )}
                       </div>
                     </div>
-                  </div>
-                )}
-              </div>
-            </div>
 
-            <div className="detail-item">
-              <span className="detail-label">Дата</span>
-              <div className="tags-dropdown-container" ref={dateDropdownRef}>
-                <div className="tags-main-row" onClick={() => setIsDateDropdownOpen((prev) => !prev)}>
-                  <div className="tags-list">
-                    {dueDate ? (
-                      <span className="tag-item date-tag">
-                        {formatDateOnly(dueDate)}
-                        <button className="tag-remove" onClick={handleDueDateClear}>
-                          ×
-                        </button>
-                      </span>
-                    ) : (
-                      <span className="tags-placeholder">Выбрать дату...</span>
+                    {isAssigneeDropdownOpen && (
+                      <div className="tags-dropdown">
+                        <span className="field-hint">
+                          Начните вводить имя или email, чтобы найти участника пространства.
+                        </span>
+                        <div className="assignee-search">
+                          <input
+                            type="text"
+                            className="assignee-search-input"
+                            placeholder="Поиск исполнителя..."
+                            value={assigneeSearch}
+                            onChange={(e) => setAssigneeSearch(e.target.value)}
+                            autoFocus
+                          />
+                        </div>
+                        <div className="existing-tags">
+                          <div className="existing-tags-list">
+                            {membersLoading ? (
+                              <div className="dropdown-status">Загрузка участников...</div>
+                            ) : membersError ? (
+                              <div className="dropdown-status error">{membersError}</div>
+                            ) : !workspaceId ? (
+                              <div className="dropdown-status">Нет активного пространства</div>
+                            ) : filteredMembers.length ? (
+                              filteredMembers.map((member) => {
+                                const isSelected = assignees.some((a) => a.id === member.user_id);
+                                return (
+                                  <div
+                                    key={member.user_id}
+                                    className={`existing-tag-item user-suggestion ${isSelected ? "selected" : ""}`}
+                                    onClick={() => handleAssigneeToggle(member)}
+                                  >
+                                    <span className="tag-label">
+                                      {formatMemberName(member)}
+                                      {member.email && (
+                                        <span className="member-email">{member.email}</span>
+                                      )}
+                                    </span>
+                                  </div>
+                                );
+                              })
+                            ) : (
+                              <div className="dropdown-status">Участники не найдены</div>
+                            )}
+                          </div>
+                        </div>
+                      </div>
                     )}
                   </div>
                 </div>
 
-                {isDateDropdownOpen && (
-                  <div className="tags-dropdown calendar-dropdown">
-                    <div className="custom-calendar">
-                      <div className="calendar-header">
-                        <button 
-                          type="button" 
-                          className="calendar-nav-btn"
-                          onClick={handlePrevMonth}
-                        >
-                          ‹
-                        </button>
-                        <div className="calendar-month-year">
-                          {monthNames[calendarDate.getMonth()]} {calendarDate.getFullYear()}
-                        </div>
-                        <button 
-                          type="button" 
-                          className="calendar-nav-btn"
-                          onClick={handleNextMonth}
-                        >
-                          ›
-                        </button>
-                      </div>
-                      <div className="calendar-weekdays">
-                        {weekDays.map((day) => (
-                          <div key={day} className="calendar-weekday">{day}</div>
-                        ))}
-                      </div>
-                      <div className="calendar-days">
-                        {getDaysInMonth(calendarDate).map((dayObj, idx) => {
-                          const day = dayObj.date;
-                          const dayClasses = [
-                            'calendar-day',
-                            !dayObj.isCurrentMonth && 'calendar-day-other-month',
-                            isToday(day) && 'calendar-day-today',
-                            isSelected(day) && 'calendar-day-selected',
-                            isOverdue(day) && 'calendar-day-overdue',
-                          ].filter(Boolean).join(' ');
-                          
-                          return (
-                            <button
-                              key={idx}
-                              type="button"
-                              className={dayClasses}
-                              onClick={() => handleDateClick(day)}
-                            >
-                              {day.getDate()}
+                <div className="detail-item">
+                  <span className="detail-label">Дата</span>
+                  <div className="tags-dropdown-container" ref={dateDropdownRef}>
+                    <div className="tags-main-row" onClick={() => setIsDateDropdownOpen((prev) => !prev)}>
+                      <div className="tags-list">
+                        {dueDate ? (
+                          <span className="tag-item date-tag">
+                            {formatDateOnly(dueDate)}
+                            <button className="tag-remove" onClick={handleDueDateClear}>
+                              ×
                             </button>
-                          );
-                        })}
+                          </span>
+                        ) : (
+                          <span className="tags-placeholder">Выбрать дату...</span>
+                        )}
                       </div>
                     </div>
-                  </div>
-                )}
-              </div>
-            </div>
 
+                    {isDateDropdownOpen && (
+                      <div className="tags-dropdown calendar-dropdown">
+                        <div className="custom-calendar">
+                          <div className="calendar-header">
+                            <button 
+                              type="button" 
+                              className="calendar-nav-btn"
+                              onClick={handlePrevMonth}
+                            >
+                              ‹
+                            </button>
+                            <div className="calendar-month-year">
+                              {monthNames[calendarDate.getMonth()]} {calendarDate.getFullYear()}
+                            </div>
+                            <button 
+                              type="button" 
+                              className="calendar-nav-btn"
+                              onClick={handleNextMonth}
+                            >
+                              ›
+                            </button>
+                          </div>
+                          <div className="calendar-weekdays">
+                            {weekDays.map((day) => (
+                              <div key={day} className="calendar-weekday">{day}</div>
+                            ))}
+                          </div>
+                          <div className="calendar-days">
+                            {getDaysInMonth(calendarDate).map((dayObj, idx) => {
+                              const day = dayObj.date;
+                              const dayClasses = [
+                                'calendar-day',
+                                !dayObj.isCurrentMonth && 'calendar-day-other-month',
+                                isToday(day) && 'calendar-day-today',
+                                isSelected(day) && 'calendar-day-selected',
+                                isOverdue(day) && 'calendar-day-overdue',
+                              ].filter(Boolean).join(' ');
+                              
+                              return (
+                                <button
+                                  key={idx}
+                                  type="button"
+                                  className={dayClasses}
+                                  onClick={() => handleDateClick(day)}
+                                >
+                                  {day.getDate()}
+                                </button>
+                              );
+                            })}
+                          </div>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </>
+            )}
+
+            {canEditTasks && (
             <div className="detail-item">
               <span className="detail-label">Приоритет</span>
               <div className="tags-dropdown-container" ref={priorityDropdownRef}>
@@ -837,8 +888,10 @@ export default function TaskModal({
                 )}
               </div>
             </div>
+            )}
           </div>
 
+          {canEditTasks && (
           <div className="task-section">
             <div className="detail-item">
               <span className="detail-label">Теги</span>
@@ -943,31 +996,45 @@ export default function TaskModal({
               </div>
             </div>
           </div>
+          )}
 
           <div className="task-section">
             <h3>Описание</h3>
-            <textarea
-              className="description-input"
-              value={description}
-              onChange={(e) => handleDescriptionChange(e.target.value)}
-              placeholder="Добавьте описание задачи..."
-              rows="4"
-              ref={(textarea) => {
-                if (textarea) {
-                  textarea.style.height = "auto";
-                  textarea.style.height = `${textarea.scrollHeight}px`;
-                }
-              }}
-              onInput={(e) => {
-                e.target.style.height = "auto";
-                e.target.style.height = `${e.target.scrollHeight}px`;
-              }}
-            />
+            {canEditTasks ? (
+              <textarea
+                className="description-input"
+                value={description}
+                onChange={(e) => handleDescriptionChange(e.target.value)}
+                placeholder="Добавьте описание задачи..."
+                rows="4"
+                ref={(textarea) => {
+                  if (textarea) {
+                    textarea.style.height = "auto";
+                    textarea.style.height = `${textarea.scrollHeight}px`;
+                  }
+                }}
+                onInput={(e) => {
+                  e.target.style.height = "auto";
+                  e.target.style.height = `${e.target.scrollHeight}px`;
+                }}
+              />
+            ) : (
+              <div className="description-readonly" style={{
+                padding: "8px 12px",
+                minHeight: "60px",
+                color: description ? "#172b4d" : "#94a3b8",
+                whiteSpace: "pre-wrap",
+                wordWrap: "break-word",
+              }}>
+                {description || "Описание отсутствует"}
+              </div>
+            )}
           </div>
 
           <div className="task-section comments-section-bottom">
             <h3>Комментарии</h3>
             <div className="comments-container">
+              {canComment && (
               <div className="comment-input-section">
                 <textarea
                   className="comment-input"
@@ -990,6 +1057,7 @@ export default function TaskModal({
                   {isCreatingComment ? "Отправка..." : "Отправить"}
                 </button>
               </div>
+              )}
               <div className="comment-display">
                 {comments.length ? (
                   <ul className="comment-list">

@@ -1,9 +1,12 @@
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.exc import SQLAlchemyError
+from sqlalchemy.orm import Session
 from db.OrmQuery import OrmQuery
 from api.models.columns import ColumnTitleUpdate, ColumnCreate
 from core.security import get_current_user
 from core.logger import logger
+from api.utils.permissions import can_view_project, can_edit_project
+from db.database import get_db
 from typing import List
 
 router = APIRouter(tags=["📊 Колонки"])
@@ -27,10 +30,15 @@ def update_column_title(column_id: int, data: ColumnTitleUpdate):
     return {"id": updated_column.id, "title": updated_column.title}
 
 @router.post("/api/columns")
-def create_column(data: ColumnCreate, current_user=Depends(get_current_user)):
+def create_column(
+    data: ColumnCreate, 
+    current_user=Depends(get_current_user),
+    db: Session = Depends(get_db)
+):
     """
     Создание новой колонки в доске.
     Проверяет доступ пользователя к доске через workspace.
+    Только владелец может создавать колонки.
     """
     if not current_user:
         raise HTTPException(status_code=401, detail="Не авторизован")
@@ -45,13 +53,13 @@ def create_column(data: ColumnCreate, current_user=Depends(get_current_user)):
     if not project:
         raise HTTPException(status_code=404, detail="Проект не найден")
     
-    # Проверяем доступ пользователя к workspace проекта
-    user_role = OrmQuery.get_user_workspace_role(current_user.id, project.workspaces_id)
-    if user_role is None:
-        raise HTTPException(
-            status_code=403, 
-            detail="Нет доступа к рабочему пространству"
-        )
+    # Проверяем доступ к проекту
+    if not can_view_project(current_user.id, project.id, db):
+        raise HTTPException(status_code=403, detail="Нет доступа к проекту")
+    
+    # Только владелец может создавать колонки
+    if not can_edit_project(current_user.id, project.id, db):
+        raise HTTPException(status_code=403, detail="Только владелец может создавать колонки")
     
     # Валидация данных
     if not data.title or not data.title.strip():

@@ -37,6 +37,13 @@ class User(Base):
         foreign_keys="Task.assigned_to",
         back_populates="assignee"
     )
+    
+    assigned_tasks_many: Mapped[List["Task"]] = relationship(
+        "Task",
+        secondary="task_assignees",
+        back_populates="assignees"
+    )
+    task_assignee_links: Mapped[List["TaskAssignee"]] = relationship(back_populates="user")
 
 class Workspace(Base):
     __tablename__ = 'workspaces'
@@ -120,6 +127,8 @@ class Task(Base):
     column_id: Mapped[int] = mapped_column(ForeignKey("columns.id"))
     
     assignee: Mapped["User"] = relationship(foreign_keys=[assigned_to], back_populates="assigned_tasks")
+    assignees: Mapped[List["User"]] = relationship("User", secondary="task_assignees", back_populates="assigned_tasks_many")
+    assignee_links: Mapped[List["TaskAssignee"]] = relationship(back_populates="task")
     author: Mapped["User"] = relationship(foreign_keys=[created_by])
     column: Mapped["Column"] = relationship(back_populates="tasks")
     comments: Mapped[List["Comment"]] = relationship(back_populates="task")
@@ -131,6 +140,16 @@ class TaskLabel(Base):
     id: Mapped[int] = mapped_column(primary_key=True)
     task_id: Mapped[int] = mapped_column(ForeignKey("tasks.id"))
     label_id: Mapped[int] = mapped_column(ForeignKey("labels.id"))
+
+class TaskAssignee(Base):
+    __tablename__ = 'task_assignees'
+    
+    id: Mapped[int] = mapped_column(primary_key=True)
+    task_id: Mapped[int] = mapped_column(ForeignKey("tasks.id"))
+    user_id: Mapped[int] = mapped_column(ForeignKey("users.id"))
+    
+    user: Mapped["User"] = relationship("User", back_populates="task_assignee_links")
+    task: Mapped["Task"] = relationship("Task", back_populates="assignee_links")
 
 class UserWorkspace(Base):
     __tablename__ = 'user_workspaces'

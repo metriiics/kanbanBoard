@@ -260,22 +260,24 @@ details[open] summary::after {
 
 .members-header {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: 2fr 1fr 1.5fr 1.5fr;
   background: #f9f9ff;
   font-weight: 600;
   padding: 10px 16px;
   font-size: 14px;
   color: #444;
   border-bottom: 1px solid #eee;
+  gap: 12px;
 }
 
 .member-row {
   display: grid;
-  grid-template-columns: 1fr 1fr;
-  align-items: center;
-  padding: 10px 16px;
+  grid-template-columns: 2fr 1fr 1.5fr 1.5fr;
+  align-items: start;
+  padding: 12px 16px;
   border-bottom: 1px solid #f0f0f0;
   transition: background 0.2s ease;
+  gap: 12px;
 }
 
 .member-row:hover {
@@ -339,10 +341,271 @@ details[open] summary::after {
   background: #eef2ff;
   color: #4338ca;
   border-radius: 12px;
-  padding: 2px 8px;
+  padding: 4px 10px;
   font-size: 12px;
-  text-transform: uppercase;
-  letter-spacing: 0.02em;
+  font-weight: 500;
+  display: inline-block;
+}
+
+.role-chip.owner {
+  background: #fef3c7;
+  color: #92400e;
+}
+
+.role-chip.reader {
+  background: #e0e7ff;
+  color: #3730a3;
+}
+
+.role-chip.commenter {
+  background: #dbeafe;
+  color: #1e40af;
+}
+
+.role-chip.participant {
+  background: #d1fae5;
+  color: #065f46;
+}
+
+.member-role-cell {
+  display: flex;
+  align-items: center;
+  min-height: 40px;
+}
+
+.role-select {
+  padding: 6px 10px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  font-size: 13px;
+  background: #fff;
+  cursor: pointer;
+  transition: border-color 0.2s;
+  width: 100%;
+  max-width: 180px;
+}
+
+.role-select:focus {
+  outline: none;
+  border-color: #4f46e5;
+  box-shadow: 0 0 0 2px rgba(79, 70, 229, 0.1);
+}
+
+.role-select:disabled {
+  background: #f3f4f6;
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.member-projects-cell {
+  display: flex;
+  align-items: center;
+  min-height: 40px;
+}
+
+.projects-count {
+  font-size: 13px;
+  color: #666;
+}
+
+.projects-select-button {
+  border: 1px solid #ddd;
+  background: #fff;
+  color: #333;
+  border-radius: 6px;
+  padding: 6px 12px;
+  font-size: 13px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-align: left;
+  min-width: 140px;
+}
+
+.projects-select-button:hover:not(:disabled) {
+  border-color: #4f46e5;
+  background: #f8f9ff;
+  color: #4f46e5;
+}
+
+.projects-select-button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.projects-owner-badge {
+  font-size: 13px;
+  color: #666;
+  font-style: italic;
+  padding: 6px 12px;
+  display: inline-block;
+}
+
+/* === Portal для выбора проектов === */
+.projects-portal-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  background: rgba(0, 0, 0, 0.3);
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding-top: 100px;
+}
+
+.projects-portal {
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+  z-index: 1001;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  animation: slideDown 0.2s ease;
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.projects-portal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 20px;
+  border-bottom: 1px solid #eee;
+  background: #f9f9ff;
+}
+
+.projects-portal-title {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 600;
+  color: #333;
+}
+
+.projects-portal-close {
+  background: none;
+  border: none;
+  font-size: 24px;
+  color: #999;
+  cursor: pointer;
+  padding: 0;
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 4px;
+  transition: all 0.2s ease;
+}
+
+.projects-portal-close:hover {
+  background: #f0f0f0;
+  color: #333;
+}
+
+.projects-portal-content {
+  padding: 12px;
+  max-height: 300px;
+  overflow-y: auto;
+  min-height: 100px;
+}
+
+.projects-portal-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.projects-portal-empty {
+  text-align: center;
+  color: #999;
+  font-size: 14px;
+  padding: 20px;
+}
+
+.project-portal-checkbox-label {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background 0.2s ease;
+  font-size: 14px;
+  color: #333;
+}
+
+.project-portal-checkbox-label:hover {
+  background: #f5f5ff;
+}
+
+.project-portal-checkbox-label input[type="checkbox"] {
+  cursor: pointer;
+  width: 18px;
+  height: 18px;
+  accent-color: #4f46e5;
+  flex-shrink: 0;
+}
+
+.project-portal-name {
+  flex: 1;
+  user-select: none;
+}
+
+.projects-portal-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  padding: 12px 20px;
+  border-top: 1px solid #eee;
+  background: #fafafa;
+}
+
+.projects-portal-cancel,
+.projects-portal-save {
+  border: none;
+  border-radius: 6px;
+  padding: 8px 16px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.projects-portal-cancel {
+  background: #f1f5f9;
+  color: #64748b;
+}
+
+.projects-portal-cancel:hover:not(:disabled) {
+  background: #e2e8f0;
+  color: #475569;
+}
+
+.projects-portal-save {
+  background: linear-gradient(135deg, #667eea, #764ba2);
+  color: #fff;
+}
+
+.projects-portal-save:hover:not(:disabled) {
+  opacity: 0.9;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(118, 75, 162, 0.3);
+}
+
+.projects-portal-cancel:disabled,
+.projects-portal-save:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
 }
 
 /* === Действия === */
@@ -350,8 +613,9 @@ details[open] summary::after {
   display: flex;
   justify-content: flex-end;
   align-items: center;
-  gap: 10px;
+  gap: 8px;
   position: relative;
+  flex-wrap: wrap;
 }
 
 /* === Кнопка исключить === */
@@ -376,6 +640,65 @@ details[open] summary::after {
   cursor: not-allowed;
   background: #f3f4f6;
   color: #9ca3af;
+}
+
+.edit-button {
+  border: none;
+  background: #e0e7ff;
+  color: #4338ca;
+  border-radius: 6px;
+  padding: 6px 12px;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.edit-button:hover {
+  background: #c7d2fe;
+}
+
+.save-button {
+  border: none;
+  background: linear-gradient(135deg, #667eea, #764ba2);
+  color: #fff;
+  border-radius: 6px;
+  padding: 6px 12px;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: opacity 0.2s ease;
+}
+
+.save-button:hover:not(:disabled) {
+  opacity: 0.9;
+}
+
+.save-button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.cancel-button {
+  border: none;
+  background: #f1f5f9;
+  color: #64748b;
+  border-radius: 6px;
+  padding: 6px 12px;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.cancel-button:hover:not(:disabled) {
+  background: #e2e8f0;
+  color: #475569;
+}
+
+.cancel-button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
 }
 
 /* === Нет результатов === */

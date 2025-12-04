@@ -1,13 +1,13 @@
-import React, { useState, useEffect, memo } from 'react';
+import React, { useState, useEffect, useMemo, memo } from 'react';
 import { useDrag, useDrop } from 'react-dnd';
 import { createPortal } from 'react-dom';
 import { getEmptyImage } from 'react-dnd-html5-backend';
 import { getAssigneeDisplayName } from '../utils/taskMapper';
 
 const KanbanTask = ({ task, index, columnId, columnTitle, onTaskClick, moveTaskInColumn }) => {
-  const [showUserInfo, setShowUserInfo] = useState(false);
+  const [showUserInfo, setShowUserInfo] = useState(null);
   const [tooltipPos, setTooltipPos] = useState({ x: 0, y: 0 });
-  const [avatarError, setAvatarError] = useState(false);
+  const [avatarErrors, setAvatarErrors] = useState(new Set()); // Множество ID пользователей, у которых не загрузилась аватарка
 
   // Защита от undefined задачи - используем безопасные значения по умолчанию
   const safeTask = task || {};
@@ -79,11 +79,22 @@ const KanbanTask = ({ task, index, columnId, columnTitle, onTaskClick, moveTaskI
     }
   };
 
-  const assignee = safeTask.assignee;
+  // Поддержка как нового формата (assignees), так и старого (assignee)
+  const assignees = useMemo(() => {
+    // Сначала проверяем новый формат assignees
+    if (safeTask.assignees && Array.isArray(safeTask.assignees) && safeTask.assignees.length > 0) {
+      return safeTask.assignees;
+    }
+    // Затем проверяем старый формат assignee
+    if (safeTask.assignee && typeof safeTask.assignee === 'object' && safeTask.assignee.id) {
+      return [safeTask.assignee];
+    }
+    return [];
+  }, [safeTask.assignees, safeTask.assignee]);
+  
   const dueDateValue = safeTask.dueDate || safeTask.due_date || null;
-  const hasAssignee = Boolean(assignee);
+  const hasAssignees = assignees.length > 0;
   const hasDueDate = Boolean(dueDateValue);
-  const assigneeName = getAssigneeDisplayName(assignee);
 
   // Проверка, просрочена ли дата
   const isDateOverdue = () => {
@@ -96,15 +107,17 @@ const KanbanTask = ({ task, index, columnId, columnTitle, onTaskClick, moveTaskI
     return dueDate < today;
   };
 
-  // Получаем URL аватара - используем напрямую из базы данных
-  const avatarUrl = assignee?.avatar_url || null;
+  // Показываем максимум 3 аватарки, остальные скрываем за "+N"
+  const MAX_VISIBLE_AVATARS = 3;
+  const visibleAssignees = useMemo(() => assignees.slice(0, MAX_VISIBLE_AVATARS), [assignees]);
+  const hiddenCount = useMemo(() => Math.max(0, assignees.length - MAX_VISIBLE_AVATARS), [assignees.length]);
 
-  // Сбрасываем ошибку при изменении задачи
+  // Сбрасываем ошибки при изменении задачи
   useEffect(() => {
     if (taskId) {
-      setAvatarError(false);
+      setAvatarErrors(new Set());
     }
-  }, [taskId, avatarUrl]);
+  }, [taskId, assignees]);
 
   // Защита от undefined задачи - возвращаем null после всех хуков
   if (!task || !task.id) {
@@ -149,7 +162,7 @@ const KanbanTask = ({ task, index, columnId, columnTitle, onTaskClick, moveTaskI
           </div>
         </div>
 
-        {(hasDueDate || hasAssignee) && (
+        {(hasDueDate || hasAssignees) && (
           <div className="task-footer">
             {hasDueDate && (
               <span 
@@ -159,42 +172,104 @@ const KanbanTask = ({ task, index, columnId, columnTitle, onTaskClick, moveTaskI
               </span>
             )}
 
-            {hasAssignee && (
-              <div
-                className="task-user"
-                onMouseEnter={handleMouseEnter}
-                onMouseLeave={handleMouseLeave}
-              >
-                {avatarUrl && !avatarError ? (
-                  <img
-                    src={avatarUrl}
-                    alt={assigneeName}
-                    className="task-user-avatar"
-                    style={{
-                      width: '25px',
-                      height: '25px',
-                      borderRadius: '50%',
-                      objectFit: 'cover',
-                    }}
-                    onError={() => setAvatarError(true)}
-                  />
-                ) : (
+            {hasAssignees && (
+              <div className="task-assignees">
+                {visibleAssignees.map((assignee, idx) => {
+                  const assigneeName = getAssigneeDisplayName(assignee);
+                  // Проверяем все возможные варианты имени поля
+                  const avatarUrl = assignee?.avatar_url || assignee?.avatarUrl || null;
+                  const avatarKey = `${assignee.id}-${idx}`;
+                  const hasAvatarError = avatarErrors.has(assignee.id);
+                  const shouldShowAvatar = avatarUrl && !hasAvatarError && avatarUrl.trim() !== '';
+                  
+                  return (
+                    <div
+                      key={avatarKey}
+                      className="task-user"
+                      onMouseEnter={(e) => {
+                        const rect = e.currentTarget.getBoundingClientRect();
+                        const tooltipWidth = 180;
+                        const tooltipHeight = 80;
+                        let left = rect.right - tooltipWidth;
+                        let top = rect.top - tooltipHeight - 8;
+                        if (left < 8) left = rect.left;
+                        if (top < 0) top = rect.bottom + 8;
+                        setTooltipPos({ x: left, y: top });
+                        setShowUserInfo(assignee);
+                      }}
+                      onMouseLeave={() => setShowUserInfo(null)}
+                      style={{
+                        marginLeft: idx > 0 ? '-8px' : '0',
+                        position: 'relative',
+                        zIndex: visibleAssignees.length - idx,
+                      }}
+                    >
+                      {shouldShowAvatar ? (
+                        <img
+                          src={avatarUrl}
+                          alt={assigneeName}
+                          className="task-user-avatar"
+                          style={{
+                            width: '25px',
+                            height: '25px',
+                            borderRadius: '50%',
+                            objectFit: 'cover',
+                            border: '2px solid white',
+                            boxShadow: '0 1px 3px rgba(0,0,0,0.2)',
+                            display: 'block',
+                          }}
+                          onError={(e) => {
+                            setAvatarErrors(prev => new Set(prev).add(assignee.id));
+                            e.target.style.display = 'none';
+                          }}
+                        />
+                      ) : (
+                        <div
+                          className="task-user-avatar-fallback"
+                          style={{
+                            width: '25px',
+                            height: '25px',
+                            borderRadius: '50%',
+                            backgroundColor: '#764ba2',
+                            color: 'white',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            fontSize: '10px',
+                            fontWeight: 'bold',
+                            border: '2px solid white',
+                            boxShadow: '0 1px 3px rgba(0,0,0,0.2)',
+                          }}
+                        >
+                          {assigneeName ? assigneeName.charAt(0).toUpperCase() : '?'}
+                        </div>
+                      )}
+                    </div>
+                  );
+                })}
+                {hiddenCount > 0 && (
                   <div
-                    className="task-user-avatar-fallback"
+                    className="task-user-avatar-more"
                     style={{
                       width: '25px',
                       height: '25px',
                       borderRadius: '50%',
-                      backgroundColor: '#764ba2',
-                      color: 'white',
+                      backgroundColor: '#e0e0e0',
+                      color: '#666',
                       display: 'flex',
                       alignItems: 'center',
                       justifyContent: 'center',
-                      fontSize: '10px',
+                      fontSize: '9px',
                       fontWeight: 'bold',
+                      border: '2px solid white',
+                      boxShadow: '0 1px 3px rgba(0,0,0,0.2)',
+                      marginLeft: '-8px',
+                      position: 'relative',
+                      zIndex: 0,
                     }}
+                    title={assignees.slice(MAX_VISIBLE_AVATARS).map(a => getAssigneeDisplayName(a)).join(', ')}
                   >
-                    {assigneeName ? assigneeName.charAt(0).toUpperCase() : '?'}
+                    +{hiddenCount}
                   </div>
                 )}
               </div>
@@ -226,7 +301,7 @@ const KanbanTask = ({ task, index, columnId, columnTitle, onTaskClick, moveTaskI
         )}
 
         {/* Tooltip через createPortal */}
-        {showUserInfo && hasAssignee &&
+        {showUserInfo && typeof showUserInfo === 'object' &&
           createPortal(
             <div
               className="user-tooltip"
@@ -236,9 +311,9 @@ const KanbanTask = ({ task, index, columnId, columnTitle, onTaskClick, moveTaskI
                 left: tooltipPos.x,
               }}
             >
-              <p><strong>{assigneeName}</strong></p>
-              {assignee.username && <p>@{assignee.username}</p>}
-              {assignee.email && <p className="user-email">{assignee.email}</p>}
+              <p><strong>{getAssigneeDisplayName(showUserInfo)}</strong></p>
+              {showUserInfo.username && <p>@{showUserInfo.username}</p>}
+              {showUserInfo.email && <p className="user-email">{showUserInfo.email}</p>}
             </div>,
             document.body
           )}
@@ -257,43 +332,75 @@ const KanbanTask = ({ task, index, columnId, columnTitle, onTaskClick, moveTaskI
             <div className="task-header">
               <h4 className="task-title">{task.title}</h4>
             </div>
-            {(hasDueDate || hasAssignee) && (
+            {(hasDueDate || hasAssignees) && (
               <div className="task-footer">
                 {hasDueDate && (
                   <span className="task-date">
                     {new Date(dueDateValue).toLocaleDateString('ru-RU')}
                   </span>
                 )}
-                {hasAssignee && (
-                  avatarUrl ? (
-                    <img
-                      src={avatarUrl}
-                      alt={assigneeName}
-                      style={{
-                        width: '25px',
-                        height: '25px',
-                        borderRadius: '50%',
-                        objectFit: 'cover',
-                      }}
-                    />
-                  ) : (
-                    <div
-                      style={{
-                        width: '25px',
-                        height: '25px',
-                        borderRadius: '50%',
-                        backgroundColor: '#764ba2',
-                        color: 'white',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        fontSize: '10px',
-                        fontWeight: 'bold',
-                      }}
-                    >
-                      {assigneeName ? assigneeName.charAt(0).toUpperCase() : '?'}
-                    </div>
-                  )
+                {hasAssignees && (
+                  <div className="task-assignees" style={{ display: 'flex', gap: '-8px' }}>
+                    {visibleAssignees.map((assignee, idx) => {
+                      const assigneeName = getAssigneeDisplayName(assignee);
+                      const avatarUrl = assignee?.avatar_url || null;
+                      return avatarUrl ? (
+                        <img
+                          key={`${assignee.id}-${idx}`}
+                          src={avatarUrl}
+                          alt={assigneeName}
+                          style={{
+                            width: '25px',
+                            height: '25px',
+                            borderRadius: '50%',
+                            objectFit: 'cover',
+                            border: '2px solid white',
+                            marginLeft: idx > 0 ? '-8px' : '0',
+                          }}
+                        />
+                      ) : (
+                        <div
+                          key={`${assignee.id}-${idx}`}
+                          style={{
+                            width: '25px',
+                            height: '25px',
+                            borderRadius: '50%',
+                            backgroundColor: '#764ba2',
+                            color: 'white',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            fontSize: '10px',
+                            fontWeight: 'bold',
+                            border: '2px solid white',
+                            marginLeft: idx > 0 ? '-8px' : '0',
+                          }}
+                        >
+                          {assigneeName ? assigneeName.charAt(0).toUpperCase() : '?'}
+                        </div>
+                      );
+                    })}
+                    {hiddenCount > 0 && (
+                      <div
+                        style={{
+                          width: '25px',
+                          height: '25px',
+                          borderRadius: '50%',
+                          backgroundColor: '#e0e0e0',
+                          color: '#666',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          fontSize: '9px',
+                          fontWeight: 'bold',
+                          border: '2px solid white',
+                          marginLeft: '-8px',
+                        }}
+                      >
+                        +{hiddenCount}
+                      </div>
+                    )}
+                  </div>
                 )}
               </div>
             )}
@@ -305,18 +412,30 @@ const KanbanTask = ({ task, index, columnId, columnTitle, onTaskClick, moveTaskI
 };
 
 // Мемоизируем компонент для предотвращения лишних ререндеров
+// Временно упрощаем мемоизацию - всегда ререндерим, если версия изменилась
 export default memo(KanbanTask, (prevProps, nextProps) => {
-  // Сравниваем только необходимые поля
-  return (
-    prevProps.task.id === nextProps.task.id &&
-    prevProps.task.title === nextProps.task.title &&
-    prevProps.task.priority === nextProps.task.priority &&
-    prevProps.task.dueDate === nextProps.task.dueDate &&
-    prevProps.task.due_date === nextProps.task.due_date &&
-    JSON.stringify(prevProps.task.labels) === JSON.stringify(nextProps.task.labels) &&
-    JSON.stringify(prevProps.task.assignee) === JSON.stringify(nextProps.task.assignee) &&
-    prevProps.index === nextProps.index &&
-    prevProps.columnId === nextProps.columnId &&
-    prevProps.columnTitle === nextProps.columnTitle
-  );
+  // Проверяем версию задачи для принудительного ререндера
+  const prevVersion = prevProps.task._version || 0;
+  const nextVersion = nextProps.task._version || 0;
+  if (prevVersion !== nextVersion) {
+    return false; // Версия изменилась - нужен ререндер
+  }
+  
+  // Если версия не изменилась, проверяем основные поля
+  // Если хотя бы одно поле изменилось, нужен ререндер
+  if (prevProps.task.id !== nextProps.task.id) return false;
+  if (prevProps.task.title !== nextProps.task.title) return false;
+  if (prevProps.task.description !== nextProps.task.description) return false;
+  if (prevProps.task.priority !== nextProps.task.priority) return false;
+  if (prevProps.task.dueDate !== nextProps.task.dueDate && prevProps.task.due_date !== nextProps.task.due_date) return false;
+  if (JSON.stringify(prevProps.task.labels || []) !== JSON.stringify(nextProps.task.labels || [])) return false;
+  if (JSON.stringify(prevProps.task.assignee) !== JSON.stringify(nextProps.task.assignee)) return false;
+  if (JSON.stringify(prevProps.task.assignees || []) !== JSON.stringify(nextProps.task.assignees || [])) return false;
+  
+  if (prevProps.index !== nextProps.index) return false;
+  if (prevProps.columnId !== nextProps.columnId) return false;
+  if (prevProps.columnTitle !== nextProps.columnTitle) return false;
+  
+  // Все одинаково - не нужен ререндер
+  return true;
 });

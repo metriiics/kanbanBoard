@@ -18,6 +18,7 @@ export default function useBoard(boardId) {
     setError(null);
     try {
       const data = await getBoardColumns(boardId);
+      
       const normalizedColumns = (data.columns || []).map((column) => ({
         ...column,
         tasks: (column.tasks || []).map((task) => normalizeTaskCard(task)),

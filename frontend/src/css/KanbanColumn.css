@@ -68,6 +68,12 @@
   padding: 6px;
   border-radius: 6px;
   transition: all 0.2s ease;
+  flex-shrink: 0;
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .column-menu:hover {
