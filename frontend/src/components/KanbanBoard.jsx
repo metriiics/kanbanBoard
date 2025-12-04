@@ -114,7 +114,10 @@ export default function KanbanBoard() {
   const moveTaskBetweenColumns = async (taskId, fromColumnId, toColumnId) => {
     // Оптимистичное обновление UI
     setColumns(prevColumns => {
-      const newColumns = [...prevColumns];
+      const newColumns = prevColumns.map(col => ({
+        ...col,
+        tasks: col.tasks ? col.tasks.filter(task => task && task.id) : []
+      }));
       
       const fromColumn = newColumns.find(col => col.id === fromColumnId);
       const toColumn = newColumns.find(col => col.id === toColumnId);
@@ -122,16 +125,32 @@ export default function KanbanBoard() {
       if (!fromColumn || !toColumn) return prevColumns;
       
       // Находим задачу
-      const taskIndex = fromColumn.tasks.findIndex(task => task.id === taskId);
+      const taskIndex = fromColumn.tasks.findIndex(task => task && task.id === taskId);
       if (taskIndex === -1) return prevColumns;
       
-      // Перемещаем задачу
-      const [task] = fromColumn.tasks.splice(taskIndex, 1);
+      // Перемещаем задачу (создаем новые массивы)
+      const task = fromColumn.tasks[taskIndex];
+      
+      // Проверяем, что задача существует
+      if (!task || !task.id) return prevColumns;
+      
       // Обновляем column_id в задаче
       const updatedTask = { ...task, column_id: toColumnId };
-      toColumn.tasks.push(updatedTask);
       
-      return newColumns;
+      // Создаем новые массивы задач для обеих колонок
+      const newFromTasks = fromColumn.tasks.filter((_, idx) => idx !== taskIndex);
+      const newToTasks = [...toColumn.tasks, updatedTask];
+      
+      // Обновляем колонки с новыми массивами задач
+      return newColumns.map(col => {
+        if (col.id === fromColumnId) {
+          return { ...col, tasks: newFromTasks };
+        }
+        if (col.id === toColumnId) {
+          return { ...col, tasks: newToTasks };
+        }
+        return col;
+      });
     });
 
     // Сохраняем на сервере
@@ -141,19 +160,38 @@ export default function KanbanBoard() {
       console.error("Ошибка при сохранении перемещения задачи:", err);
       // Откатываем изменения при ошибке
       setColumns(prevColumns => {
-        const newColumns = [...prevColumns];
+        const newColumns = prevColumns.map(col => ({
+          ...col,
+          tasks: col.tasks ? col.tasks.filter(task => task && task.id) : []
+        }));
+        
         const fromColumn = newColumns.find(col => col.id === fromColumnId);
         const toColumn = newColumns.find(col => col.id === toColumnId);
         
         if (!fromColumn || !toColumn) return prevColumns;
         
-        const taskIndex = toColumn.tasks.findIndex(task => task.id === taskId);
+        const taskIndex = toColumn.tasks.findIndex(task => task && task.id === taskId);
         if (taskIndex === -1) return prevColumns;
         
-        const [task] = toColumn.tasks.splice(taskIndex, 1);
-        fromColumn.tasks.push(task);
+        const task = toColumn.tasks[taskIndex];
         
-        return newColumns;
+        // Проверяем, что задача существует
+        if (!task || !task.id) return prevColumns;
+        
+        // Создаем новые массивы задач
+        const newToTasks = toColumn.tasks.filter((_, idx) => idx !== taskIndex);
+        const newFromTasks = [...fromColumn.tasks, task];
+        
+        // Обновляем колонки с новыми массивами задач
+        return newColumns.map(col => {
+          if (col.id === fromColumnId) {
+            return { ...col, tasks: newFromTasks };
+          }
+          if (col.id === toColumnId) {
+            return { ...col, tasks: newToTasks };
+          }
+          return col;
+        });
       });
     }
   };
@@ -161,16 +199,36 @@ export default function KanbanBoard() {
   // Функция для изменения порядка задач в колонке
   const moveTaskInColumn = (dragIndex, hoverIndex, columnId) => {
     setColumns(prevColumns => {
-      const newColumns = [...prevColumns];
+      const newColumns = prevColumns.map(col => ({
+        ...col,
+        tasks: col.tasks ? col.tasks.filter(task => task && task.id) : []
+      }));
+      
       const column = newColumns.find(col => col.id === columnId);
       
       if (!column) return prevColumns;
       
-      // Меняем порядок задач
-      const [movedTask] = column.tasks.splice(dragIndex, 1);
-      column.tasks.splice(hoverIndex, 0, movedTask);
+      // Проверяем валидность индексов
+      if (dragIndex < 0 || dragIndex >= column.tasks.length || 
+          hoverIndex < 0 || hoverIndex >= column.tasks.length) {
+        return prevColumns;
+      }
       
-      return newColumns;
+      // Получаем задачу
+      const movedTask = column.tasks[dragIndex];
+      
+      // Проверяем, что задача существует
+      if (!movedTask || !movedTask.id) return prevColumns;
+      
+      // Создаем новый массив с измененным порядком
+      const newTasks = [...column.tasks];
+      newTasks.splice(dragIndex, 1);
+      newTasks.splice(hoverIndex, 0, movedTask);
+      
+      // Обновляем колонку с новым массивом задач
+      return newColumns.map(col => 
+        col.id === columnId ? { ...col, tasks: newTasks } : col
+      );
     });
   };
 

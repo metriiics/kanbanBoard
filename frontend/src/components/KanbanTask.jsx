@@ -7,6 +7,11 @@ import { getAssigneeDisplayName } from '../utils/taskMapper';
 const KanbanTask = ({ task, index, columnId, columnTitle, onTaskClick, moveTaskInColumn }) => {
   const [showUserInfo, setShowUserInfo] = useState(false);
   const [tooltipPos, setTooltipPos] = useState({ x: 0, y: 0 });
+  const [avatarError, setAvatarError] = useState(false);
+
+  // Защита от undefined задачи - используем безопасные значения по умолчанию
+  const safeTask = task || {};
+  const taskId = safeTask.id || null;
 
   const getPriorityColor = (priority) => {
     switch (priority) {
@@ -20,16 +25,19 @@ const KanbanTask = ({ task, index, columnId, columnTitle, onTaskClick, moveTaskI
   // 🟣 Правильно деструктурируем preview из useDrag
   const [{ isDragging }, drag, preview] = useDrag({
     type: 'task',
-    item: { taskId: task.id, index, columnId },
+    item: { taskId: taskId, index, columnId },
     collect: (monitor) => ({
       isDragging: monitor.isDragging(),
     }),
+    canDrag: () => !!taskId, // Отключаем drag если нет taskId
   });
 
   // 🟢 Отключаем стандартное drag-превью
   useEffect(() => {
-    preview(getEmptyImage(), { captureDraggingState: true });
-  }, [preview]);
+    if (taskId) {
+      preview(getEmptyImage(), { captureDraggingState: true });
+    }
+  }, [preview, taskId]);
 
   const [, drop] = useDrop({
     accept: 'task',
@@ -47,25 +55,31 @@ const KanbanTask = ({ task, index, columnId, columnTitle, onTaskClick, moveTaskI
   };
 
   const handleClick = () => {
-    if (onTaskClick && typeof onTaskClick === 'function') {
-      onTaskClick(task, columnTitle);
+    if (onTaskClick && typeof onTaskClick === 'function' && safeTask.id) {
+      onTaskClick(safeTask, columnTitle);
     }
   };
 
-  const assignee = task.assignee;
-  const dueDateValue = task.dueDate || task.due_date || null;
+  const assignee = safeTask.assignee;
+  const dueDateValue = safeTask.dueDate || safeTask.due_date || null;
   const hasAssignee = Boolean(assignee);
   const hasDueDate = Boolean(dueDateValue);
   const assigneeName = getAssigneeDisplayName(assignee);
-  const [avatarError, setAvatarError] = useState(false);
 
   // Получаем URL аватара - используем напрямую из базы данных
   const avatarUrl = assignee?.avatar_url || null;
 
   // Сбрасываем ошибку при изменении задачи
   useEffect(() => {
-    setAvatarError(false);
-  }, [task.id, avatarUrl]);
+    if (taskId) {
+      setAvatarError(false);
+    }
+  }, [taskId, avatarUrl]);
+
+  // Защита от undefined задачи - возвращаем null после всех хуков
+  if (!task || !task.id) {
+    return null;
+  }
 
   const handleMouseEnter = (e) => {
     const rect = e.currentTarget.getBoundingClientRect();

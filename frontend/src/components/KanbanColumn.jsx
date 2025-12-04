@@ -83,9 +83,10 @@ const KanbanColumn = ({
       }
 
       // --- если перетаскивается задача ---
-      if (monitor.getItemType() === 'task' && item.columnId !== column.id) {
+      if (monitor.getItemType() === 'task' && item.columnId !== column.id && item.taskId) {
         // Предотвращаем множественные вызовы
         if (item.lastColumnId !== column.id) {
+          // Проверяем, что задача еще существует в исходной колонке
           moveTaskBetweenColumns(item.taskId, item.columnId, column.id);
           item.columnId = column.id;
           item.lastColumnId = column.id;
@@ -246,7 +247,7 @@ const KanbanColumn = ({
       </div>
 
       <div className="tasks-container">
-        {column.tasks.map((task, index) => (
+        {column.tasks.filter(task => task && task.id).map((task, index) => (
           <KanbanTask
             key={task.id}
             task={task}
