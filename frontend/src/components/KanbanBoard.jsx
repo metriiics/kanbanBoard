@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from 'react';
+import React, { useCallback, useState, useMemo } from 'react';
 import { useParams } from 'react-router-dom';
 import { DndProvider } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
@@ -13,6 +13,9 @@ import MyTaskView from './MyTaskView';
 import { normalizeTaskCard } from "../utils/taskMapper";
 import { useTasks } from "../hooks/h_useTasks";
 import { createColumn } from "../api/a_columns";
+
+// Создаем backend один раз вне компонента, чтобы избежать ошибки "Cannot have two HTML5 backends"
+const html5Backend = HTML5Backend;
 
 export default function KanbanBoard() {
   const { boardId } = useParams();
@@ -366,7 +369,7 @@ export default function KanbanBoard() {
   };
 
   return (
-    <DndProvider backend={HTML5Backend}>
+    <DndProvider backend={html5Backend}>
       <div className="kanban-board-with-sidebar">
         {/* Боковое меню */}
         <Sidebar 

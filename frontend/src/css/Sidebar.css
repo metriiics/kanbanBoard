@@ -208,7 +208,7 @@
 .sidebar-content {
   flex: 1;
   padding: 16px 0;
-  overflow-y: auto;
+  overflow: hidden;
   background: transparent;
 }
 
@@ -274,6 +274,39 @@
 
 /* === УНИФИЦИРОВАННЫЙ СТИЛЬ ДЛЯ ПРОЕКТОВ И ДОСОК === */
 
+/* Контейнеры для списков с ограничением высоты и скроллом */
+.projects-list,
+.boards-list {
+  max-height: 280px; /* Ограничение для отображения примерно 5 элементов */
+  overflow-y: auto;
+  overflow-x: hidden;
+  margin-bottom: 12px;
+  padding-right: 4px; /* Отступ для скроллбара */
+}
+
+/* Кастомный скроллбар для списков */
+.projects-list::-webkit-scrollbar,
+.boards-list::-webkit-scrollbar {
+  width: 4px;
+}
+
+.projects-list::-webkit-scrollbar-track,
+.boards-list::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.05);
+  border-radius: 2px;
+}
+
+.projects-list::-webkit-scrollbar-thumb,
+.boards-list::-webkit-scrollbar-thumb {
+  background: linear-gradient(135deg, #667eea, #764ba2);
+  border-radius: 2px;
+}
+
+.projects-list::-webkit-scrollbar-thumb:hover,
+.boards-list::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(135deg, #764ba2, #667eea);
+}
+
 /* Контейнер для элементов проектов и досок */
 .project-item,
 .board-item {
@@ -330,30 +363,113 @@
 /* Выбранное состояние */
 .project-header.selected,
 .board-link-wrapper.active {
-  background: rgba(255, 255, 255, 0.9);
-  border-color: rgba(102, 126, 234, 0.3);
+  background: rgba(255, 255, 255, 0.9) !important;
+  border: 1px solid rgba(102, 126, 234, 0.3) !important;
+  transform: translateX(2px);
 }
 
 .project-header.selected::before,
 .board-link-wrapper.active::before {
-  opacity: 1;
+  opacity: 1 !important;
 }
 
-/* Иконки */
+/* Дополнительное выделение для активной доски */
+.board-link-wrapper.active .board-name {
+  color: #111;
+  font-weight: 600;
+}
+
+/* Иконки - минималистичный дизайн */
 .project-icon,
 .board-icon {
   margin-right: 12px;
-  font-size: 16px;
+  width: 16px;
+  height: 16px;
   flex-shrink: 0;
-  color: #666;
-  transition: all 0.3s ease;
+  display: inline-block;
+  position: relative;
+  transition: all 0.2s ease;
 }
+
+/* Иконка проекта - простая папка */
+.project-icon::before {
+  content: '';
+  position: absolute;
+  width: 100%;
+  height: 70%;
+  bottom: 0;
+  left: 0;
+  background: #a1a1aa;
+  border-radius: 2px;
+  opacity: 0.4;
+  transition: all 0.2s ease;
+}
+
+.project-icon::after {
+  content: '';
+  position: absolute;
+  width: 50%;
+  height: 20%;
+  top: 0;
+  left: 25%;
+  background: #a1a1aa;
+  border-radius: 1px 1px 0 0;
+  opacity: 0.5;
+  transition: all 0.2s ease;
+}
+
+/* Иконка доски - простой квадрат */
+.board-icon::before {
+  content: '';
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  background: transparent;
+  border: 1.5px solid #a1a1aa;
+  border-radius: 2px;
+  opacity: 0.4;
+  transition: all 0.2s ease;
+}
+
+.board-icon::after {
+  content: '';
+  position: absolute;
+  width: 60%;
+  height: 60%;
+  top: 20%;
+  left: 20%;
+  background: #a1a1aa;
+  border-radius: 1px;
+  opacity: 0.3;
+  transition: all 0.2s ease;
+}
+
+/* Состояния при наведении и выборе */
+.project-header:hover .project-icon::before,
+.project-header.selected .project-icon::before,
+.project-header:hover .project-icon::after,
+.project-header.selected .project-icon::after {
+  background: #667eea;
+  opacity: 0.7;
+}
+
+.board-link-wrapper:hover .board-icon::before,
+.board-link-wrapper.active .board-icon::before {
+  border-color: #667eea;
+  opacity: 0.7;
+}
+
+.board-link-wrapper:hover .board-icon::after,
+.board-link-wrapper.active .board-icon::after {
+  background: #667eea;
+  opacity: 0.5;
+}
+
 
 .project-header:hover .project-icon,
 .project-header.selected .project-icon,
 .board-link-wrapper:hover .board-icon,
 .board-link-wrapper.active .board-icon {
-  color: #667eea;
   transform: scale(1.1);
 }
 
@@ -416,10 +532,7 @@
   backdrop-filter: blur(10px);
 }
 
-/* Список досок */
-.boards-list {
-  margin-bottom: 12px;
-}
+/* Список досок - стили уже определены выше в .projects-list, .boards-list */
 
 /* Троеточия - одинаковый стиль для проектов и досок */
 .project-header .menu-wrapper,
@@ -433,26 +546,24 @@
 
 .project-header .menu-button,
 .board-link-wrapper .menu-button {
-  background: rgba(255, 255, 255, 0.6);
-  border: 1px solid rgba(0,0,0,0.1);
+  background: transparent;
+  border: none;
   font-size: 16px;
   color: #666;
   cursor: pointer;
   padding: 4px 8px;
-  border-radius: 6px;
   transition: all 0.2s ease;
   display: flex;
   align-items: center;
   justify-content: center;
-  backdrop-filter: blur(10px);
   width: 24px;
   height: 24px;
 }
 
 .project-header .menu-button:hover,
 .board-link-wrapper .menu-button:hover {
-  background: rgba(255, 255, 255, 0.8);
-  border-color: rgba(0,0,0,0.2);
+  color: #111;
+  background: transparent;
 }
 
 /* === НИЖНИЕ КНОПКИ - ЦЕНТРИРОВАННЫЕ === */
@@ -642,24 +753,6 @@
   margin-left: 12px;
 }
 
-/* Скроллбар */
-.sidebar-content::-webkit-scrollbar {
-  width: 4px;
-}
-
-.sidebar-content::-webkit-scrollbar-track {
-  background: rgba(0, 0, 0, 0.05);
-  border-radius: 2px;
-}
-
-.sidebar-content::-webkit-scrollbar-thumb {
-  background: linear-gradient(135deg, #667eea, #764ba2);
-  border-radius: 2px;
-}
-
-.sidebar-content::-webkit-scrollbar-thumb:hover {
-  background: linear-gradient(135deg, #764ba2, #667eea);
-}
 
 /* Анимации */
 @keyframes slideIn {

@@ -16,6 +16,7 @@ import PageLoader from "./PageLoader";
 export default function Sidebar({ isCollapsed, onToggle }) {
   const [expandedProjects, setExpandedProjects] = useState({});
   const [selectedProject, setSelectedProject] = useState(null);
+  const manuallySelectedProjectRef = useRef(false);
   const [showProjectModal, setShowProjectModal] = useState(false);
   const [showBoardModal, setShowBoardModal] = useState(false);
   const [modalType, setModalType] = useState(null);
@@ -107,7 +108,10 @@ export default function Sidebar({ isCollapsed, onToggle }) {
     }
   };
 
-  const handleProjectClick = (project) => setSelectedProject(project);
+  const handleProjectClick = (project) => {
+    manuallySelectedProjectRef.current = true;
+    setSelectedProject(project);
+  };
 
   const handleCreateProject = (e) => {
     e.stopPropagation();
@@ -225,8 +229,68 @@ export default function Sidebar({ isCollapsed, onToggle }) {
     closeModal();
   };
 
-  const isBoardActive = (boardId) =>
-    location.pathname.includes(`/boards/${boardId}`);
+  const isBoardActive = (boardId) => {
+    const path = location.pathname;
+    // Проверяем оба варианта: /board/ и /boards/ для совместимости
+    return path.includes(`/board/${boardId}`) || path.includes(`/boards/${boardId}`);
+  };
+
+  // Определяем проект для отображения досок
+  // Приоритет: selectedProject (ручной выбор) > проект из URL (автоматический выбор)
+  const getProjectForBoards = () => {
+    // Если проект выбран вручную, всегда используем его
+    if (selectedProject) {
+      return selectedProject;
+    }
+    
+    // Если проект не выбран вручную, но есть активная доска в URL, находим проект
+    const path = location.pathname;
+    const boardMatch = path.match(/\/project\/(\d+)\/board\/(\d+)/);
+    if (boardMatch && projects.length > 0) {
+      const projectId = parseInt(boardMatch[1]);
+      return projects.find(p => p.id === projectId);
+    }
+    return null;
+  };
+
+  const projectForBoards = getProjectForBoards();
+
+  // Автоматически выбираем проект, если выбрана доска
+  useEffect(() => {
+    // Если проект был выбран вручную и мы не на странице доски, не перезаписываем его
+    if (manuallySelectedProjectRef.current) {
+      const path = location.pathname;
+      const boardMatch = path.match(/\/project\/(\d+)\/board\/(\d+)/);
+      // Если пользователь переходит на доску, сбрасываем флаг
+      if (boardMatch) {
+        manuallySelectedProjectRef.current = false;
+      } else {
+        // Если мы не на странице доски, сохраняем выбранный вручную проект
+        return;
+      }
+    }
+    
+    const path = location.pathname;
+    const boardMatch = path.match(/\/project\/(\d+)\/board\/(\d+)/);
+    
+    if (boardMatch && projects.length > 0) {
+      const projectId = parseInt(boardMatch[1]);
+      const boardId = parseInt(boardMatch[2]);
+      
+      // Находим проект с этой доской
+      const project = projects.find(p => p.id === projectId);
+      
+      if (project && project.boards && project.boards.some(b => b.id === boardId)) {
+        // При переходе на доску всегда выбираем проект из URL
+        setSelectedProject((prev) => {
+          if (!prev || prev.id !== projectId) {
+            return project;
+          }
+          return prev;
+        });
+      }
+    }
+  }, [location.pathname, projects]);
 
   // === Открытие дропдауна (через портал) ===
   const openDropdown = (e, id, type) => {
@@ -374,54 +438,56 @@ export default function Sidebar({ isCollapsed, onToggle }) {
                 </button>
               </div>
 
-              {projects.map((project) => (
-                <div key={project.id} className="project-item">
-                  <div
-                    className={`project-header ${
-                      selectedProject?.id === project.id ? 'selected' : ''
-                    }`}
-                    onClick={() => handleProjectClick(project)}
-                  >
-                    <span className="project-icon">📁</span>
-                    <span className="project-name">{project.title}</span>
-
+              <div className="projects-list">
+                {projects.map((project) => (
+                  <div key={project.id} className="project-item">
                     <div
-                      className="menu-wrapper"
-                      onClick={(e) => e.stopPropagation()}
+                      className={`project-header ${
+                        selectedProject?.id === project.id ? 'selected' : ''
+                      }`}
+                      onClick={() => handleProjectClick(project)}
                     >
-                      <button
-                        className="menu-button"
-                        onClick={(e) => openDropdown(e, project.id, 'project')}
+                      <span className="project-icon"></span>
+                      <span className="project-name">{project.title}</span>
+
+                      <div
+                        className="menu-wrapper"
+                        onClick={(e) => e.stopPropagation()}
                       >
-                        ...
-                      </button>
+                        <button
+                          className="menu-button"
+                          onClick={(e) => openDropdown(e, project.id, 'project')}
+                        >
+                          ...
+                        </button>
+                      </div>
                     </div>
                   </div>
-                </div>
-              ))}
+                ))}
+              </div>
             </div>
 
             {/* === ДОСКИ === */}
-            {selectedProject && (
+            {projectForBoards && (
               <div className="section">
                 <div className="section-header">
                   <div className="boards-header">
                     <h4 className="section-title">ДОСКИ</h4>
                     <span className="selected-project-name">
-                      {selectedProject.title}
+                      {projectForBoards.title}
                     </span>
                   </div>
                   <button className="create-btn" onClick={handleCreateBoard}>+</button>
                 </div>
 
                 <div className="boards-list">
-                  {selectedProject.boards?.map((board) => (
+                  {projectForBoards.boards?.map((board) => (
                     <div key={board.id} className="board-item">
                       <Link
-                        to={user?.username ? `/${user.username}/project/${selectedProject.id}/board/${board.id}` : '#'}
+                        to={user?.username ? `/${user.username}/project/${projectForBoards.id}/board/${board.id}` : '#'}
                         className={`board-link-wrapper ${isBoardActive(board.id) ? 'active' : ''}`}
                       >
-                        <span className="board-icon">📋</span>
+                        <span className="board-icon"></span>
                         <span className="board-name">{board.title}</span>
                         
                         <div className="menu-wrapper" onClick={(e) => e.stopPropagation()}>
