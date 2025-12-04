@@ -32033,3 +32033,653 @@
 2025-12-04 17:45:15 | INFO | <- GET /api/users/me | 200 | 0.01s | IP: 127.0.0.1
 2025-12-04 17:45:15 | INFO | <- GET /api/users/me | 200 | 0.014s | IP: 127.0.0.1
 2025-12-04 17:45:15 | INFO | <- GET /api/users/me | 200 | 0.012s | IP: 127.0.0.1
+2025-12-04 17:48:55 | INFO | -> GET /api/users/me | IP: 127.0.0.1 | UA: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:145.0) Gecko/20100101 Firefox/145.0
+2025-12-04 17:48:55 | INFO | <- GET /api/users/me | 200 | 0.007s | IP: 127.0.0.1
+2025-12-04 17:49:04 | INFO | -> GET /api/users/me | IP: 127.0.0.1 | UA: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:145.0) Gecko/20100101 Firefox/145.0
+2025-12-04 17:49:04 | INFO | <- GET /api/users/me | 200 | 0.008s | IP: 127.0.0.1
+2025-12-04 17:49:12 | INFO | -> GET /api/users/me | IP: 127.0.0.1 | UA: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:145.0) Gecko/20100101 Firefox/145.0
+2025-12-04 17:49:12 | INFO | <- GET /api/users/me | 200 | 0.006s | IP: 127.0.0.1
+2025-12-04 17:49:25 | INFO | -> GET /api/users/me | IP: 127.0.0.1 | UA: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:145.0) Gecko/20100101 Firefox/145.0
+2025-12-04 17:49:25 | INFO | -> GET /api/workspace/me | IP: 127.0.0.1 | UA: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:145.0) Gecko/20100101 Firefox/145.0
+2025-12-04 17:49:25 | INFO | -> GET /api/users/me | IP: 127.0.0.1 | UA: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:145.0) Gecko/20100101 Firefox/145.0
+2025-12-04 17:49:25 | INFO | -> GET /api/workspaces/my | IP: 127.0.0.1 | UA: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:145.0) Gecko/20100101 Firefox/145.0
+2025-12-04 17:49:25 | INFO | -> GET /api/workspaces/my | IP: 127.0.0.1 | UA: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:145.0) Gecko/20100101 Firefox/145.0
+2025-12-04 17:49:25 | INFO | -> GET /api/workspace/me | IP: 127.0.0.1 | UA: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:145.0) Gecko/20100101 Firefox/145.0
+2025-12-04 17:49:25 | INFO | <- GET /api/users/me | 200 | 0.021s | IP: 127.0.0.1
+2025-12-04 17:49:25 | INFO | <- GET /api/users/me | 200 | 0.021s | IP: 127.0.0.1
+2025-12-04 17:49:25 | INFO | <- GET /api/workspace/me | 200 | 0.035s | IP: 127.0.0.1
+2025-12-04 17:49:25 | INFO | <- GET /api/workspaces/my | 200 | 0.034s | IP: 127.0.0.1
+2025-12-04 17:49:25 | INFO | <- GET /api/workspaces/my | 200 | 0.04s | IP: 127.0.0.1
+2025-12-04 17:49:25 | INFO | <- GET /api/workspace/me | 200 | 0.042s | IP: 127.0.0.1
+2025-12-04 17:49:25 | INFO | -> GET /api/workspace/me | IP: 127.0.0.1 | UA: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:145.0) Gecko/20100101 Firefox/145.0
+2025-12-04 17:49:25 | INFO | -> GET /api/workspaces/my | IP: 127.0.0.1 | UA: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:145.0) Gecko/20100101 Firefox/145.0
+2025-12-04 17:49:25 | INFO | -> GET /api/workspace/me | IP: 127.0.0.1 | UA: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:145.0) Gecko/20100101 Firefox/145.0
+2025-12-04 17:49:25 | INFO | -> OPTIONS /api/boards/12/columns | IP: 127.0.0.1 | UA: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:145.0) Gecko/20100101 Firefox/145.0
+2025-12-04 17:49:25 | INFO | -> OPTIONS /api/boards/12/columns | IP: 127.0.0.1 | UA: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:145.0) Gecko/20100101 Firefox/145.0
+2025-12-04 17:49:25 | INFO | -> GET /api/workspaces/my | IP: 127.0.0.1 | UA: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:145.0) Gecko/20100101 Firefox/145.0
+2025-12-04 17:49:25 | INFO | <- OPTIONS /api/boards/12/columns | 200 | 0.004s | IP: 127.0.0.1
+2025-12-04 17:49:25 | INFO | <- OPTIONS /api/boards/12/columns | 200 | 0.004s | IP: 127.0.0.1
+2025-12-04 17:49:25 | INFO | -> GET /api/boards/12/columns | IP: 127.0.0.1 | UA: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:145.0) Gecko/20100101 Firefox/145.0
+2025-12-04 17:49:25 | INFO | -> GET /api/boards/12/columns | IP: 127.0.0.1 | UA: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:145.0) Gecko/20100101 Firefox/145.0
+2025-12-04 17:49:25 | INFO | <- GET /api/workspace/me | 200 | 0.036s | IP: 127.0.0.1
+2025-12-04 17:49:25 | INFO | <- GET /api/workspace/me | 200 | 0.057s | IP: 127.0.0.1
+2025-12-04 17:49:25 | INFO | <- GET /api/workspaces/my | 200 | 0.059s | IP: 127.0.0.1
+2025-12-04 17:49:25 | INFO | <- GET /api/boards/12/columns | 200 | 0.065s | IP: 127.0.0.1
+2025-12-04 17:49:25 | INFO | <- GET /api/boards/12/columns | 200 | 0.069s | IP: 127.0.0.1
+2025-12-04 17:49:25 | INFO | <- GET /api/workspaces/my | 200 | 0.126s | IP: 127.0.0.1
+2025-12-04 17:49:25 | INFO | -> GET /api/users/me | IP: 127.0.0.1 | UA: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:145.0) Gecko/20100101 Firefox/145.0
+2025-12-04 17:49:25 | INFO | -> GET /api/workspace/projects | IP: 127.0.0.1 | UA: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:145.0) Gecko/20100101 Firefox/145.0
+2025-12-04 17:49:25 | INFO | -> GET /api/workspace/projects | IP: 127.0.0.1 | UA: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:145.0) Gecko/20100101 Firefox/145.0
+2025-12-04 17:49:25 | INFO | -> OPTIONS /api/colors | IP: 127.0.0.1 | UA: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:145.0) Gecko/20100101 Firefox/145.0
+2025-12-04 17:49:25 | INFO | <- OPTIONS /api/colors | 200 | 0.006s | IP: 127.0.0.1
+2025-12-04 17:49:25 | INFO | -> GET /api/users/me | IP: 127.0.0.1 | UA: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:145.0) Gecko/20100101 Firefox/145.0
+2025-12-04 17:49:25 | INFO | -> OPTIONS /api/colors | IP: 127.0.0.1 | UA: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:145.0) Gecko/20100101 Firefox/145.0
+2025-12-04 17:49:25 | INFO | <- GET /api/users/me | 200 | 0.027s | IP: 127.0.0.1
+2025-12-04 17:49:25 | INFO | <- OPTIONS /api/colors | 200 | 0.004s | IP: 127.0.0.1
+2025-12-04 17:49:25 | INFO | -> OPTIONS /api/colors | IP: 127.0.0.1 | UA: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:145.0) Gecko/20100101 Firefox/145.0
+2025-12-04 17:49:25 | INFO | -> GET /api/colors | IP: 127.0.0.1 | UA: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:145.0) Gecko/20100101 Firefox/145.0
+2025-12-04 17:49:25 | INFO | <- OPTIONS /api/colors | 200 | 0.005s | IP: 127.0.0.1
+2025-12-04 17:49:25 | INFO | -> OPTIONS /api/colors | IP: 127.0.0.1 | UA: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:145.0) Gecko/20100101 Firefox/145.0
+2025-12-04 17:49:25 | INFO | <- OPTIONS /api/colors | 200 | 0.003s | IP: 127.0.0.1
+2025-12-04 17:49:25 | INFO | -> GET /api/colors | IP: 127.0.0.1 | UA: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:145.0) Gecko/20100101 Firefox/145.0
+2025-12-04 17:49:25 | INFO | <- GET /api/users/me | 200 | 0.028s | IP: 127.0.0.1
+2025-12-04 17:49:25 | INFO | -> GET /api/colors | IP: 127.0.0.1 | UA: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:145.0) Gecko/20100101 Firefox/145.0
+2025-12-04 17:49:25 | INFO | -> GET /api/colors | IP: 127.0.0.1 | UA: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:145.0) Gecko/20100101 Firefox/145.0
+2025-12-04 17:49:25 | INFO | <- GET /api/workspace/projects | 200 | 0.064s | IP: 127.0.0.1
+2025-12-04 17:49:25 | INFO | -> OPTIONS /api/colors | IP: 127.0.0.1 | UA: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:145.0) Gecko/20100101 Firefox/145.0
+2025-12-04 17:49:25 | INFO | <- OPTIONS /api/colors | 200 | 0.005s | IP: 127.0.0.1
+2025-12-04 17:49:25 | INFO | <- GET /api/workspace/projects | 200 | 0.077s | IP: 127.0.0.1
+2025-12-04 17:49:25 | INFO | -> OPTIONS /api/colors | IP: 127.0.0.1 | UA: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:145.0) Gecko/20100101 Firefox/145.0
+2025-12-04 17:49:25 | INFO | <- OPTIONS /api/colors | 200 | 0.005s | IP: 127.0.0.1
+2025-12-04 17:49:25 | INFO | -> GET /api/colors | IP: 127.0.0.1 | UA: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:145.0) Gecko/20100101 Firefox/145.0
+2025-12-04 17:49:25 | INFO | -> OPTIONS /api/colors | IP: 127.0.0.1 | UA: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:145.0) Gecko/20100101 Firefox/145.0
+2025-12-04 17:49:25 | INFO | <- OPTIONS /api/colors | 200 | 0.005s | IP: 127.0.0.1
+2025-12-04 17:49:25 | INFO | <- GET /api/colors | 200 | 0.054s | IP: 127.0.0.1
+2025-12-04 17:49:25 | INFO | <- GET /api/colors | 200 | 0.06s | IP: 127.0.0.1
+2025-12-04 17:49:25 | INFO | -> GET /api/colors | IP: 127.0.0.1 | UA: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:145.0) Gecko/20100101 Firefox/145.0
+2025-12-04 17:49:26 | INFO | -> OPTIONS /api/colors | IP: 127.0.0.1 | UA: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:145.0) Gecko/20100101 Firefox/145.0
+2025-12-04 17:49:26 | INFO | -> GET /api/colors | IP: 127.0.0.1 | UA: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:145.0) Gecko/20100101 Firefox/145.0
+2025-12-04 17:49:26 | INFO | <- OPTIONS /api/colors | 200 | 0.005s | IP: 127.0.0.1
+2025-12-04 17:49:26 | INFO | -> OPTIONS /api/colors | IP: 127.0.0.1 | UA: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:145.0) Gecko/20100101 Firefox/145.0
+2025-12-04 17:49:26 | INFO | <- OPTIONS /api/colors | 200 | 0.004s | IP: 127.0.0.1
+2025-12-04 17:49:26 | INFO | <- GET /api/colors | 200 | 0.033s | IP: 127.0.0.1
+2025-12-04 17:49:26 | INFO | -> GET /api/colors | IP: 127.0.0.1 | UA: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:145.0) Gecko/20100101 Firefox/145.0
+2025-12-04 17:49:26 | INFO | -> GET /api/colors | IP: 127.0.0.1 | UA: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:145.0) Gecko/20100101 Firefox/145.0
+2025-12-04 17:49:26 | INFO | <- GET /api/colors | 200 | 0.037s | IP: 127.0.0.1
+2025-12-04 17:49:26 | INFO | <- GET /api/colors | 200 | 0.036s | IP: 127.0.0.1
+2025-12-04 17:49:26 | INFO | -> OPTIONS /api/colors | IP: 127.0.0.1 | UA: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:145.0) Gecko/20100101 Firefox/145.0
+2025-12-04 17:49:26 | INFO | <- OPTIONS /api/colors | 200 | 0.003s | IP: 127.0.0.1
+2025-12-04 17:49:26 | INFO | -> OPTIONS /api/colors | IP: 127.0.0.1 | UA: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:145.0) Gecko/20100101 Firefox/145.0
+2025-12-04 17:49:26 | INFO | <- OPTIONS /api/colors | 200 | 0.003s | IP: 127.0.0.1
+2025-12-04 17:49:26 | INFO | -> OPTIONS /api/colors | IP: 127.0.0.1 | UA: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:145.0) Gecko/20100101 Firefox/145.0
+2025-12-04 17:49:26 | INFO | <- OPTIONS /api/colors | 200 | 0.001s | IP: 127.0.0.1
+2025-12-04 17:49:26 | INFO | -> GET /api/colors | IP: 127.0.0.1 | UA: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:145.0) Gecko/20100101 Firefox/145.0
+2025-12-04 17:49:26 | INFO | <- GET /api/colors | 200 | 0.036s | IP: 127.0.0.1
+2025-12-04 17:49:26 | INFO | -> GET /api/colors | IP: 127.0.0.1 | UA: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:145.0) Gecko/20100101 Firefox/145.0
+2025-12-04 17:49:26 | INFO | <- GET /api/colors | 200 | 0.037s | IP: 127.0.0.1
+2025-12-04 17:49:26 | INFO | -> GET /api/colors | IP: 127.0.0.1 | UA: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:145.0) Gecko/20100101 Firefox/145.0
+2025-12-04 17:49:26 | INFO | <- GET /api/colors | 200 | 0.026s | IP: 127.0.0.1
+2025-12-04 17:49:26 | INFO | <- GET /api/colors | 200 | 0.159s | IP: 127.0.0.1
+2025-12-04 17:49:26 | INFO | <- GET /api/colors | 200 | 0.034s | IP: 127.0.0.1
+2025-12-04 17:49:26 | INFO | <- GET /api/colors | 200 | 0.146s | IP: 127.0.0.1
+2025-12-04 17:49:26 | INFO | <- GET /api/colors | 200 | 0.033s | IP: 127.0.0.1
+2025-12-04 17:49:44 | INFO | -> GET /api/users/me | IP: 127.0.0.1 | UA: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:145.0) Gecko/20100101 Firefox/145.0
+2025-12-04 17:49:44 | INFO | <- GET /api/users/me | 200 | 0.006s | IP: 127.0.0.1
+2025-12-04 17:49:44 | INFO | -> GET /api/users/me | IP: 127.0.0.1 | UA: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:145.0) Gecko/20100101 Firefox/145.0
+2025-12-04 17:49:44 | INFO | <- GET /api/users/me | 200 | 0.004s | IP: 127.0.0.1
+2025-12-04 17:49:58 | INFO | -> GET /api/users/me | IP: 127.0.0.1 | UA: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:145.0) Gecko/20100101 Firefox/145.0
+2025-12-04 17:49:58 | INFO | <- GET /api/users/me | 200 | 0.008s | IP: 127.0.0.1
+2025-12-04 17:50:22 | INFO | -> GET /api/workspace/projects | IP: 127.0.0.1 | UA: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:145.0) Gecko/20100101 Firefox/145.0
+2025-12-04 17:50:22 | INFO | -> GET /api/workspace/projects | IP: 127.0.0.1 | UA: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:145.0) Gecko/20100101 Firefox/145.0
+2025-12-04 17:50:22 | INFO | -> GET /api/workspace/projects | IP: 127.0.0.1 | UA: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:145.0) Gecko/20100101 Firefox/145.0
+2025-12-04 17:50:22 | INFO | -> GET /api/workspace/projects | IP: 127.0.0.1 | UA: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:145.0) Gecko/20100101 Firefox/145.0
+2025-12-04 17:50:22 | INFO | -> GET /api/users/me | IP: 127.0.0.1 | UA: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:145.0) Gecko/20100101 Firefox/145.0
+2025-12-04 17:50:22 | INFO | -> GET /api/users/me/tasks | IP: 127.0.0.1 | UA: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:145.0) Gecko/20100101 Firefox/145.0
+2025-12-04 17:50:22 | INFO | <- GET /api/users/me | 200 | 0.032s | IP: 127.0.0.1
+2025-12-04 17:50:22 | INFO | -> GET /api/users/me | IP: 127.0.0.1 | UA: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:145.0) Gecko/20100101 Firefox/145.0
+2025-12-04 17:50:22 | INFO | <- GET /api/workspace/projects | 200 | 0.061s | IP: 127.0.0.1
+2025-12-04 17:50:22 | INFO | -> GET /api/users/me/tasks | IP: 127.0.0.1 | UA: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:145.0) Gecko/20100101 Firefox/145.0
+2025-12-04 17:50:22 | INFO | <- GET /api/users/me | 200 | 0.024s | IP: 127.0.0.1
+2025-12-04 17:50:22 | INFO | <- GET /api/users/me/tasks | 200 | 0.066s | IP: 127.0.0.1
+2025-12-04 17:50:22 | INFO | <- GET /api/users/me/tasks | 200 | 0.032s | IP: 127.0.0.1
+2025-12-04 17:50:22 | INFO | <- GET /api/workspace/projects | 200 | 0.123s | IP: 127.0.0.1
+2025-12-04 17:50:22 | INFO | <- GET /api/workspace/projects | 200 | 0.134s | IP: 127.0.0.1
+2025-12-04 17:50:22 | INFO | <- GET /api/workspace/projects | 200 | 0.143s | IP: 127.0.0.1
+2025-12-04 17:50:23 | INFO | -> GET /api/workspace/projects | IP: 127.0.0.1 | UA: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:145.0) Gecko/20100101 Firefox/145.0
+2025-12-04 17:50:23 | INFO | -> GET /api/users/me | IP: 127.0.0.1 | UA: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:145.0) Gecko/20100101 Firefox/145.0
+2025-12-04 17:50:23 | INFO | -> GET /api/users/me | IP: 127.0.0.1 | UA: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:145.0) Gecko/20100101 Firefox/145.0
+2025-12-04 17:50:23 | INFO | -> GET /api/workspace/projects | IP: 127.0.0.1 | UA: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:145.0) Gecko/20100101 Firefox/145.0
+2025-12-04 17:50:23 | INFO | <- GET /api/users/me | 200 | 0.023s | IP: 127.0.0.1
+2025-12-04 17:50:23 | INFO | <- GET /api/users/me | 200 | 0.027s | IP: 127.0.0.1
+2025-12-04 17:50:23 | INFO | <- GET /api/workspace/projects | 200 | 0.035s | IP: 127.0.0.1
+2025-12-04 17:50:23 | INFO | <- GET /api/workspace/projects | 200 | 0.036s | IP: 127.0.0.1
+2025-12-04 17:50:25 | INFO | -> GET /api/users/me | IP: 127.0.0.1 | UA: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:145.0) Gecko/20100101 Firefox/145.0
+2025-12-04 17:50:25 | INFO | -> GET /api/users/me | IP: 127.0.0.1 | UA: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:145.0) Gecko/20100101 Firefox/145.0
+2025-12-04 17:50:25 | INFO | <- GET /api/users/me | 200 | 0.009s | IP: 127.0.0.1
+2025-12-04 17:50:25 | INFO | <- GET /api/users/me | 200 | 0.01s | IP: 127.0.0.1
+2025-12-04 17:50:31 | INFO | -> PUT /api/users/me | IP: 127.0.0.1 | UA: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:145.0) Gecko/20100101 Firefox/145.0
+2025-12-04 17:50:31 | INFO | <- PUT /api/users/me | 200 | 0.027s | IP: 127.0.0.1
+2025-12-04 17:50:31 | INFO | -> GET /api/users/me | IP: 127.0.0.1 | UA: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:145.0) Gecko/20100101 Firefox/145.0
+2025-12-04 17:50:31 | INFO | <- GET /api/users/me | 200 | 0.005s | IP: 127.0.0.1
+2025-12-04 17:50:31 | INFO | -> GET /static/avatars/avatar_19fe9b58.jpg | IP: 127.0.0.1 | UA: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:145.0) Gecko/20100101 Firefox/145.0
+2025-12-04 17:50:31 | INFO | <- GET /static/avatars/avatar_19fe9b58.jpg | 200 | 0.003s | IP: 127.0.0.1
+2025-12-04 17:50:34 | INFO | -> GET /api/workspace/projects | IP: 127.0.0.1 | UA: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:145.0) Gecko/20100101 Firefox/145.0
+2025-12-04 17:50:34 | INFO | -> GET /api/workspace/projects | IP: 127.0.0.1 | UA: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:145.0) Gecko/20100101 Firefox/145.0
+2025-12-04 17:50:34 | INFO | -> GET /api/users/me/tasks | IP: 127.0.0.1 | UA: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:145.0) Gecko/20100101 Firefox/145.0
+2025-12-04 17:50:34 | INFO | -> GET /api/workspace/projects | IP: 127.0.0.1 | UA: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:145.0) Gecko/20100101 Firefox/145.0
+2025-12-04 17:50:34 | INFO | -> GET /api/users/me | IP: 127.0.0.1 | UA: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:145.0) Gecko/20100101 Firefox/145.0
+2025-12-04 17:50:34 | INFO | -> GET /api/workspace/projects | IP: 127.0.0.1 | UA: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:145.0) Gecko/20100101 Firefox/145.0
+2025-12-04 17:50:34 | INFO | <- GET /api/users/me | 200 | 0.022s | IP: 127.0.0.1
+2025-12-04 17:50:34 | INFO | -> GET /api/users/me | IP: 127.0.0.1 | UA: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:145.0) Gecko/20100101 Firefox/145.0
+2025-12-04 17:50:34 | INFO | <- GET /api/users/me | 200 | 0.021s | IP: 127.0.0.1
+2025-12-04 17:50:34 | INFO | -> GET /api/users/me/tasks | IP: 127.0.0.1 | UA: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:145.0) Gecko/20100101 Firefox/145.0
+2025-12-04 17:50:34 | INFO | <- GET /api/users/me/tasks | 200 | 0.061s | IP: 127.0.0.1
+2025-12-04 17:50:34 | INFO | <- GET /api/users/me/tasks | 200 | 0.025s | IP: 127.0.0.1
+2025-12-04 17:50:34 | INFO | <- GET /api/workspace/projects | 200 | 0.148s | IP: 127.0.0.1
+2025-12-04 17:50:34 | INFO | <- GET /api/workspace/projects | 200 | 0.174s | IP: 127.0.0.1
+2025-12-04 17:50:34 | INFO | <- GET /api/workspace/projects | 200 | 0.174s | IP: 127.0.0.1
+2025-12-04 17:50:34 | INFO | <- GET /api/workspace/projects | 200 | 0.177s | IP: 127.0.0.1
+2025-12-04 17:50:35 | INFO | -> GET /api/workspace/projects | IP: 127.0.0.1 | UA: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:145.0) Gecko/20100101 Firefox/145.0
+2025-12-04 17:50:35 | INFO | -> GET /api/users/me | IP: 127.0.0.1 | UA: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:145.0) Gecko/20100101 Firefox/145.0
+2025-12-04 17:50:35 | INFO | -> GET /api/workspace/projects | IP: 127.0.0.1 | UA: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:145.0) Gecko/20100101 Firefox/145.0
+2025-12-04 17:50:35 | INFO | -> GET /api/users/me | IP: 127.0.0.1 | UA: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:145.0) Gecko/20100101 Firefox/145.0
+2025-12-04 17:50:35 | INFO | <- GET /api/users/me | 200 | 0.013s | IP: 127.0.0.1
+2025-12-04 17:50:35 | INFO | <- GET /api/users/me | 200 | 0.016s | IP: 127.0.0.1
+2025-12-04 17:50:35 | INFO | <- GET /api/workspace/projects | 200 | 0.032s | IP: 127.0.0.1
+2025-12-04 17:50:35 | INFO | <- GET /api/workspace/projects | 200 | 0.033s | IP: 127.0.0.1
+2025-12-04 17:50:36 | INFO | -> GET /api/boards/12/columns | IP: 127.0.0.1 | UA: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:145.0) Gecko/20100101 Firefox/145.0
+2025-12-04 17:50:36 | INFO | <- GET /api/boards/12/columns | 200 | 0.016s | IP: 127.0.0.1
+2025-12-04 17:50:36 | INFO | -> GET /api/boards/12/columns | IP: 127.0.0.1 | UA: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:145.0) Gecko/20100101 Firefox/145.0
+2025-12-04 17:50:36 | INFO | <- GET /api/boards/12/columns | 200 | 0.019s | IP: 127.0.0.1
+2025-12-04 17:50:36 | INFO | -> GET /api/workspace/projects | IP: 127.0.0.1 | UA: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:145.0) Gecko/20100101 Firefox/145.0
+2025-12-04 17:50:36 | INFO | -> GET /api/users/me | IP: 127.0.0.1 | UA: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:145.0) Gecko/20100101 Firefox/145.0
+2025-12-04 17:50:36 | INFO | <- GET /api/users/me | 200 | 0.011s | IP: 127.0.0.1
+2025-12-04 17:50:36 | INFO | -> GET /api/colors | IP: 127.0.0.1 | UA: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:145.0) Gecko/20100101 Firefox/145.0
+2025-12-04 17:50:36 | INFO | -> GET /api/colors | IP: 127.0.0.1 | UA: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:145.0) Gecko/20100101 Firefox/145.0
+2025-12-04 17:50:36 | INFO | -> GET /api/colors | IP: 127.0.0.1 | UA: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:145.0) Gecko/20100101 Firefox/145.0
+2025-12-04 17:50:36 | INFO | -> GET /api/colors | IP: 127.0.0.1 | UA: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:145.0) Gecko/20100101 Firefox/145.0
+2025-12-04 17:50:36 | INFO | -> GET /api/colors | IP: 127.0.0.1 | UA: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:145.0) Gecko/20100101 Firefox/145.0
+2025-12-04 17:50:36 | INFO | <- GET /api/workspace/projects | 200 | 0.032s | IP: 127.0.0.1
+2025-12-04 17:50:36 | INFO | -> GET /api/colors | IP: 127.0.0.1 | UA: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:145.0) Gecko/20100101 Firefox/145.0
+2025-12-04 17:50:36 | INFO | <- GET /api/colors | 200 | 0.048s | IP: 127.0.0.1
+2025-12-04 17:50:36 | INFO | -> GET /api/workspace/projects | IP: 127.0.0.1 | UA: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:145.0) Gecko/20100101 Firefox/145.0
+2025-12-04 17:50:36 | INFO | <- GET /api/colors | 200 | 0.051s | IP: 127.0.0.1
+2025-12-04 17:50:36 | INFO | -> GET /api/users/me | IP: 127.0.0.1 | UA: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:145.0) Gecko/20100101 Firefox/145.0
+2025-12-04 17:50:36 | INFO | <- GET /api/colors | 200 | 0.06s | IP: 127.0.0.1
+2025-12-04 17:50:36 | INFO | -> GET /api/colors | IP: 127.0.0.1 | UA: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:145.0) Gecko/20100101 Firefox/145.0
+2025-12-04 17:50:36 | INFO | <- GET /api/colors | 200 | 0.075s | IP: 127.0.0.1
+2025-12-04 17:50:36 | INFO | -> GET /api/colors | IP: 127.0.0.1 | UA: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:145.0) Gecko/20100101 Firefox/145.0
+2025-12-04 17:50:36 | INFO | <- GET /api/users/me | 200 | 0.036s | IP: 127.0.0.1
+2025-12-04 17:50:36 | INFO | -> GET /api/colors | IP: 127.0.0.1 | UA: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:145.0) Gecko/20100101 Firefox/145.0
+2025-12-04 17:50:36 | INFO | <- GET /api/workspace/projects | 200 | 0.057s | IP: 127.0.0.1
+2025-12-04 17:50:36 | INFO | -> GET /api/colors | IP: 127.0.0.1 | UA: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:145.0) Gecko/20100101 Firefox/145.0
+2025-12-04 17:50:36 | INFO | <- GET /api/colors | 200 | 0.052s | IP: 127.0.0.1
+2025-12-04 17:50:36 | INFO | -> GET /api/colors | IP: 127.0.0.1 | UA: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:145.0) Gecko/20100101 Firefox/145.0
+2025-12-04 17:50:36 | INFO | <- GET /api/colors | 200 | 0.037s | IP: 127.0.0.1
+2025-12-04 17:50:36 | INFO | <- GET /api/colors | 200 | 0.059s | IP: 127.0.0.1
+2025-12-04 17:50:36 | INFO | -> GET /api/colors | IP: 127.0.0.1 | UA: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:145.0) Gecko/20100101 Firefox/145.0
+2025-12-04 17:50:36 | INFO | <- GET /api/colors | 200 | 0.036s | IP: 127.0.0.1
+2025-12-04 17:50:36 | INFO | <- GET /api/colors | 200 | 0.056s | IP: 127.0.0.1
+2025-12-04 17:50:36 | INFO | <- GET /api/colors | 200 | 0.171s | IP: 127.0.0.1
+2025-12-04 17:50:36 | INFO | <- GET /api/colors | 200 | 0.033s | IP: 127.0.0.1
+2025-12-04 17:50:36 | INFO | <- GET /api/colors | 200 | 0.162s | IP: 127.0.0.1
+2025-12-04 17:50:40 | INFO | -> GET /api/users/me | IP: 127.0.0.1 | UA: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:145.0) Gecko/20100101 Firefox/145.0
+2025-12-04 17:50:40 | INFO | <- GET /api/users/me | 200 | 0.005s | IP: 127.0.0.1
+2025-12-04 17:50:40 | INFO | -> GET /api/users/me | IP: 127.0.0.1 | UA: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:145.0) Gecko/20100101 Firefox/145.0
+2025-12-04 17:50:40 | INFO | <- GET /api/users/me | 200 | 0.006s | IP: 127.0.0.1
+2025-12-04 17:50:47 | INFO | -> PUT /api/users/me | IP: 127.0.0.1 | UA: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:145.0) Gecko/20100101 Firefox/145.0
+2025-12-04 17:50:47 | INFO | <- PUT /api/users/me | 200 | 0.016s | IP: 127.0.0.1
+2025-12-04 17:50:47 | INFO | -> GET /api/users/me | IP: 127.0.0.1 | UA: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:145.0) Gecko/20100101 Firefox/145.0
+2025-12-04 17:50:47 | INFO | <- GET /api/users/me | 200 | 0.004s | IP: 127.0.0.1
+2025-12-04 17:50:51 | INFO | -> GET /api/workspace/projects | IP: 127.0.0.1 | UA: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:145.0) Gecko/20100101 Firefox/145.0
+2025-12-04 17:50:51 | INFO | -> GET /api/workspace/projects | IP: 127.0.0.1 | UA: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:145.0) Gecko/20100101 Firefox/145.0
+2025-12-04 17:50:51 | INFO | -> GET /api/users/me | IP: 127.0.0.1 | UA: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:145.0) Gecko/20100101 Firefox/145.0
+2025-12-04 17:50:51 | INFO | -> GET /api/workspace/projects | IP: 127.0.0.1 | UA: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:145.0) Gecko/20100101 Firefox/145.0
+2025-12-04 17:50:51 | INFO | -> GET /api/workspace/projects | IP: 127.0.0.1 | UA: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:145.0) Gecko/20100101 Firefox/145.0
+2025-12-04 17:50:51 | INFO | -> GET /api/users/me/tasks | IP: 127.0.0.1 | UA: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:145.0) Gecko/20100101 Firefox/145.0
+2025-12-04 17:50:51 | INFO | <- GET /api/users/me | 200 | 0.021s | IP: 127.0.0.1
+2025-12-04 17:50:51 | INFO | -> GET /api/users/me | IP: 127.0.0.1 | UA: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:145.0) Gecko/20100101 Firefox/145.0
+2025-12-04 17:50:51 | INFO | <- GET /api/users/me | 200 | 0.028s | IP: 127.0.0.1
+2025-12-04 17:50:51 | INFO | -> GET /api/users/me/tasks | IP: 127.0.0.1 | UA: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:145.0) Gecko/20100101 Firefox/145.0
+2025-12-04 17:50:51 | INFO | <- GET /api/workspace/projects | 200 | 0.062s | IP: 127.0.0.1
+2025-12-04 17:50:51 | INFO | <- GET /api/users/me/tasks | 200 | 0.064s | IP: 127.0.0.1
+2025-12-04 17:50:51 | INFO | <- GET /api/workspace/projects | 200 | 0.119s | IP: 127.0.0.1
+2025-12-04 17:50:51 | INFO | <- GET /api/workspace/projects | 200 | 0.136s | IP: 127.0.0.1
+2025-12-04 17:50:51 | INFO | <- GET /api/users/me/tasks | 200 | 0.103s | IP: 127.0.0.1
+2025-12-04 17:50:51 | INFO | <- GET /api/workspace/projects | 200 | 0.223s | IP: 127.0.0.1
+2025-12-04 17:50:51 | INFO | -> GET /api/workspace/projects | IP: 127.0.0.1 | UA: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:145.0) Gecko/20100101 Firefox/145.0
+2025-12-04 17:50:51 | INFO | -> GET /api/workspace/projects | IP: 127.0.0.1 | UA: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:145.0) Gecko/20100101 Firefox/145.0
+2025-12-04 17:50:51 | INFO | -> GET /api/users/me | IP: 127.0.0.1 | UA: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:145.0) Gecko/20100101 Firefox/145.0
+2025-12-04 17:50:51 | INFO | -> GET /api/users/me | IP: 127.0.0.1 | UA: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:145.0) Gecko/20100101 Firefox/145.0
+2025-12-04 17:50:51 | INFO | <- GET /api/users/me | 200 | 0.02s | IP: 127.0.0.1
+2025-12-04 17:50:51 | INFO | <- GET /api/users/me | 200 | 0.022s | IP: 127.0.0.1
+2025-12-04 17:50:51 | INFO | <- GET /api/workspace/projects | 200 | 0.03s | IP: 127.0.0.1
+2025-12-04 17:50:51 | INFO | <- GET /api/workspace/projects | 200 | 0.036s | IP: 127.0.0.1
+2025-12-04 17:50:53 | INFO | -> GET /api/boards/12/columns | IP: 127.0.0.1 | UA: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:145.0) Gecko/20100101 Firefox/145.0
+2025-12-04 17:50:53 | INFO | <- GET /api/boards/12/columns | 200 | 0.017s | IP: 127.0.0.1
+2025-12-04 17:50:53 | INFO | -> GET /api/boards/12/columns | IP: 127.0.0.1 | UA: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:145.0) Gecko/20100101 Firefox/145.0
+2025-12-04 17:50:53 | INFO | <- GET /api/boards/12/columns | 200 | 0.02s | IP: 127.0.0.1
+2025-12-04 17:50:53 | INFO | -> GET /api/workspace/projects | IP: 127.0.0.1 | UA: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:145.0) Gecko/20100101 Firefox/145.0
+2025-12-04 17:50:53 | INFO | -> GET /api/users/me | IP: 127.0.0.1 | UA: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:145.0) Gecko/20100101 Firefox/145.0
+2025-12-04 17:50:53 | INFO | <- GET /api/users/me | 200 | 0.01s | IP: 127.0.0.1
+2025-12-04 17:50:53 | INFO | -> GET /api/colors | IP: 127.0.0.1 | UA: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:145.0) Gecko/20100101 Firefox/145.0
+2025-12-04 17:50:53 | INFO | <- GET /api/workspace/projects | 200 | 0.024s | IP: 127.0.0.1
+2025-12-04 17:50:53 | INFO | -> GET /api/colors | IP: 127.0.0.1 | UA: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:145.0) Gecko/20100101 Firefox/145.0
+2025-12-04 17:50:53 | INFO | -> GET /api/colors | IP: 127.0.0.1 | UA: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:145.0) Gecko/20100101 Firefox/145.0
+2025-12-04 17:50:53 | INFO | -> GET /api/colors | IP: 127.0.0.1 | UA: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:145.0) Gecko/20100101 Firefox/145.0
+2025-12-04 17:50:53 | INFO | -> GET /api/workspace/projects | IP: 127.0.0.1 | UA: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:145.0) Gecko/20100101 Firefox/145.0
+2025-12-04 17:50:53 | INFO | -> GET /api/users/me | IP: 127.0.0.1 | UA: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:145.0) Gecko/20100101 Firefox/145.0
+2025-12-04 17:50:53 | INFO | <- GET /api/colors | 200 | 0.026s | IP: 127.0.0.1
+2025-12-04 17:50:53 | INFO | -> GET /api/colors | IP: 127.0.0.1 | UA: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:145.0) Gecko/20100101 Firefox/145.0
+2025-12-04 17:50:53 | INFO | <- GET /api/users/me | 200 | 0.034s | IP: 127.0.0.1
+2025-12-04 17:50:53 | INFO | -> GET /api/colors | IP: 127.0.0.1 | UA: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:145.0) Gecko/20100101 Firefox/145.0
+2025-12-04 17:50:53 | INFO | <- GET /api/colors | 200 | 0.061s | IP: 127.0.0.1
+2025-12-04 17:50:53 | INFO | <- GET /api/colors | 200 | 0.068s | IP: 127.0.0.1
+2025-12-04 17:50:53 | INFO | <- GET /api/colors | 200 | 0.064s | IP: 127.0.0.1
+2025-12-04 17:50:53 | INFO | -> GET /api/colors | IP: 127.0.0.1 | UA: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:145.0) Gecko/20100101 Firefox/145.0
+2025-12-04 17:50:53 | INFO | -> GET /api/colors | IP: 127.0.0.1 | UA: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:145.0) Gecko/20100101 Firefox/145.0
+2025-12-04 17:50:53 | INFO | -> GET /api/colors | IP: 127.0.0.1 | UA: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:145.0) Gecko/20100101 Firefox/145.0
+2025-12-04 17:50:53 | INFO | <- GET /api/workspace/projects | 200 | 0.074s | IP: 127.0.0.1
+2025-12-04 17:50:53 | INFO | -> GET /api/colors | IP: 127.0.0.1 | UA: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:145.0) Gecko/20100101 Firefox/145.0
+2025-12-04 17:50:53 | INFO | <- GET /api/colors | 200 | 0.045s | IP: 127.0.0.1
+2025-12-04 17:50:53 | INFO | -> GET /api/colors | IP: 127.0.0.1 | UA: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:145.0) Gecko/20100101 Firefox/145.0
+2025-12-04 17:50:53 | INFO | <- GET /api/colors | 200 | 0.043s | IP: 127.0.0.1
+2025-12-04 17:50:53 | INFO | <- GET /api/colors | 200 | 0.046s | IP: 127.0.0.1
+2025-12-04 17:50:53 | INFO | <- GET /api/colors | 200 | 0.052s | IP: 127.0.0.1
+2025-12-04 17:50:53 | INFO | <- GET /api/colors | 200 | 0.037s | IP: 127.0.0.1
+2025-12-04 17:50:53 | INFO | <- GET /api/colors | 200 | 0.022s | IP: 127.0.0.1
+2025-12-04 17:50:53 | INFO | -> GET /api/colors | IP: 127.0.0.1 | UA: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:145.0) Gecko/20100101 Firefox/145.0
+2025-12-04 17:50:53 | INFO | <- GET /api/colors | 200 | 0.012s | IP: 127.0.0.1
+2025-12-04 17:50:53 | INFO | <- GET /api/colors | 200 | 0.121s | IP: 127.0.0.1
+2025-12-04 17:53:29 | INFO | -> OPTIONS /api/users/me | IP: 127.0.0.1 | UA: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:145.0) Gecko/20100101 Firefox/145.0
+2025-12-04 17:53:29 | INFO | <- OPTIONS /api/users/me | 200 | 0.001s | IP: 127.0.0.1
+2025-12-04 17:53:29 | INFO | -> GET /api/boards/12/columns | IP: 127.0.0.1 | UA: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:145.0) Gecko/20100101 Firefox/145.0
+2025-12-04 17:53:29 | INFO | -> GET /api/boards/12/columns | IP: 127.0.0.1 | UA: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:145.0) Gecko/20100101 Firefox/145.0
+2025-12-04 17:53:29 | INFO | -> GET /api/users/me | IP: 127.0.0.1 | UA: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:145.0) Gecko/20100101 Firefox/145.0
+2025-12-04 17:53:29 | INFO | -> OPTIONS /api/workspaces/my | IP: 127.0.0.1 | UA: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:145.0) Gecko/20100101 Firefox/145.0
+2025-12-04 17:53:29 | INFO | -> OPTIONS /api/workspace/me | IP: 127.0.0.1 | UA: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:145.0) Gecko/20100101 Firefox/145.0
+2025-12-04 17:53:29 | INFO | -> OPTIONS /api/workspaces/my | IP: 127.0.0.1 | UA: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:145.0) Gecko/20100101 Firefox/145.0
+2025-12-04 17:53:29 | INFO | -> OPTIONS /api/workspace/me | IP: 127.0.0.1 | UA: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:145.0) Gecko/20100101 Firefox/145.0
+2025-12-04 17:53:29 | INFO | <- OPTIONS /api/workspaces/my | 200 | 0.008s | IP: 127.0.0.1
+2025-12-04 17:53:29 | INFO | <- OPTIONS /api/workspace/me | 200 | 0.01s | IP: 127.0.0.1
+2025-12-04 17:53:29 | INFO | <- OPTIONS /api/workspaces/my | 200 | 0.011s | IP: 127.0.0.1
+2025-12-04 17:53:29 | INFO | <- OPTIONS /api/workspace/me | 200 | 0.011s | IP: 127.0.0.1
+2025-12-04 17:53:29 | INFO | -> GET /api/workspaces/my | IP: 127.0.0.1 | UA: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:145.0) Gecko/20100101 Firefox/145.0
+2025-12-04 17:53:29 | INFO | <- GET /api/users/me | 200 | 0.042s | IP: 127.0.0.1
+2025-12-04 17:53:29 | INFO | <- GET /api/boards/12/columns | 200 | 0.055s | IP: 127.0.0.1
+2025-12-04 17:53:29 | INFO | -> GET /api/workspace/me | IP: 127.0.0.1 | UA: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:145.0) Gecko/20100101 Firefox/145.0
+2025-12-04 17:53:29 | INFO | -> GET /api/workspaces/my | IP: 127.0.0.1 | UA: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:145.0) Gecko/20100101 Firefox/145.0
+2025-12-04 17:53:29 | INFO | -> GET /api/workspace/me | IP: 127.0.0.1 | UA: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:145.0) Gecko/20100101 Firefox/145.0
+2025-12-04 17:53:29 | INFO | <- GET /api/boards/12/columns | 200 | 0.061s | IP: 127.0.0.1
+2025-12-04 17:53:29 | INFO | -> GET /api/users/me | IP: 127.0.0.1 | UA: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:145.0) Gecko/20100101 Firefox/145.0
+2025-12-04 17:53:29 | INFO | -> GET /static/avatars/avatar_19fe9b58.jpg | IP: 127.0.0.1 | UA: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:145.0) Gecko/20100101 Firefox/145.0
+2025-12-04 17:53:29 | INFO | <- GET /api/users/me | 200 | 0.035s | IP: 127.0.0.1
+2025-12-04 17:53:29 | INFO | <- GET /static/avatars/avatar_19fe9b58.jpg | 200 | 0.018s | IP: 127.0.0.1
+2025-12-04 17:53:29 | INFO | <- GET /api/workspaces/my | 200 | 0.079s | IP: 127.0.0.1
+2025-12-04 17:53:29 | INFO | <- GET /api/workspace/me | 200 | 0.07s | IP: 127.0.0.1
+2025-12-04 17:53:29 | INFO | <- GET /api/workspaces/my | 200 | 0.069s | IP: 127.0.0.1
+2025-12-04 17:53:29 | INFO | <- GET /api/workspace/me | 200 | 0.064s | IP: 127.0.0.1
+2025-12-04 17:53:29 | INFO | -> GET /api/colors | IP: 127.0.0.1 | UA: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:145.0) Gecko/20100101 Firefox/145.0
+2025-12-04 17:53:29 | INFO | -> GET /api/colors | IP: 127.0.0.1 | UA: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:145.0) Gecko/20100101 Firefox/145.0
+2025-12-04 17:53:29 | INFO | -> GET /api/colors | IP: 127.0.0.1 | UA: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:145.0) Gecko/20100101 Firefox/145.0
+2025-12-04 17:53:29 | INFO | -> OPTIONS /api/workspace/projects | IP: 127.0.0.1 | UA: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:145.0) Gecko/20100101 Firefox/145.0
+2025-12-04 17:53:29 | INFO | <- OPTIONS /api/workspace/projects | 200 | 0.006s | IP: 127.0.0.1
+2025-12-04 17:53:29 | INFO | -> GET /api/colors | IP: 127.0.0.1 | UA: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:145.0) Gecko/20100101 Firefox/145.0
+2025-12-04 17:53:29 | INFO | -> GET /api/colors | IP: 127.0.0.1 | UA: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:145.0) Gecko/20100101 Firefox/145.0
+2025-12-04 17:53:29 | INFO | -> GET /api/colors | IP: 127.0.0.1 | UA: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:145.0) Gecko/20100101 Firefox/145.0
+2025-12-04 17:53:29 | INFO | <- GET /api/colors | 200 | 0.051s | IP: 127.0.0.1
+2025-12-04 17:53:29 | INFO | -> GET /api/colors | IP: 127.0.0.1 | UA: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:145.0) Gecko/20100101 Firefox/145.0
+2025-12-04 17:53:29 | INFO | <- GET /api/colors | 200 | 0.065s | IP: 127.0.0.1
+2025-12-04 17:53:29 | INFO | <- GET /api/colors | 200 | 0.076s | IP: 127.0.0.1
+2025-12-04 17:53:29 | INFO | <- GET /api/colors | 200 | 0.058s | IP: 127.0.0.1
+2025-12-04 17:53:29 | INFO | -> GET /api/colors | IP: 127.0.0.1 | UA: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:145.0) Gecko/20100101 Firefox/145.0
+2025-12-04 17:53:29 | INFO | -> GET /api/colors | IP: 127.0.0.1 | UA: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:145.0) Gecko/20100101 Firefox/145.0
+2025-12-04 17:53:29 | INFO | -> GET /api/colors | IP: 127.0.0.1 | UA: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:145.0) Gecko/20100101 Firefox/145.0
+2025-12-04 17:53:29 | INFO | <- GET /api/colors | 200 | 0.076s | IP: 127.0.0.1
+2025-12-04 17:53:29 | INFO | -> GET /api/colors | IP: 127.0.0.1 | UA: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:145.0) Gecko/20100101 Firefox/145.0
+2025-12-04 17:53:29 | INFO | <- GET /api/colors | 200 | 0.06s | IP: 127.0.0.1
+2025-12-04 17:53:30 | INFO | -> GET /api/colors | IP: 127.0.0.1 | UA: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:145.0) Gecko/20100101 Firefox/145.0
+2025-12-04 17:53:30 | INFO | <- GET /api/colors | 200 | 0.06s | IP: 127.0.0.1
+2025-12-04 17:53:30 | INFO | -> GET /api/workspace/projects | IP: 127.0.0.1 | UA: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:145.0) Gecko/20100101 Firefox/145.0
+2025-12-04 17:53:30 | INFO | <- GET /api/colors | 200 | 0.07s | IP: 127.0.0.1
+2025-12-04 17:53:30 | INFO | <- GET /api/colors | 200 | 0.055s | IP: 127.0.0.1
+2025-12-04 17:53:30 | INFO | -> GET /api/workspace/projects | IP: 127.0.0.1 | UA: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:145.0) Gecko/20100101 Firefox/145.0
+2025-12-04 17:53:30 | INFO | -> OPTIONS /api/users/me | IP: 127.0.0.1 | UA: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:145.0) Gecko/20100101 Firefox/145.0
+2025-12-04 17:53:30 | INFO | <- GET /api/colors | 200 | 0.081s | IP: 127.0.0.1
+2025-12-04 17:53:30 | INFO | <- OPTIONS /api/users/me | 200 | 0.006s | IP: 127.0.0.1
+2025-12-04 17:53:30 | INFO | -> OPTIONS /api/workspace/projects | IP: 127.0.0.1 | UA: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:145.0) Gecko/20100101 Firefox/145.0
+2025-12-04 17:53:30 | INFO | -> OPTIONS /api/users/me | IP: 127.0.0.1 | UA: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:145.0) Gecko/20100101 Firefox/145.0
+2025-12-04 17:53:30 | INFO | <- OPTIONS /api/workspace/projects | 200 | 0.005s | IP: 127.0.0.1
+2025-12-04 17:53:30 | INFO | <- OPTIONS /api/users/me | 200 | 0.007s | IP: 127.0.0.1
+2025-12-04 17:53:30 | INFO | -> GET /api/users/me | IP: 127.0.0.1 | UA: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:145.0) Gecko/20100101 Firefox/145.0
+2025-12-04 17:53:30 | INFO | <- GET /api/colors | 200 | 0.066s | IP: 127.0.0.1
+2025-12-04 17:53:30 | INFO | -> GET /api/workspace/projects | IP: 127.0.0.1 | UA: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:145.0) Gecko/20100101 Firefox/145.0
+2025-12-04 17:53:30 | INFO | -> GET /api/users/me | IP: 127.0.0.1 | UA: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:145.0) Gecko/20100101 Firefox/145.0
+2025-12-04 17:53:30 | INFO | <- GET /api/colors | 200 | 0.182s | IP: 127.0.0.1
+2025-12-04 17:53:30 | INFO | <- GET /api/workspace/projects | 200 | 0.075s | IP: 127.0.0.1
+2025-12-04 17:53:30 | INFO | <- GET /api/users/me | 200 | 0.034s | IP: 127.0.0.1
+2025-12-04 17:53:30 | INFO | <- GET /api/workspace/projects | 200 | 0.044s | IP: 127.0.0.1
+2025-12-04 17:53:30 | INFO | <- GET /api/users/me | 200 | 0.117s | IP: 127.0.0.1
+2025-12-04 17:53:30 | INFO | <- GET /api/workspace/projects | 200 | 0.168s | IP: 127.0.0.1
+2025-12-04 17:53:39 | INFO | -> OPTIONS /api/tasks/20/details | IP: 127.0.0.1 | UA: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:145.0) Gecko/20100101 Firefox/145.0
+2025-12-04 17:53:39 | INFO | <- OPTIONS /api/tasks/20/details | 200 | 0.002s | IP: 127.0.0.1
+2025-12-04 17:53:39 | INFO | -> OPTIONS /api/workspace/members | IP: 127.0.0.1 | UA: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:145.0) Gecko/20100101 Firefox/145.0
+2025-12-04 17:53:39 | INFO | -> OPTIONS /api/workspace/labels | IP: 127.0.0.1 | UA: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:145.0) Gecko/20100101 Firefox/145.0
+2025-12-04 17:53:39 | INFO | -> GET /api/tasks/20/details | IP: 127.0.0.1 | UA: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:145.0) Gecko/20100101 Firefox/145.0
+2025-12-04 17:53:39 | INFO | <- OPTIONS /api/workspace/members | 200 | 0.004s | IP: 127.0.0.1
+2025-12-04 17:53:39 | INFO | <- OPTIONS /api/workspace/labels | 200 | 0.005s | IP: 127.0.0.1
+2025-12-04 17:53:39 | INFO | -> GET /api/workspace/members | IP: 127.0.0.1 | UA: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:145.0) Gecko/20100101 Firefox/145.0
+2025-12-04 17:53:39 | INFO | -> GET /api/workspace/labels | IP: 127.0.0.1 | UA: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:145.0) Gecko/20100101 Firefox/145.0
+2025-12-04 17:53:39 | INFO | <- GET /api/workspace/labels | 200 | 0.038s | IP: 127.0.0.1
+2025-12-04 17:53:39 | INFO | <- GET /api/workspace/members | 200 | 0.048s | IP: 127.0.0.1
+2025-12-04 17:53:39 | INFO | <- GET /api/tasks/20/details | 200 | 0.058s | IP: 127.0.0.1
+2025-12-04 17:53:53 | INFO | -> OPTIONS /api/tasks/12/details | IP: 127.0.0.1 | UA: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:145.0) Gecko/20100101 Firefox/145.0
+2025-12-04 17:53:53 | INFO | <- OPTIONS /api/tasks/12/details | 200 | 0.001s | IP: 127.0.0.1
+2025-12-04 17:53:53 | INFO | -> GET /api/workspace/members | IP: 127.0.0.1 | UA: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:145.0) Gecko/20100101 Firefox/145.0
+2025-12-04 17:53:53 | INFO | -> GET /api/tasks/12/details | IP: 127.0.0.1 | UA: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:145.0) Gecko/20100101 Firefox/145.0
+2025-12-04 17:53:53 | INFO | -> GET /api/workspace/labels | IP: 127.0.0.1 | UA: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:145.0) Gecko/20100101 Firefox/145.0
+2025-12-04 17:53:53 | INFO | <- GET /api/workspace/members | 200 | 0.081s | IP: 127.0.0.1
+2025-12-04 17:53:53 | INFO | <- GET /api/workspace/labels | 200 | 0.083s | IP: 127.0.0.1
+2025-12-04 17:53:53 | INFO | <- GET /api/tasks/12/details | 200 | 0.086s | IP: 127.0.0.1
+2025-12-04 17:53:56 | INFO | -> OPTIONS /api/tasks/19/details | IP: 127.0.0.1 | UA: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:145.0) Gecko/20100101 Firefox/145.0
+2025-12-04 17:53:56 | INFO | <- OPTIONS /api/tasks/19/details | 200 | 0.001s | IP: 127.0.0.1
+2025-12-04 17:53:56 | INFO | -> GET /api/workspace/labels | IP: 127.0.0.1 | UA: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:145.0) Gecko/20100101 Firefox/145.0
+2025-12-04 17:53:56 | INFO | -> GET /api/workspace/members | IP: 127.0.0.1 | UA: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:145.0) Gecko/20100101 Firefox/145.0
+2025-12-04 17:53:56 | INFO | -> GET /api/tasks/19/details | IP: 127.0.0.1 | UA: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:145.0) Gecko/20100101 Firefox/145.0
+2025-12-04 17:53:56 | INFO | <- GET /api/workspace/labels | 200 | 0.026s | IP: 127.0.0.1
+2025-12-04 17:53:56 | INFO | <- GET /api/workspace/members | 200 | 0.029s | IP: 127.0.0.1
+2025-12-04 17:53:56 | INFO | <- GET /api/tasks/19/details | 200 | 0.031s | IP: 127.0.0.1
+2025-12-04 17:54:01 | INFO | -> OPTIONS /api/tasks/18/details | IP: 127.0.0.1 | UA: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:145.0) Gecko/20100101 Firefox/145.0
+2025-12-04 17:54:01 | INFO | <- OPTIONS /api/tasks/18/details | 200 | 0.001s | IP: 127.0.0.1
+2025-12-04 17:54:01 | INFO | -> GET /api/workspace/members | IP: 127.0.0.1 | UA: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:145.0) Gecko/20100101 Firefox/145.0
+2025-12-04 17:54:01 | INFO | -> GET /api/workspace/labels | IP: 127.0.0.1 | UA: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:145.0) Gecko/20100101 Firefox/145.0
+2025-12-04 17:54:01 | INFO | -> GET /api/tasks/18/details | IP: 127.0.0.1 | UA: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:145.0) Gecko/20100101 Firefox/145.0
+2025-12-04 17:54:01 | INFO | <- GET /api/workspace/members | 200 | 0.025s | IP: 127.0.0.1
+2025-12-04 17:54:01 | INFO | <- GET /api/workspace/labels | 200 | 0.027s | IP: 127.0.0.1
+2025-12-04 17:54:01 | INFO | <- GET /api/tasks/18/details | 200 | 0.027s | IP: 127.0.0.1
+2025-12-04 17:54:02 | INFO | -> OPTIONS /api/tasks/17/details | IP: 127.0.0.1 | UA: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:145.0) Gecko/20100101 Firefox/145.0
+2025-12-04 17:54:02 | INFO | -> GET /api/workspace/members | IP: 127.0.0.1 | UA: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:145.0) Gecko/20100101 Firefox/145.0
+2025-12-04 17:54:02 | INFO | -> GET /api/workspace/labels | IP: 127.0.0.1 | UA: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:145.0) Gecko/20100101 Firefox/145.0
+2025-12-04 17:54:02 | INFO | <- OPTIONS /api/tasks/17/details | 200 | 0.003s | IP: 127.0.0.1
+2025-12-04 17:54:02 | INFO | -> GET /api/tasks/17/details | IP: 127.0.0.1 | UA: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:145.0) Gecko/20100101 Firefox/145.0
+2025-12-04 17:54:02 | INFO | <- GET /api/workspace/labels | 200 | 0.021s | IP: 127.0.0.1
+2025-12-04 17:54:02 | INFO | <- GET /api/workspace/members | 200 | 0.027s | IP: 127.0.0.1
+2025-12-04 17:54:02 | INFO | <- GET /api/tasks/17/details | 200 | 0.028s | IP: 127.0.0.1
+2025-12-04 17:54:06 | INFO | -> GET /api/workspace/members | IP: 127.0.0.1 | UA: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:145.0) Gecko/20100101 Firefox/145.0
+2025-12-04 17:54:06 | INFO | -> OPTIONS /api/tasks/16/details | IP: 127.0.0.1 | UA: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:145.0) Gecko/20100101 Firefox/145.0
+2025-12-04 17:54:06 | INFO | -> GET /api/workspace/labels | IP: 127.0.0.1 | UA: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:145.0) Gecko/20100101 Firefox/145.0
+2025-12-04 17:54:06 | INFO | <- OPTIONS /api/tasks/16/details | 200 | 0.003s | IP: 127.0.0.1
+2025-12-04 17:54:06 | INFO | -> GET /api/tasks/16/details | IP: 127.0.0.1 | UA: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:145.0) Gecko/20100101 Firefox/145.0
+2025-12-04 17:54:06 | INFO | <- GET /api/workspace/members | 200 | 0.028s | IP: 127.0.0.1
+2025-12-04 17:54:06 | INFO | <- GET /api/workspace/labels | 200 | 0.026s | IP: 127.0.0.1
+2025-12-04 17:54:06 | INFO | <- GET /api/tasks/16/details | 200 | 0.026s | IP: 127.0.0.1
+2025-12-04 17:54:36 | INFO | -> GET /api/tasks/16/details | IP: 127.0.0.1 | UA: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:145.0) Gecko/20100101 Firefox/145.0
+2025-12-04 17:54:36 | INFO | -> GET /api/workspace/members | IP: 127.0.0.1 | UA: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:145.0) Gecko/20100101 Firefox/145.0
+2025-12-04 17:54:36 | INFO | -> GET /api/workspace/labels | IP: 127.0.0.1 | UA: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:145.0) Gecko/20100101 Firefox/145.0
+2025-12-04 17:54:36 | INFO | <- GET /api/workspace/members | 200 | 0.03s | IP: 127.0.0.1
+2025-12-04 17:54:36 | INFO | <- GET /api/workspace/labels | 200 | 0.027s | IP: 127.0.0.1
+2025-12-04 17:54:36 | INFO | <- GET /api/tasks/16/details | 200 | 0.035s | IP: 127.0.0.1
+2025-12-04 17:56:33 | INFO | -> OPTIONS /api/workspace/labels | IP: 127.0.0.1 | UA: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:145.0) Gecko/20100101 Firefox/145.0
+2025-12-04 17:56:33 | INFO | <- OPTIONS /api/workspace/labels | 200 | 0.001s | IP: 127.0.0.1
+2025-12-04 17:56:33 | INFO | -> POST /api/workspace/labels | IP: 127.0.0.1 | UA: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:145.0) Gecko/20100101 Firefox/145.0
+2025-12-04 17:56:33 | INFO | <- POST /api/workspace/labels | 200 | 0.107s | IP: 127.0.0.1
+2025-12-04 17:56:33 | INFO | -> OPTIONS /api/tasks/16 | IP: 127.0.0.1 | UA: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:145.0) Gecko/20100101 Firefox/145.0
+2025-12-04 17:56:33 | INFO | <- OPTIONS /api/tasks/16 | 200 | 0.001s | IP: 127.0.0.1
+2025-12-04 17:56:33 | INFO | -> PUT /api/tasks/16 | IP: 127.0.0.1 | UA: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:145.0) Gecko/20100101 Firefox/145.0
+2025-12-04 17:56:33 | INFO | <- PUT /api/tasks/16 | 200 | 0.078s | IP: 127.0.0.1
+2025-12-04 17:56:35 | INFO | -> PUT /api/tasks/16 | IP: 127.0.0.1 | UA: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:145.0) Gecko/20100101 Firefox/145.0
+2025-12-04 17:56:35 | INFO | <- PUT /api/tasks/16 | 200 | 0.026s | IP: 127.0.0.1
+2025-12-04 17:56:35 | INFO | -> PUT /api/tasks/16 | IP: 127.0.0.1 | UA: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:145.0) Gecko/20100101 Firefox/145.0
+2025-12-04 17:56:35 | INFO | <- PUT /api/tasks/16 | 200 | 0.028s | IP: 127.0.0.1
+2025-12-04 17:56:40 | INFO | -> POST /api/workspace/labels | IP: 127.0.0.1 | UA: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:145.0) Gecko/20100101 Firefox/145.0
+2025-12-04 17:56:40 | INFO | <- POST /api/workspace/labels | 200 | 0.018s | IP: 127.0.0.1
+2025-12-04 17:56:40 | INFO | -> PUT /api/tasks/16 | IP: 127.0.0.1 | UA: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:145.0) Gecko/20100101 Firefox/145.0
+2025-12-04 17:56:40 | INFO | <- PUT /api/tasks/16 | 200 | 0.025s | IP: 127.0.0.1
+2025-12-04 17:56:44 | INFO | -> GET /api/boards/12/columns | IP: 127.0.0.1 | UA: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:145.0) Gecko/20100101 Firefox/145.0
+2025-12-04 17:56:44 | INFO | -> GET /api/workspace/me | IP: 127.0.0.1 | UA: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:145.0) Gecko/20100101 Firefox/145.0
+2025-12-04 17:56:44 | INFO | -> GET /api/workspaces/my | IP: 127.0.0.1 | UA: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:145.0) Gecko/20100101 Firefox/145.0
+2025-12-04 17:56:44 | INFO | -> GET /api/users/me | IP: 127.0.0.1 | UA: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:145.0) Gecko/20100101 Firefox/145.0
+2025-12-04 17:56:44 | INFO | <- GET /api/users/me | 200 | 0.021s | IP: 127.0.0.1
+2025-12-04 17:56:44 | INFO | <- GET /api/workspace/me | 200 | 0.053s | IP: 127.0.0.1
+2025-12-04 17:56:44 | INFO | <- GET /api/workspaces/my | 200 | 0.053s | IP: 127.0.0.1
+2025-12-04 17:56:44 | INFO | -> GET /api/workspaces/my | IP: 127.0.0.1 | UA: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:145.0) Gecko/20100101 Firefox/145.0
+2025-12-04 17:56:44 | INFO | -> GET /api/workspace/me | IP: 127.0.0.1 | UA: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:145.0) Gecko/20100101 Firefox/145.0
+2025-12-04 17:56:44 | INFO | <- GET /api/boards/12/columns | 200 | 0.068s | IP: 127.0.0.1
+2025-12-04 17:56:44 | INFO | -> GET /api/boards/12/columns | IP: 127.0.0.1 | UA: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:145.0) Gecko/20100101 Firefox/145.0
+2025-12-04 17:56:44 | INFO | -> GET /api/users/me | IP: 127.0.0.1 | UA: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:145.0) Gecko/20100101 Firefox/145.0
+2025-12-04 17:56:44 | INFO | <- GET /api/workspaces/my | 200 | 0.05s | IP: 127.0.0.1
+2025-12-04 17:56:44 | INFO | <- GET /api/workspace/me | 200 | 0.056s | IP: 127.0.0.1
+2025-12-04 17:56:44 | INFO | <- GET /api/users/me | 200 | 0.033s | IP: 127.0.0.1
+2025-12-04 17:56:44 | INFO | <- GET /api/boards/12/columns | 200 | 0.063s | IP: 127.0.0.1
+2025-12-04 17:56:44 | INFO | -> GET /static/avatars/avatar_19fe9b58.jpg | IP: 127.0.0.1 | UA: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:145.0) Gecko/20100101 Firefox/145.0
+2025-12-04 17:56:44 | INFO | -> GET /api/colors | IP: 127.0.0.1 | UA: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:145.0) Gecko/20100101 Firefox/145.0
+2025-12-04 17:56:44 | INFO | <- GET /static/avatars/avatar_19fe9b58.jpg | 200 | 0.005s | IP: 127.0.0.1
+2025-12-04 17:56:44 | INFO | -> GET /api/colors | IP: 127.0.0.1 | UA: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:145.0) Gecko/20100101 Firefox/145.0
+2025-12-04 17:56:44 | INFO | -> GET /api/colors | IP: 127.0.0.1 | UA: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:145.0) Gecko/20100101 Firefox/145.0
+2025-12-04 17:56:44 | INFO | -> GET /api/workspace/projects | IP: 127.0.0.1 | UA: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:145.0) Gecko/20100101 Firefox/145.0
+2025-12-04 17:56:44 | INFO | -> GET /api/colors | IP: 127.0.0.1 | UA: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:145.0) Gecko/20100101 Firefox/145.0
+2025-12-04 17:56:44 | INFO | -> GET /api/colors | IP: 127.0.0.1 | UA: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:145.0) Gecko/20100101 Firefox/145.0
+2025-12-04 17:56:44 | INFO | <- GET /api/colors | 200 | 0.062s | IP: 127.0.0.1
+2025-12-04 17:56:44 | INFO | -> GET /api/workspace/projects | IP: 127.0.0.1 | UA: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:145.0) Gecko/20100101 Firefox/145.0
+2025-12-04 17:56:44 | INFO | <- GET /api/colors | 200 | 0.084s | IP: 127.0.0.1
+2025-12-04 17:56:44 | INFO | <- GET /api/colors | 200 | 0.089s | IP: 127.0.0.1
+2025-12-04 17:56:44 | INFO | -> GET /api/users/me | IP: 127.0.0.1 | UA: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:145.0) Gecko/20100101 Firefox/145.0
+2025-12-04 17:56:44 | INFO | -> GET /api/colors | IP: 127.0.0.1 | UA: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:145.0) Gecko/20100101 Firefox/145.0
+2025-12-04 17:56:45 | INFO | <- GET /api/colors | 200 | 0.092s | IP: 127.0.0.1
+2025-12-04 17:56:45 | INFO | <- GET /api/colors | 200 | 0.097s | IP: 127.0.0.1
+2025-12-04 17:56:45 | INFO | -> GET /api/colors | IP: 127.0.0.1 | UA: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:145.0) Gecko/20100101 Firefox/145.0
+2025-12-04 17:56:45 | INFO | -> GET /api/users/me | IP: 127.0.0.1 | UA: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:145.0) Gecko/20100101 Firefox/145.0
+2025-12-04 17:56:45 | INFO | <- GET /api/workspace/projects | 200 | 0.114s | IP: 127.0.0.1
+2025-12-04 17:56:45 | INFO | -> GET /api/colors | IP: 127.0.0.1 | UA: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:145.0) Gecko/20100101 Firefox/145.0
+2025-12-04 17:56:45 | INFO | <- GET /api/users/me | 200 | 0.054s | IP: 127.0.0.1
+2025-12-04 17:56:45 | INFO | -> GET /api/colors | IP: 127.0.0.1 | UA: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:145.0) Gecko/20100101 Firefox/145.0
+2025-12-04 17:56:45 | INFO | <- GET /api/colors | 200 | 0.078s | IP: 127.0.0.1
+2025-12-04 17:56:45 | INFO | <- GET /api/users/me | 200 | 0.056s | IP: 127.0.0.1
+2025-12-04 17:56:45 | INFO | <- GET /api/workspace/projects | 200 | 0.118s | IP: 127.0.0.1
+2025-12-04 17:56:45 | INFO | -> GET /api/colors | IP: 127.0.0.1 | UA: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:145.0) Gecko/20100101 Firefox/145.0
+2025-12-04 17:56:45 | INFO | -> GET /api/colors | IP: 127.0.0.1 | UA: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:145.0) Gecko/20100101 Firefox/145.0
+2025-12-04 17:56:45 | INFO | -> GET /api/colors | IP: 127.0.0.1 | UA: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:145.0) Gecko/20100101 Firefox/145.0
+2025-12-04 17:56:45 | INFO | <- GET /api/colors | 200 | 0.058s | IP: 127.0.0.1
+2025-12-04 17:56:45 | INFO | <- GET /api/colors | 200 | 0.066s | IP: 127.0.0.1
+2025-12-04 17:56:45 | INFO | <- GET /api/colors | 200 | 0.046s | IP: 127.0.0.1
+2025-12-04 17:56:45 | INFO | <- GET /api/colors | 200 | 0.053s | IP: 127.0.0.1
+2025-12-04 17:56:45 | INFO | <- GET /api/colors | 200 | 0.055s | IP: 127.0.0.1
+2025-12-04 17:56:45 | INFO | <- GET /api/colors | 200 | 0.168s | IP: 127.0.0.1
+2025-12-04 17:56:46 | INFO | -> GET /api/tasks/16/details | IP: 127.0.0.1 | UA: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:145.0) Gecko/20100101 Firefox/145.0
+2025-12-04 17:56:46 | INFO | -> GET /api/workspace/members | IP: 127.0.0.1 | UA: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:145.0) Gecko/20100101 Firefox/145.0
+2025-12-04 17:56:46 | INFO | -> GET /api/workspace/labels | IP: 127.0.0.1 | UA: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:145.0) Gecko/20100101 Firefox/145.0
+2025-12-04 17:56:46 | INFO | <- GET /api/workspace/labels | 200 | 0.037s | IP: 127.0.0.1
+2025-12-04 17:56:46 | INFO | <- GET /api/workspace/members | 200 | 0.048s | IP: 127.0.0.1
+2025-12-04 17:56:46 | INFO | <- GET /api/tasks/16/details | 200 | 0.055s | IP: 127.0.0.1
+2025-12-04 17:56:52 | INFO | -> GET /api/workspace/labels | IP: 127.0.0.1 | UA: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:145.0) Gecko/20100101 Firefox/145.0
+2025-12-04 17:56:52 | INFO | -> GET /api/workspace/members | IP: 127.0.0.1 | UA: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:145.0) Gecko/20100101 Firefox/145.0
+2025-12-04 17:56:52 | INFO | -> GET /api/tasks/20/details | IP: 127.0.0.1 | UA: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:145.0) Gecko/20100101 Firefox/145.0
+2025-12-04 17:56:53 | INFO | <- GET /api/workspace/members | 200 | 0.197s | IP: 127.0.0.1
+2025-12-04 17:56:53 | INFO | <- GET /api/workspace/labels | 200 | 0.202s | IP: 127.0.0.1
+2025-12-04 17:56:58 | INFO | -> GET /api/workspace/members | IP: 127.0.0.1 | UA: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:145.0) Gecko/20100101 Firefox/145.0
+2025-12-04 17:56:58 | INFO | -> GET /api/workspace/labels | IP: 127.0.0.1 | UA: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:145.0) Gecko/20100101 Firefox/145.0
+2025-12-04 17:56:58 | INFO | -> OPTIONS /api/tasks/20/details | IP: 127.0.0.1 | UA: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:145.0) Gecko/20100101 Firefox/145.0
+2025-12-04 17:56:58 | INFO | <- OPTIONS /api/tasks/20/details | 200 | 0.003s | IP: 127.0.0.1
+2025-12-04 17:56:58 | INFO | -> GET /api/tasks/20/details | IP: 127.0.0.1 | UA: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:145.0) Gecko/20100101 Firefox/145.0
+2025-12-04 17:56:58 | INFO | <- GET /api/workspace/members | 200 | 0.103s | IP: 127.0.0.1
+2025-12-04 17:56:58 | INFO | <- GET /api/workspace/labels | 200 | 0.187s | IP: 127.0.0.1
+2025-12-04 17:57:40 | INFO | -> GET /api/boards/12/columns | IP: 127.0.0.1 | UA: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:145.0) Gecko/20100101 Firefox/145.0
+2025-12-04 17:57:40 | INFO | -> GET /api/boards/12/columns | IP: 127.0.0.1 | UA: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:145.0) Gecko/20100101 Firefox/145.0
+2025-12-04 18:00:20 | INFO | -> GET /api/users/me | IP: 127.0.0.1 | UA: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:145.0) Gecko/20100101 Firefox/145.0
+2025-12-04 18:00:20 | INFO | -> GET /api/workspace/me | IP: 127.0.0.1 | UA: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:145.0) Gecko/20100101 Firefox/145.0
+2025-12-04 18:00:20 | INFO | -> GET /api/workspaces/my | IP: 127.0.0.1 | UA: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:145.0) Gecko/20100101 Firefox/145.0
+2025-12-04 18:00:20 | INFO | -> GET /api/workspaces/my | IP: 127.0.0.1 | UA: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:145.0) Gecko/20100101 Firefox/145.0
+2025-12-04 18:00:20 | INFO | -> GET /api/workspace/me | IP: 127.0.0.1 | UA: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:145.0) Gecko/20100101 Firefox/145.0
+2025-12-04 18:00:20 | INFO | -> OPTIONS /api/boards/12/columns | IP: 127.0.0.1 | UA: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:145.0) Gecko/20100101 Firefox/145.0
+2025-12-04 18:00:20 | INFO | -> OPTIONS /api/boards/12/columns | IP: 127.0.0.1 | UA: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:145.0) Gecko/20100101 Firefox/145.0
+2025-12-04 18:00:20 | INFO | <- OPTIONS /api/boards/12/columns | 200 | 0.003s | IP: 127.0.0.1
+2025-12-04 18:00:20 | INFO | <- OPTIONS /api/boards/12/columns | 200 | 0.004s | IP: 127.0.0.1
+2025-12-04 18:00:20 | INFO | <- GET /api/users/me | 200 | 0.106s | IP: 127.0.0.1
+2025-12-04 18:00:20 | INFO | -> GET /api/boards/12/columns | IP: 127.0.0.1 | UA: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:145.0) Gecko/20100101 Firefox/145.0
+2025-12-04 18:00:20 | INFO | -> GET /api/boards/12/columns | IP: 127.0.0.1 | UA: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:145.0) Gecko/20100101 Firefox/145.0
+2025-12-04 18:00:20 | INFO | -> GET /api/users/me | IP: 127.0.0.1 | UA: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:145.0) Gecko/20100101 Firefox/145.0
+2025-12-04 18:00:20 | INFO | <- GET /api/workspace/me | 200 | 0.041s | IP: 127.0.0.1
+2025-12-04 18:00:20 | INFO | <- GET /api/workspaces/my | 200 | 0.144s | IP: 127.0.0.1
+2025-12-04 18:00:20 | INFO | <- GET /api/workspaces/my | 200 | 0.201s | IP: 127.0.0.1
+2025-12-04 18:00:20 | INFO | <- GET /api/users/me | 200 | 0.165s | IP: 127.0.0.1
+2025-12-04 18:00:20 | INFO | <- GET /api/workspace/me | 200 | 0.261s | IP: 127.0.0.1
+2025-12-04 18:00:23 | INFO | -> GET /api/users/me | IP: 127.0.0.1 | UA: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:145.0) Gecko/20100101 Firefox/145.0
+2025-12-04 18:00:23 | INFO | -> GET /api/workspace/me | IP: 127.0.0.1 | UA: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:145.0) Gecko/20100101 Firefox/145.0
+2025-12-04 18:00:23 | INFO | -> GET /api/workspaces/my | IP: 127.0.0.1 | UA: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:145.0) Gecko/20100101 Firefox/145.0
+2025-12-04 18:00:23 | INFO | -> GET /api/workspace/me | IP: 127.0.0.1 | UA: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:145.0) Gecko/20100101 Firefox/145.0
+2025-12-04 18:00:23 | INFO | -> GET /api/workspaces/my | IP: 127.0.0.1 | UA: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:145.0) Gecko/20100101 Firefox/145.0
+2025-12-04 18:00:23 | INFO | <- GET /api/users/me | 200 | 0.024s | IP: 127.0.0.1
+2025-12-04 18:00:23 | INFO | -> GET /api/users/me | IP: 127.0.0.1 | UA: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:145.0) Gecko/20100101 Firefox/145.0
+2025-12-04 18:00:23 | INFO | <- GET /api/workspace/me | 200 | 0.061s | IP: 127.0.0.1
+2025-12-04 18:00:23 | INFO | -> GET /static/avatars/avatar_19fe9b58.jpg | IP: 127.0.0.1 | UA: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:145.0) Gecko/20100101 Firefox/145.0
+2025-12-04 18:00:23 | INFO | <- GET /api/workspaces/my | 200 | 0.067s | IP: 127.0.0.1
+2025-12-04 18:00:23 | INFO | <- GET /api/users/me | 200 | 0.046s | IP: 127.0.0.1
+2025-12-04 18:00:23 | INFO | <- GET /api/workspaces/my | 200 | 0.08s | IP: 127.0.0.1
+2025-12-04 18:00:23 | INFO | <- GET /api/workspace/me | 200 | 0.086s | IP: 127.0.0.1
+2025-12-04 18:00:23 | INFO | <- GET /static/avatars/avatar_19fe9b58.jpg | 304 | 0.094s | IP: 127.0.0.1
+2025-12-04 18:00:24 | INFO | -> GET /api/workspace/projects | IP: 127.0.0.1 | UA: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:145.0) Gecko/20100101 Firefox/145.0
+2025-12-04 18:00:24 | INFO | -> GET /api/workspace/projects | IP: 127.0.0.1 | UA: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:145.0) Gecko/20100101 Firefox/145.0
+2025-12-04 18:00:24 | INFO | -> GET /api/workspace/projects | IP: 127.0.0.1 | UA: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:145.0) Gecko/20100101 Firefox/145.0
+2025-12-04 18:00:24 | INFO | -> GET /api/users/me | IP: 127.0.0.1 | UA: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:145.0) Gecko/20100101 Firefox/145.0
+2025-12-04 18:00:24 | INFO | -> GET /api/users/me | IP: 127.0.0.1 | UA: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:145.0) Gecko/20100101 Firefox/145.0
+2025-12-04 18:00:24 | INFO | -> GET /api/workspace/projects | IP: 127.0.0.1 | UA: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:145.0) Gecko/20100101 Firefox/145.0
+2025-12-04 18:00:24 | INFO | <- GET /api/users/me | 200 | 0.031s | IP: 127.0.0.1
+2025-12-04 18:00:24 | INFO | -> OPTIONS /api/users/me/tasks | IP: 127.0.0.1 | UA: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:145.0) Gecko/20100101 Firefox/145.0
+2025-12-04 18:00:24 | INFO | <- OPTIONS /api/users/me/tasks | 200 | 0.002s | IP: 127.0.0.1
+2025-12-04 18:00:24 | INFO | <- GET /api/users/me | 200 | 0.045s | IP: 127.0.0.1
+2025-12-04 18:00:24 | INFO | -> OPTIONS /api/users/me/tasks | IP: 127.0.0.1 | UA: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:145.0) Gecko/20100101 Firefox/145.0
+2025-12-04 18:00:24 | INFO | -> GET /api/users/me/tasks | IP: 127.0.0.1 | UA: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:145.0) Gecko/20100101 Firefox/145.0
+2025-12-04 18:00:24 | INFO | <- OPTIONS /api/users/me/tasks | 200 | 0.008s | IP: 127.0.0.1
+2025-12-04 18:00:24 | INFO | -> GET /api/users/me/tasks | IP: 127.0.0.1 | UA: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:145.0) Gecko/20100101 Firefox/145.0
+2025-12-04 18:00:24 | INFO | <- GET /api/workspace/projects | 200 | 0.105s | IP: 127.0.0.1
+2025-12-04 18:00:24 | INFO | <- GET /api/workspace/projects | 200 | 0.298s | IP: 127.0.0.1
+2025-12-04 18:00:24 | INFO | <- GET /api/workspace/projects | 200 | 0.297s | IP: 127.0.0.1
+2025-12-04 18:00:24 | INFO | <- GET /api/workspace/projects | 200 | 0.335s | IP: 127.0.0.1
+2025-12-04 18:00:25 | INFO | -> GET /api/workspace/projects | IP: 127.0.0.1 | UA: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:145.0) Gecko/20100101 Firefox/145.0
+2025-12-04 18:00:25 | INFO | -> GET /api/users/me | IP: 127.0.0.1 | UA: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:145.0) Gecko/20100101 Firefox/145.0
+2025-12-04 18:00:25 | INFO | -> GET /api/workspace/projects | IP: 127.0.0.1 | UA: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:145.0) Gecko/20100101 Firefox/145.0
+2025-12-04 18:00:25 | INFO | -> GET /api/users/me | IP: 127.0.0.1 | UA: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:145.0) Gecko/20100101 Firefox/145.0
+2025-12-04 18:00:25 | INFO | <- GET /api/users/me | 200 | 0.022s | IP: 127.0.0.1
+2025-12-04 18:00:25 | INFO | <- GET /api/users/me | 200 | 0.022s | IP: 127.0.0.1
+2025-12-04 18:00:25 | INFO | <- GET /api/workspace/projects | 200 | 0.046s | IP: 127.0.0.1
+2025-12-04 18:00:25 | INFO | <- GET /api/workspace/projects | 200 | 0.042s | IP: 127.0.0.1
+2025-12-04 18:00:27 | INFO | -> OPTIONS /api/boards/12/columns | IP: 127.0.0.1 | UA: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:145.0) Gecko/20100101 Firefox/145.0
+2025-12-04 18:00:27 | INFO | -> OPTIONS /api/boards/12/columns | IP: 127.0.0.1 | UA: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:145.0) Gecko/20100101 Firefox/145.0
+2025-12-04 18:00:27 | INFO | <- OPTIONS /api/boards/12/columns | 200 | 0.002s | IP: 127.0.0.1
+2025-12-04 18:00:27 | INFO | <- OPTIONS /api/boards/12/columns | 200 | 0.002s | IP: 127.0.0.1
+2025-12-04 18:00:27 | INFO | -> GET /api/boards/12/columns | IP: 127.0.0.1 | UA: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:145.0) Gecko/20100101 Firefox/145.0
+2025-12-04 18:00:27 | INFO | -> GET /api/boards/12/columns | IP: 127.0.0.1 | UA: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:145.0) Gecko/20100101 Firefox/145.0
+2025-12-04 18:00:35 | INFO | -> GET /api/workspace/projects | IP: 127.0.0.1 | UA: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:145.0) Gecko/20100101 Firefox/145.0
+2025-12-04 18:00:35 | INFO | -> GET /api/users/me | IP: 127.0.0.1 | UA: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:145.0) Gecko/20100101 Firefox/145.0
+2025-12-04 18:00:35 | INFO | -> GET /api/workspace/me | IP: 127.0.0.1 | UA: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:145.0) Gecko/20100101 Firefox/145.0
+2025-12-04 18:00:35 | INFO | -> GET /api/users/me | IP: 127.0.0.1 | UA: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:145.0) Gecko/20100101 Firefox/145.0
+2025-12-04 18:00:35 | INFO | -> GET /api/workspaces/my | IP: 127.0.0.1 | UA: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:145.0) Gecko/20100101 Firefox/145.0
+2025-12-04 18:00:35 | INFO | -> GET /api/workspaces/my | IP: 127.0.0.1 | UA: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:145.0) Gecko/20100101 Firefox/145.0
+2025-12-04 18:00:35 | INFO | -> GET /api/users/me | IP: 127.0.0.1 | UA: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:145.0) Gecko/20100101 Firefox/145.0
+2025-12-04 18:00:35 | INFO | -> GET /api/workspace/projects | IP: 127.0.0.1 | UA: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:145.0) Gecko/20100101 Firefox/145.0
+2025-12-04 18:00:35 | INFO | -> GET /api/workspace/me | IP: 127.0.0.1 | UA: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:145.0) Gecko/20100101 Firefox/145.0
+2025-12-04 18:00:35 | INFO | <- GET /api/users/me | 200 | 0.045s | IP: 127.0.0.1
+2025-12-04 18:00:35 | INFO | <- GET /api/users/me | 200 | 0.038s | IP: 127.0.0.1
+2025-12-04 18:00:35 | INFO | -> GET /api/users/me | IP: 127.0.0.1 | UA: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:145.0) Gecko/20100101 Firefox/145.0
+2025-12-04 18:00:35 | INFO | <- GET /api/users/me | 200 | 0.056s | IP: 127.0.0.1
+2025-12-04 18:00:35 | INFO | <- GET /api/workspace/projects | 200 | 0.105s | IP: 127.0.0.1
+2025-12-04 18:00:35 | INFO | <- GET /api/users/me | 200 | 0.04s | IP: 127.0.0.1
+2025-12-04 18:00:35 | INFO | <- GET /api/workspaces/my | 200 | 0.095s | IP: 127.0.0.1
+2025-12-04 18:00:35 | INFO | <- GET /api/workspace/me | 200 | 0.09s | IP: 127.0.0.1
+2025-12-04 18:00:35 | INFO | -> GET /api/workspace/projects | IP: 127.0.0.1 | UA: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:145.0) Gecko/20100101 Firefox/145.0
+2025-12-04 18:00:35 | INFO | -> GET /api/workspace/projects | IP: 127.0.0.1 | UA: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:145.0) Gecko/20100101 Firefox/145.0
+2025-12-04 18:00:35 | INFO | -> OPTIONS /api/users/me/tasks | IP: 127.0.0.1 | UA: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:145.0) Gecko/20100101 Firefox/145.0
+2025-12-04 18:00:35 | INFO | <- OPTIONS /api/users/me/tasks | 200 | 0.005s | IP: 127.0.0.1
+2025-12-04 18:00:35 | INFO | -> GET /api/users/me/tasks | IP: 127.0.0.1 | UA: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:145.0) Gecko/20100101 Firefox/145.0
+2025-12-04 18:00:35 | INFO | <- GET /api/workspace/projects | 200 | 0.055s | IP: 127.0.0.1
+2025-12-04 18:00:35 | INFO | <- GET /api/workspaces/my | 200 | 0.183s | IP: 127.0.0.1
+2025-12-04 18:00:35 | INFO | <- GET /api/workspace/me | 200 | 0.217s | IP: 127.0.0.1
+2025-12-04 18:00:35 | INFO | <- GET /api/workspace/projects | 200 | 0.199s | IP: 127.0.0.1
+2025-12-04 18:00:35 | INFO | <- GET /api/workspace/projects | 200 | 0.155s | IP: 127.0.0.1
+2025-12-04 18:00:36 | INFO | -> GET /api/workspace/projects | IP: 127.0.0.1 | UA: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:145.0) Gecko/20100101 Firefox/145.0
+2025-12-04 18:00:36 | INFO | -> GET /api/users/me | IP: 127.0.0.1 | UA: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:145.0) Gecko/20100101 Firefox/145.0
+2025-12-04 18:00:36 | INFO | -> GET /api/workspace/projects | IP: 127.0.0.1 | UA: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:145.0) Gecko/20100101 Firefox/145.0
+2025-12-04 18:00:36 | INFO | -> GET /api/users/me | IP: 127.0.0.1 | UA: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:145.0) Gecko/20100101 Firefox/145.0
+2025-12-04 18:00:36 | INFO | <- GET /api/users/me | 200 | 0.02s | IP: 127.0.0.1
+2025-12-04 18:00:36 | INFO | <- GET /api/users/me | 200 | 0.033s | IP: 127.0.0.1
+2025-12-04 18:00:36 | INFO | <- GET /api/workspace/projects | 200 | 0.041s | IP: 127.0.0.1
+2025-12-04 18:00:36 | INFO | <- GET /api/workspace/projects | 200 | 0.046s | IP: 127.0.0.1
+2025-12-04 18:00:46 | INFO | -> GET /api/workspace/projects | IP: 127.0.0.1 | UA: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:145.0) Gecko/20100101 Firefox/145.0
+2025-12-04 18:00:46 | INFO | -> GET /api/users/me | IP: 127.0.0.1 | UA: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:145.0) Gecko/20100101 Firefox/145.0
+2025-12-04 18:00:46 | INFO | -> GET /api/workspace/me | IP: 127.0.0.1 | UA: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:145.0) Gecko/20100101 Firefox/145.0
+2025-12-04 18:00:46 | INFO | -> GET /api/workspace/projects | IP: 127.0.0.1 | UA: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:145.0) Gecko/20100101 Firefox/145.0
+2025-12-04 18:00:46 | INFO | -> GET /api/workspaces/my | IP: 127.0.0.1 | UA: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:145.0) Gecko/20100101 Firefox/145.0
+2025-12-04 18:00:46 | INFO | -> GET /api/users/me | IP: 127.0.0.1 | UA: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:145.0) Gecko/20100101 Firefox/145.0
+2025-12-04 18:00:46 | INFO | -> GET /api/users/me | IP: 127.0.0.1 | UA: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:145.0) Gecko/20100101 Firefox/145.0
+2025-12-04 18:00:46 | INFO | -> GET /api/workspace/me | IP: 127.0.0.1 | UA: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:145.0) Gecko/20100101 Firefox/145.0
+2025-12-04 18:00:46 | INFO | -> GET /api/workspaces/my | IP: 127.0.0.1 | UA: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:145.0) Gecko/20100101 Firefox/145.0
+2025-12-04 18:00:46 | INFO | <- GET /api/users/me | 200 | 0.037s | IP: 127.0.0.1
+2025-12-04 18:00:46 | INFO | <- GET /api/users/me | 200 | 0.042s | IP: 127.0.0.1
+2025-12-04 18:00:46 | INFO | <- GET /api/users/me | 200 | 0.044s | IP: 127.0.0.1
+2025-12-04 18:00:46 | INFO | -> GET /api/users/me | IP: 127.0.0.1 | UA: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:145.0) Gecko/20100101 Firefox/145.0
+2025-12-04 18:00:46 | INFO | <- GET /api/workspace/projects | 200 | 0.09s | IP: 127.0.0.1
+2025-12-04 18:00:46 | INFO | <- GET /api/workspace/me | 200 | 0.082s | IP: 127.0.0.1
+2025-12-04 18:00:46 | INFO | <- GET /api/users/me | 200 | 0.029s | IP: 127.0.0.1
+2025-12-04 18:00:46 | INFO | <- GET /api/workspace/projects | 200 | 0.092s | IP: 127.0.0.1
+2025-12-04 18:00:46 | INFO | -> GET /api/workspace/projects | IP: 127.0.0.1 | UA: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:145.0) Gecko/20100101 Firefox/145.0
+2025-12-04 18:00:46 | INFO | -> GET /api/workspace/projects | IP: 127.0.0.1 | UA: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:145.0) Gecko/20100101 Firefox/145.0
+2025-12-04 18:00:46 | INFO | -> OPTIONS /api/users/me/tasks | IP: 127.0.0.1 | UA: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:145.0) Gecko/20100101 Firefox/145.0
+2025-12-04 18:00:46 | INFO | <- OPTIONS /api/users/me/tasks | 200 | 0.005s | IP: 127.0.0.1
+2025-12-04 18:00:46 | INFO | -> GET /api/users/me/tasks | IP: 127.0.0.1 | UA: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:145.0) Gecko/20100101 Firefox/145.0
+2025-12-04 18:00:46 | INFO | <- GET /api/workspace/projects | 200 | 0.059s | IP: 127.0.0.1
+2025-12-04 18:00:46 | INFO | <- GET /api/workspace/projects | 200 | 0.059s | IP: 127.0.0.1
+2025-12-04 18:00:46 | INFO | <- GET /api/workspaces/my | 200 | 0.181s | IP: 127.0.0.1
+2025-12-04 18:00:46 | INFO | <- GET /api/workspaces/my | 200 | 0.203s | IP: 127.0.0.1
+2025-12-04 18:00:46 | INFO | <- GET /api/workspace/me | 200 | 0.193s | IP: 127.0.0.1
+2025-12-04 18:00:46 | INFO | -> GET /api/workspace/projects | IP: 127.0.0.1 | UA: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:145.0) Gecko/20100101 Firefox/145.0
+2025-12-04 18:00:46 | INFO | -> GET /api/workspace/projects | IP: 127.0.0.1 | UA: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:145.0) Gecko/20100101 Firefox/145.0
+2025-12-04 18:00:46 | INFO | -> GET /api/users/me | IP: 127.0.0.1 | UA: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:145.0) Gecko/20100101 Firefox/145.0
+2025-12-04 18:00:46 | INFO | -> GET /api/users/me | IP: 127.0.0.1 | UA: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:145.0) Gecko/20100101 Firefox/145.0
+2025-12-04 18:00:46 | INFO | <- GET /api/users/me | 200 | 0.028s | IP: 127.0.0.1
+2025-12-04 18:00:46 | INFO | <- GET /api/users/me | 200 | 0.034s | IP: 127.0.0.1
+2025-12-04 18:00:46 | INFO | <- GET /api/workspace/projects | 200 | 0.054s | IP: 127.0.0.1
+2025-12-04 18:00:46 | INFO | <- GET /api/workspace/projects | 200 | 0.052s | IP: 127.0.0.1
+2025-12-04 18:00:51 | INFO | -> GET /api/users/me | IP: 127.0.0.1 | UA: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:145.0) Gecko/20100101 Firefox/145.0
+2025-12-04 18:00:51 | INFO | -> GET /api/workspace/me | IP: 127.0.0.1 | UA: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:145.0) Gecko/20100101 Firefox/145.0
+2025-12-04 18:00:51 | INFO | -> GET /api/workspaces/my | IP: 127.0.0.1 | UA: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:145.0) Gecko/20100101 Firefox/145.0
+2025-12-04 18:00:51 | INFO | -> GET /api/workspace/me | IP: 127.0.0.1 | UA: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:145.0) Gecko/20100101 Firefox/145.0
+2025-12-04 18:00:51 | INFO | -> GET /api/workspaces/my | IP: 127.0.0.1 | UA: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:145.0) Gecko/20100101 Firefox/145.0
+2025-12-04 18:00:51 | INFO | <- GET /api/users/me | 200 | 0.019s | IP: 127.0.0.1
+2025-12-04 18:00:51 | INFO | -> GET /api/users/me | IP: 127.0.0.1 | UA: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:145.0) Gecko/20100101 Firefox/145.0
+2025-12-04 18:00:51 | INFO | <- GET /api/workspace/me | 200 | 0.05s | IP: 127.0.0.1
+2025-12-04 18:00:51 | INFO | <- GET /api/workspaces/my | 200 | 0.057s | IP: 127.0.0.1
+2025-12-04 18:00:51 | INFO | <- GET /api/users/me | 200 | 0.038s | IP: 127.0.0.1
+2025-12-04 18:00:51 | INFO | <- GET /api/workspaces/my | 200 | 0.07s | IP: 127.0.0.1
+2025-12-04 18:00:51 | INFO | <- GET /api/workspace/me | 200 | 0.072s | IP: 127.0.0.1
+2025-12-04 18:00:52 | INFO | -> GET /api/workspace/projects | IP: 127.0.0.1 | UA: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:145.0) Gecko/20100101 Firefox/145.0
+2025-12-04 18:00:52 | INFO | -> GET /api/workspace/projects | IP: 127.0.0.1 | UA: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:145.0) Gecko/20100101 Firefox/145.0
+2025-12-04 18:00:52 | INFO | -> GET /api/workspace/projects | IP: 127.0.0.1 | UA: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:145.0) Gecko/20100101 Firefox/145.0
+2025-12-04 18:00:52 | INFO | -> GET /api/users/me | IP: 127.0.0.1 | UA: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:145.0) Gecko/20100101 Firefox/145.0
+2025-12-04 18:00:52 | INFO | -> GET /api/workspace/projects | IP: 127.0.0.1 | UA: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:145.0) Gecko/20100101 Firefox/145.0
+2025-12-04 18:00:52 | INFO | -> GET /api/users/me | IP: 127.0.0.1 | UA: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:145.0) Gecko/20100101 Firefox/145.0
+2025-12-04 18:00:52 | INFO | <- GET /api/users/me | 200 | 0.02s | IP: 127.0.0.1
+2025-12-04 18:00:52 | INFO | <- GET /api/users/me | 200 | 0.027s | IP: 127.0.0.1
+2025-12-04 18:00:52 | INFO | -> OPTIONS /api/users/me/tasks | IP: 127.0.0.1 | UA: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:145.0) Gecko/20100101 Firefox/145.0
+2025-12-04 18:00:52 | INFO | <- OPTIONS /api/users/me/tasks | 200 | 0.004s | IP: 127.0.0.1
+2025-12-04 18:00:52 | INFO | -> OPTIONS /api/users/me/tasks | IP: 127.0.0.1 | UA: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:145.0) Gecko/20100101 Firefox/145.0
+2025-12-04 18:00:52 | INFO | <- OPTIONS /api/users/me/tasks | 200 | 0.005s | IP: 127.0.0.1
+2025-12-04 18:00:52 | INFO | -> GET /api/users/me/tasks | IP: 127.0.0.1 | UA: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:145.0) Gecko/20100101 Firefox/145.0
+2025-12-04 18:00:52 | INFO | -> GET /api/users/me/tasks | IP: 127.0.0.1 | UA: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:145.0) Gecko/20100101 Firefox/145.0
+2025-12-04 18:00:52 | INFO | <- GET /api/workspace/projects | 200 | 0.05s | IP: 127.0.0.1
+2025-12-04 18:00:52 | INFO | <- GET /api/workspace/projects | 200 | 0.06s | IP: 127.0.0.1
+2025-12-04 18:00:52 | INFO | <- GET /api/workspace/projects | 200 | 0.076s | IP: 127.0.0.1
+2025-12-04 18:00:52 | INFO | <- GET /api/workspace/projects | 200 | 0.256s | IP: 127.0.0.1
+2025-12-04 18:00:52 | INFO | -> GET /api/workspace/projects | IP: 127.0.0.1 | UA: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:145.0) Gecko/20100101 Firefox/145.0
+2025-12-04 18:00:52 | INFO | -> GET /api/users/me | IP: 127.0.0.1 | UA: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:145.0) Gecko/20100101 Firefox/145.0
+2025-12-04 18:00:52 | INFO | -> GET /api/workspace/projects | IP: 127.0.0.1 | UA: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:145.0) Gecko/20100101 Firefox/145.0
+2025-12-04 18:00:52 | INFO | -> GET /api/users/me | IP: 127.0.0.1 | UA: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:145.0) Gecko/20100101 Firefox/145.0
+2025-12-04 18:00:52 | INFO | <- GET /api/users/me | 200 | 0.019s | IP: 127.0.0.1
+2025-12-04 18:00:52 | INFO | <- GET /api/users/me | 200 | 0.017s | IP: 127.0.0.1
+2025-12-04 18:00:52 | INFO | <- GET /api/workspace/projects | 200 | 0.035s | IP: 127.0.0.1
+2025-12-04 18:00:52 | INFO | <- GET /api/workspace/projects | 200 | 0.036s | IP: 127.0.0.1
+2025-12-04 18:00:54 | INFO | -> OPTIONS /api/boards/12/columns | IP: 127.0.0.1 | UA: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:145.0) Gecko/20100101 Firefox/145.0
+2025-12-04 18:00:54 | INFO | -> OPTIONS /api/boards/12/columns | IP: 127.0.0.1 | UA: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:145.0) Gecko/20100101 Firefox/145.0
+2025-12-04 18:00:54 | INFO | <- OPTIONS /api/boards/12/columns | 200 | 0.002s | IP: 127.0.0.1
+2025-12-04 18:00:54 | INFO | <- OPTIONS /api/boards/12/columns | 200 | 0.002s | IP: 127.0.0.1
+2025-12-04 18:00:54 | INFO | -> GET /api/boards/12/columns | IP: 127.0.0.1 | UA: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:145.0) Gecko/20100101 Firefox/145.0
+2025-12-04 18:00:54 | INFO | -> GET /api/boards/12/columns | IP: 127.0.0.1 | UA: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:145.0) Gecko/20100101 Firefox/145.0

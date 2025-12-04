@@ -432,6 +432,9 @@ export default function TaskModal({
   const createdAt = taskDetail?.createdAt || task?.createdAt || task?.created_at || null;
   const comments = taskDetail?.comments ?? [];
   const assigneeName = getAssigneeDisplayName(assignee);
+  const author = taskDetail?.author || null;
+  const authorName = getAssigneeDisplayName(author);
+  const projectName = taskDetail?.column?.project?.title || task?.projectName || "Без проекта";
 
   return (
     <>
@@ -470,7 +473,7 @@ export default function TaskModal({
               <div className="meta-separator">•</div>
 
               <span className="meta-project">
-                Проект: <strong>{task.projectName || "Без проекта"}</strong>
+                Проект: <strong>{projectName}</strong>
               </span>
 
               <div className="meta-separator">•</div>
@@ -478,6 +481,15 @@ export default function TaskModal({
               <span className="meta-board">
                 Колонка: <strong>{taskDetail?.column?.title || task.columnTitle || "Без колонки"}</strong>
               </span>
+
+              {author && (
+                <>
+                  <div className="meta-separator">•</div>
+                  <span className="meta-author">
+                    Автор: <strong>{authorName}</strong>
+                  </span>
+                </>
+              )}
             </div>
           </div>
 

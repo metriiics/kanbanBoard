@@ -55,6 +55,7 @@ export function normalizeTaskDetail(detail) {
     column: detail.column || null,
     labels: Array.isArray(detail.labels) ? detail.labels : [],
     assignee: detail.assignee || null,
+    author: detail.author || null,
     comments: Array.isArray(detail.comments) ? detail.comments : [],
   };
 }

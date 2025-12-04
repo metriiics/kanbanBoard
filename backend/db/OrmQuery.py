@@ -186,7 +186,7 @@ class OrmQuery:
     def get_task_with_relations(task_id: int):
 
         """
-        Возвращает задачу вместе с подгруженными relations (labels, assignee, column->board, comments->user),
+        Возвращает задачу вместе с подгруженными relations (labels, assignee, author, column->board, comments->user),
         чтобы работать с ними после закрытия сессии.
         """
 
@@ -196,7 +196,8 @@ class OrmQuery:
                 .options(
                     joinedload(Task.labels),
                     joinedload(Task.assignee),
-                    joinedload(Task.column).joinedload(Column.board),
+                    joinedload(Task.author),
+                    joinedload(Task.column).joinedload(Column.board).joinedload(Board.project),
                     joinedload(Task.comments).joinedload(Comment.user)
                 )
                 .filter(Task.id == task_id)
@@ -204,7 +205,7 @@ class OrmQuery:
             )
 
     @staticmethod
-    def create_task(title: str, column_id: int, assigned_to: int | None = None):
+    def create_task(title: str, column_id: int, assigned_to: int | None = None, created_by: int | None = None):
         """
         Создаёт задачу с минимальными полями (title, column_id).
         Возвращает объект Task или None, если колонка не найдена.
@@ -216,7 +217,8 @@ class OrmQuery:
             new_task = Task(
                 title=title,
                 column_id=column_id,
-                assigned_to=assigned_to
+                assigned_to=assigned_to,
+                created_by=created_by
             )
             session.add(new_task)
             session.commit()

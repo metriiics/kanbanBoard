@@ -65,6 +65,7 @@ class ColumnOut(BaseModel):
     id: int
     title: Optional[str] = None
     board_id: Optional[int] = None
+    project: Optional[ProjectInfo] = None
 
 class TaskCommentOut(BaseModel):
     id: int
@@ -83,6 +84,7 @@ class TaskDetailOut(BaseModel):
     column: Optional[ColumnOut] = None
     labels: List[LabelOut] = Field(default_factory=list)
     assignee: Optional[AssigneeOut] = None
+    author: Optional[AssigneeOut] = None
     comments: List[TaskCommentOut] = Field(default_factory=list)
 
 class TaskCreate(BaseModel):

@@ -17,7 +17,7 @@ def create_task_endpoint(payload: TaskCreate, current_user = Depends(get_current
     Создаёт новую задачу с минимальными полями при создании на доске.
     Сохраняется только title и column_id. Возвращает минимальные данные для карточки на доске.
     """
-    task = OrmQuery.create_task(title=payload.title, column_id=payload.column_id, assigned_to=None)
+    task = OrmQuery.create_task(title=payload.title, column_id=payload.column_id, assigned_to=None, created_by=current_user.id)
     if not task:
         raise HTTPException(status_code=404, detail="Column not found")
 
@@ -184,6 +184,7 @@ def get_task_details(task_id: int, current_user = Depends(get_current_user)):
     - column (id, title, board_id)
     - labels
     - assignee
+    - author (создатель задачи)
     - comments (с информацией о пользователе и времени)
     """
     task = OrmQuery.get_task_with_relations(task_id)
@@ -206,11 +207,32 @@ def get_task_details(task_id: int, current_user = Depends(get_current_user)):
             "email": getattr(a, "email", None),
         }
 
+    author = None
+    auth = getattr(task, "author", None)
+    if auth:
+        author = {
+            "id": auth.id,
+            "first_name": getattr(auth, "first_name", None),
+            "last_name": getattr(auth, "last_name", None),
+            "username": getattr(auth, "username", None),
+            "email": getattr(auth, "email", None),
+        }
+
     column = None
     col = getattr(task, "column", None)
     if col:
         board_id_val = getattr(col, "board_id", None) or (getattr(col, "board", None).id if getattr(col, "board", None) else None)
-        column = {"id": col.id, "title": getattr(col, "title", None), "board_id": board_id_val}
+        project_info = None
+        board = getattr(col, "board", None)
+        if board:
+            project = getattr(board, "project", None)
+            if project:
+                project_info = {
+                    "id": project.id,
+                    "title": getattr(project, "title", None),
+                    "workspaces_id": getattr(project, "workspaces_id", None)
+                }
+        column = {"id": col.id, "title": getattr(col, "title", None), "board_id": board_id_val, "project": project_info}
 
     comments = []
     for com in getattr(task, "comments", []) or []:
@@ -242,6 +264,7 @@ def get_task_details(task_id: int, current_user = Depends(get_current_user)):
         "column": column,
         "labels": labels,
         "assignee": assignee,
+        "author": author,
         "comments": comments
     }
 
@@ -278,11 +301,32 @@ def update_task(task_id: int, payload: TaskUpdate, current_user = Depends(get_cu
             "email": getattr(a, "email", None),
         }
 
+    author = None
+    auth = getattr(task, "author", None)
+    if auth:
+        author = {
+            "id": auth.id,
+            "first_name": getattr(auth, "first_name", None),
+            "last_name": getattr(auth, "last_name", None),
+            "username": getattr(auth, "username", None),
+            "email": getattr(auth, "email", None),
+        }
+
     column = None
     col = getattr(task, "column", None)
     if col:
         board_id_val = getattr(col, "board_id", None) or (getattr(col, "board", None).id if getattr(col, "board", None) else None)
-        column = {"id": col.id, "title": getattr(col, "title", None), "board_id": board_id_val}
+        project_info = None
+        board = getattr(col, "board", None)
+        if board:
+            project = getattr(board, "project", None)
+            if project:
+                project_info = {
+                    "id": project.id,
+                    "title": getattr(project, "title", None),
+                    "workspaces_id": getattr(project, "workspaces_id", None)
+                }
+        column = {"id": col.id, "title": getattr(col, "title", None), "board_id": board_id_val, "project": project_info}
 
     comments = []
     for com in getattr(task, "comments", []) or []:
@@ -303,6 +347,18 @@ def update_task(task_id: int, payload: TaskUpdate, current_user = Depends(get_cu
             "created_at": getattr(com, "created_at", None)
         })
 
+    # Получаем автора
+    author = None
+    auth = getattr(task, "author", None)
+    if auth:
+        author = {
+            "id": auth.id,
+            "first_name": getattr(auth, "first_name", None),
+            "last_name": getattr(auth, "last_name", None),
+            "username": getattr(auth, "username", None),
+            "email": getattr(auth, "email", None),
+        }
+
     return {
         "id": task.id,
         "title": getattr(task, "title", None),
@@ -314,6 +370,7 @@ def update_task(task_id: int, payload: TaskUpdate, current_user = Depends(get_cu
         "column": column,
         "labels": labels,
         "assignee": assignee,
+        "author": author,
         "comments": comments
     }
 
