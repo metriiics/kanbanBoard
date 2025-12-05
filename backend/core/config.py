@@ -12,6 +12,10 @@ class Settings(BaseSettings):
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 1440
     SALT: str
     FRONTEND_URL: str = "http://localhost:3000"
+    
+    # Ollama настройки
+    OLLAMA_BASE_URL: str = "http://localhost:11434"
+    OLLAMA_MODEL: str = "llama3.2"  # Дефолтная модель
 
     @property
     def DATABASE_URL(self) -> str:

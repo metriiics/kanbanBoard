@@ -1,5 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import '../css/AIAgentPanel.css';
+import { chatWithAI } from '../api/a_ai';
 
 const AIAgentPanel = ({ isOpen, onClose }) => {
   const [messages, setMessages] = useState([
@@ -45,20 +46,35 @@ const AIAgentPanel = ({ isOpen, onClose }) => {
     };
 
     setMessages((prev) => [...prev, userMessage]);
+    const messageText = inputValue.trim();
     setInputValue('');
     setIsTyping(true);
 
-    // Имитация ответа AI (здесь будет реальный API вызов)
-    setTimeout(() => {
+    try {
+      // Вызов реального API для получения ответа от AI
+      const response = await chatWithAI(messageText);
+      
       const aiMessage = {
         id: Date.now() + 1,
         type: 'ai',
-        content: 'Это демо-ответ AI агента. Здесь будет подключена реальная интеграция с AI.',
+        content: response.response,
         timestamp: new Date(),
       };
       setMessages((prev) => [...prev, aiMessage]);
+    } catch (error) {
+      console.error('Ошибка при получении ответа от AI:', error);
+      
+      // Показываем сообщение об ошибке пользователю
+      const errorMessage = {
+        id: Date.now() + 1,
+        type: 'ai',
+        content: error.response?.data?.detail || 'Произошла ошибка при обращении к AI. Проверьте, что Ollama запущена и доступна.',
+        timestamp: new Date(),
+      };
+      setMessages((prev) => [...prev, errorMessage]);
+    } finally {
       setIsTyping(false);
-    }, 1500);
+    }
   };
 
   const handleKeyPress = (e) => {

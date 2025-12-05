@@ -11,6 +11,7 @@ from api.endpoints import (
     invites,
     workspace_members,
     workspaces,
+    ai,
 )
 from fastapi.staticfiles import StaticFiles
 from db.database import Base, engine
@@ -31,6 +32,7 @@ app.include_router(colors_columns.router) # Подключение роутер�
 app.include_router(invites.router) # Подключение роутеров
 app.include_router(workspace_members.router) # Подключение роутеров
 app.include_router(workspaces.router) # Подключение роутеров
+app.include_router(ai.router) # Подключение роутера AI
 
 origins = ["http://localhost:3000"]
 
