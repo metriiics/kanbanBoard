@@ -16,7 +16,7 @@
    # или
    cp env.example .env
    ```
-2. (Опционально) отредактируйте `.env` — задайте свои пароли, `SECRET_KEY`, `SALT`, при необходимости укажите `OLLAMA_BASE_URL` и `FRONTEND_URL`.
+2. (Опционально) отредактируйте `.env` — задайте свои пароли, `SECRET_KEY`, `SALT`, при необходимости укажите `OLLAMA_BASE_URL` и `FRONTEND_URL`. Важно: значения `POSTGRES_*` и `DB_*` должны совпадать (например, `kanban/kanban_password`), иначе backend не сможет подключиться к базе.
 3. Соберите и запустите стек:
    ```bash
    docker compose up --build -d
@@ -28,7 +28,7 @@
 5. Приложение будет доступно на `http://localhost:8080`, API — по `http://localhost:8080/api`.
 
 ## Контейнеры
-- `kanban-frontend` — билд фронтенда + nginx (`deploy/nginx/default.conf`), проксирует `/api` и `/static` к backend.
+- `kanban-frontend` — билд фронтенда + nginx (`deploy/nginx/default.conf`), отдаёт React-статические файлы и проксирует только `/api` и `/static/avatars` к backend.
 - `kanban-backend` — FastAPI + Alembic. При старте автоматически применяет миграции (можно отключить `RUN_MIGRATIONS=false`).
 - `kanban-postgres` — база данных с постоянным volume `postgres_data`.
 - `kanban-ollama` — сервис для работы модуля `api/ai` (volume `ollama_data`). Можно удалить из `docker-compose.yml`, если AI не нужен.
@@ -36,6 +36,7 @@
 ## Полезные команды
 - Логи: `docker compose logs -f backend`, `docker compose logs -f frontend`.
 - Обновить фронт/бэкенд после изменения кода: `docker compose up --build backend frontend`.
+- Если меняете `REACT_APP_API_URL`, обязательно пересоберите фронтенд без кэша: `docker compose build --no-cache frontend`.
 - Остановить стек: `docker compose down`.
 - Сбросить данные БД: `docker compose down -v` (удалит volume `postgres_data`).
 

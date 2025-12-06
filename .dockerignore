@@ -14,7 +14,10 @@ frontend/node_modules
 frontend/build
 frontend/.env*
 backend/.env*
+backend/.env.docker
 .env
+docker-compose.yml
+README.md
 backend/env
 env/
 venv/
