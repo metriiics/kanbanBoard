@@ -16,6 +16,7 @@ from api.endpoints import (
 from fastapi.staticfiles import StaticFiles
 from db.database import Base, engine
 from db import dbstruct  # Импортируем все модели для создания таблиц
+from core.config import settings
 from core.logger import logger
 import time
 
@@ -34,7 +35,10 @@ app.include_router(workspace_members.router) # Подключение роуте
 app.include_router(workspaces.router) # Подключение роутеров
 app.include_router(ai.router) # Подключение роутера AI
 
-origins = ["http://localhost:3000"]
+raw_origins = [origin.strip() for origin in settings.FRONTEND_URL.split(",") if origin.strip()]
+if "http://localhost:3000" not in raw_origins:
+    raw_origins.append("http://localhost:3000")
+origins = raw_origins or ["http://localhost:3000"]
 
 app.add_middleware(
     CORSMiddleware,
